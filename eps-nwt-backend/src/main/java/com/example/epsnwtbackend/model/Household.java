@@ -1,9 +1,7 @@
-package model;
+package com.example.epsnwtbackend.model;
 
 
 import jakarta.persistence.*;
-
-import java.util.Set;
 
 @Entity
 @Table(name = "households")

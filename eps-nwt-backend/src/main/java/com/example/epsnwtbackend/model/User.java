@@ -1,4 +1,4 @@
-package model;
+package com.example.epsnwtbackend.model;
 
 import jakarta.persistence.*;
 

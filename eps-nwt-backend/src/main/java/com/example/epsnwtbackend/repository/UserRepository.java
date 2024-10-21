@@ -1,6 +1,6 @@
-package repository;
+package com.example.epsnwtbackend.repository;
 
-import model.User;
+import com.example.epsnwtbackend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
