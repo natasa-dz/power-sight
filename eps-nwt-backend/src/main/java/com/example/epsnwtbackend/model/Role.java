@@ -1,5 +1,14 @@
 package com.example.epsnwtbackend.model;
 
-public enum Role {
-    ADMIN, EMPLOYEE, CITIZEN, SUPERADMIN
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
+
+public enum Role implements GrantedAuthority {
+    ADMIN, EMPLOYEE, CITIZEN, SUPERADMIN;
+
+    @JsonIgnore
+    @Override
+    public String getAuthority() {
+        return this.name();
+    }
 }
