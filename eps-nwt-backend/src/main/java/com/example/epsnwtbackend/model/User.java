@@ -22,8 +22,42 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    public boolean isPasswordChanged() {
+        return passwordChanged;
+    }
+
+    public void setPasswordChanged(boolean passwordChanged) {
+        this.passwordChanged = passwordChanged;
+    }
+
+    @Column(nullable = false)
+    private boolean passwordChanged = false;
+
     public Long getId() {
         return id;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = false;
+
+    @Column(name = "activation_token")
+    private String activationToken;
+
+
+    public String getActivationToken() {
+        return activationToken;
+    }
+
+    public void setActivationToken(String activationToken) {
+        this.activationToken = activationToken;
     }
 
     public void setId(Long id) {
