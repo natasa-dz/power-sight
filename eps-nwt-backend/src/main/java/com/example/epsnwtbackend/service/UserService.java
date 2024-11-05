@@ -1,5 +1,7 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.dto.UserCredentials;
+import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
 import jakarta.annotation.PostConstruct;
@@ -11,6 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.epsnwtbackend.repository.UserRepository;
+
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -92,24 +97,64 @@ public class UserService implements UserDetailsService {
 
     }
 
-    //TODO: PROMENI U USERDTO, SOLVE PIC STORING LOGIC!
-    public User registerUser(User registrationDto){
-        // Create the user and save to database (initially inactive)
-        User user = new User();
-        user.setUsername(registrationDto.getUsername());
-        user.setPassword(bCryptPasswordEncoder.encode(registrationDto.getPassword()));
-        user.setActive(false); // User is not active by default
-
-        // Generate activation token
-        String token = UUID.randomUUID().toString();
-        user.setActivationToken(token);
-        userRepository.save(user);
-
-        // Send activation email
-        String activationLink = "http://your-domain.com/activate?token=" + token;
-        emailService.sendActivationEmail(user.getUsername(), activationLink);
-
-        return user;
+    public String getUserPhotoPath(Long userId) {
+        return userRepository.findUserPhotoPathById(userId);
     }
+
+    public Optional<UserDto> findUser(String email){
+        Optional<User> toFind = userRepository.findByUsername(email);
+        if(toFind.isPresent()){
+            return Optional.of(new UserDto(toFind.get()));
+        }
+        return Optional.empty();
+    }
+
+    private String generateSecret() {
+        return new GoogleAuthenticator().createCredentials().getKey();
+    }
+
+
+    public Optional<UserCredentials> register(UserDto dto) {
+
+        System.out.println(dto.getPassword());
+        //TODO: Add missing fields!!!!
+
+//        System.out.println(dto.getConfirmPassword());
+//
+//        if(!dto.getPassword().equals(dto.getConfirmPassword())){
+//            return Optional.empty();
+//        }
+        if(userRepository.findByUsername(dto.getUsername()).isPresent()){
+            return Optional.empty();
+        }
+
+        dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+
+        User user=new User(dto);
+
+        User saved = userRepository.save(user);
+        return Optional.of(new UserCredentials(saved));
+    }
+
+    public Optional<UserDto> logIn(UserCredentials credentials) {
+        Optional<User> u = userRepository.findByUsername(credentials.getEmail());
+        if ((u.isPresent()) && (u.get().getPassword().equals(credentials.getPassword()))){
+            return Optional.of(new UserDto(u.get()));
+        }
+        return Optional.empty();
+    }
+
+    public void saveActivationToken(String username, String activationToken) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+
+        user.setActivationToken(activationToken);
+
+        userRepository.save(user);
+    }
+
+
+
 
 }
