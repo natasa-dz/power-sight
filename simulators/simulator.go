@@ -36,6 +36,8 @@ func GetHourlyConsumption(hour int) float64 {
 	}
 }
 
+var lastSuccessfulMessageTime string
+
 func main() {
 	id := flag.String("id", "simulator", "Unique ID for the simulator instance")
 	municipalityInput := flag.String("municipality", "novisad", "Municipality name")
@@ -128,6 +130,9 @@ func sendAMQPMessage(ch *amqp.Channel, queue string, data map[string]interface{}
 	if err != nil {
 		log.Printf("Failed to publish message to %s: %v", queue, err)
 	} else {
+		if strings.HasPrefix(queue, "consumption") {
+			lastSuccessfulMessageTime = data["timestamp"].(string)
+		}
 		log.Printf("Message sent to %s queue", queue)
 	}
 }
