@@ -1,5 +1,6 @@
 package com.example.epsnwtbackend.controller;
 
+import com.example.epsnwtbackend.dto.ChangePasswordDto;
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
@@ -74,8 +75,6 @@ public class UserController {
     }
 
 
-    // TODO: login i register
-
     @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> logInProcess(@RequestBody UserCredentials credentials){
 
@@ -134,4 +133,14 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Logout successful."));
     }
 
+
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto dto) {
+        boolean isChanged = userService.changePassword(dto.getUsername(), dto.getOldPassword(), dto.getNewPassword());
+
+        if (isChanged) {
+            return ResponseEntity.ok("Password updated successfully");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password change failed");
+    }
 }

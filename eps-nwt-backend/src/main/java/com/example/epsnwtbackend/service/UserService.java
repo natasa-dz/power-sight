@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.epsnwtbackend.repository.UserRepository;
 
@@ -32,7 +33,8 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private EmailService emailService; // Your email service
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -82,9 +84,10 @@ public class UserService implements UserDetailsService {
         return (UserDetails) user;
     }
 
-
+    @PostConstruct
     private void createSuperAdminIfNotExists() {
-        if (userRepository.findByUsername("admin") == null) {
+
+        if (userRepository.findByUsername("admin").isEmpty()) {
             String randomPassword = generateRandomPassword();
             User superAdmin = new User();
             superAdmin.setPassword(bCryptPasswordEncoder.encode(randomPassword));
@@ -109,10 +112,26 @@ public class UserService implements UserDetailsService {
         return Optional.empty();
     }
 
+
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return false; // Old password is incorrect
+        }
+
+        // Set the new password and mark the password as changed
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChanged(true);
+        userRepository.save(user);  // Save the updated user to persist the changes
+
+        return true;
+    }
+
     private String generateSecret() {
         return new GoogleAuthenticator().createCredentials().getKey();
     }
-
 
     public Optional<UserCredentials> register(UserDto dto) {
 
@@ -150,11 +169,10 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
         user.setActivationToken(activationToken);
+        user.setActive(false);
 
         userRepository.save(user);
     }
-
-
 
 
 }
