@@ -19,8 +19,6 @@ const (
 )
 
 func GetHourlyConsumption(hour int) float64 {
-	//oko 500 kWh mesecno po domacinstvu
-	//to je 16.6 kwH dnevno tj oko 0.7 na sat u proseku
 	baseConsumption := 0.35
 	switch {
 	case hour >= 0 && hour < 6:
@@ -57,18 +55,40 @@ func main() {
 	}
 	defer ch.Close()
 
-	_, err = ch.QueueDeclare("heartbeat_queue_"+municipality, true, false, false, false, nil)
+	// Declare exchanges for heartbeat and consumption
+	err = ch.ExchangeDeclare("heartbeatExchange", "direct", true, false, false, false, nil)
+	if err != nil {
+		log.Fatalf("Failed to declare heartbeat exchange: %v", err)
+	}
+	err = ch.ExchangeDeclare("consumptionExchange", "direct", true, false, false, false, nil)
+	if err != nil {
+		log.Fatalf("Failed to declare consumption exchange: %v", err)
+	}
+
+	// Declare and bind the queues to their respective exchanges
+	heartbeatQueueName := "heartbeat_queue_" + municipality
+	consumptionQueueName := "consumption_queue_" + municipality
+
+	_, err = ch.QueueDeclare(heartbeatQueueName, true, false, false, false, nil)
 	if err != nil {
 		log.Fatalf("Failed to declare heartbeat queue: %v", err)
 	}
+	err = ch.QueueBind(heartbeatQueueName, heartbeatQueueName, "heartbeatExchange", false, nil)
+	if err != nil {
+		log.Fatalf("Failed to bind heartbeat queue: %v", err)
+	}
 
-	_, err = ch.QueueDeclare("consumption_queue_"+municipality, true, false, false, false, nil)
+	_, err = ch.QueueDeclare(consumptionQueueName, true, false, false, false, nil)
 	if err != nil {
 		log.Fatalf("Failed to declare consumption queue: %v", err)
 	}
+	err = ch.QueueBind(consumptionQueueName, consumptionQueueName, "consumptionExchange", false, nil)
+	if err != nil {
+		log.Fatalf("Failed to bind consumption queue: %v", err)
+	}
 
-	go sendHeartbeat(ch, *id, "heartbeat_queue_"+municipality)
-	go sendConsumptionData(ch, *id, "consumption_queue_"+municipality)
+	go sendHeartbeat(ch, *id, heartbeatQueueName)
+	go sendConsumptionData(ch, *id, consumptionQueueName)
 
 	select {}
 }
@@ -83,7 +103,7 @@ func sendHeartbeat(ch *amqp.Channel, id string, queue string) {
 			"id":        "simulator-" + id,
 			"timestamp": time.Now().Format(time.RFC3339),
 		}
-		sendAMQPMessage(ch, queue, message)
+		sendAMQPMessage(ch, "heartbeatExchange", queue, message)
 	}
 }
 
@@ -95,7 +115,7 @@ func sendConsumptionData(ch *amqp.Channel, id string, queue string) {
 		baseDate := time.Date(2024, time.November, 1, 0, 0, 0, 0, time.UTC)
 		now := time.Now().UTC()
 		timePassed := now.Sub(baseDate)
-		simulationHoursPassed := int(math.Round(timePassed.Minutes())) + 60 //srbija je +1 UTC i zato + 60
+		simulationHoursPassed := int(math.Round(timePassed.Minutes())) + 60
 		daysPassed := simulationHoursPassed / 24
 		hour := simulationHoursPassed % 24
 		date := baseDate.AddDate(0, 0, daysPassed)
@@ -106,11 +126,11 @@ func sendConsumptionData(ch *amqp.Channel, id string, queue string) {
 			"consumption": consumption,
 			"timestamp":   simulationTime.Format(time.RFC3339),
 		}
-		sendAMQPMessage(ch, queue, message)
+		sendAMQPMessage(ch, "consumptionExchange", queue, message)
 	}
 }
 
-func sendAMQPMessage(ch *amqp.Channel, queue string, data map[string]interface{}) {
+func sendAMQPMessage(ch *amqp.Channel, exchange, routingKey string, data map[string]interface{}) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		log.Printf("Error encoding JSON: %v", err)
@@ -118,8 +138,8 @@ func sendAMQPMessage(ch *amqp.Channel, queue string, data map[string]interface{}
 	}
 
 	err = ch.Publish(
-		"",
-		queue,
+		exchange,
+		routingKey,
 		false,
 		false,
 		amqp.Publishing{
@@ -128,11 +148,11 @@ func sendAMQPMessage(ch *amqp.Channel, queue string, data map[string]interface{}
 		},
 	)
 	if err != nil {
-		log.Printf("Failed to publish message to %s: %v", queue, err)
+		log.Printf("Failed to publish message to %s: %v", routingKey, err)
 	} else {
-		if strings.HasPrefix(queue, "consumption") {
+		if strings.HasPrefix(routingKey, "consumption") {
 			lastSuccessfulMessageTime = data["timestamp"].(string)
 		}
-		log.Printf("Message sent to %s queue", queue)
+		log.Printf("Message sent to %s via exchange %s", routingKey, exchange)
 	}
 }

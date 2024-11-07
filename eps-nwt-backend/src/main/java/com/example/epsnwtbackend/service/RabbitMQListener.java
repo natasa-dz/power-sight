@@ -1,19 +1,19 @@
 package com.example.epsnwtbackend.service;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RabbitMQListener {
 
-    @RabbitListener(queues = "heartbeat_queue")
-    public void receiveHeartbeat(String message) {
-        System.out.println("Recieved heartbeat: " + message);
+    @RabbitListener(id = "heartbeatExchange", concurrency = "2")
+    public void recieveHeartbeat(Object message) {
+        System.out.println("Received heartbeat message: " + message);
     }
 
-
-    @RabbitListener(queues = "consumption_queue")
-    public void receiveConsumption(String message) {
-        System.out.println("Recieved consumption: " + message);
+    @RabbitListener(id = "consumptionExchange", concurrency = "2")
+    public void receiveConsumption(Object message) {
+        System.out.println("Received consumption: " + message);
     }
 }
