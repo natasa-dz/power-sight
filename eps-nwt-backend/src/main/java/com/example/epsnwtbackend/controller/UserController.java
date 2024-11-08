@@ -80,14 +80,15 @@ public class UserController {
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 credentials.getEmail(), credentials.getPassword()));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Optional<UserDto> dto = userDetailsService.findUser(credentials.getEmail());
-        UserDto userDto=dto.get();
 
+        System.out.println("Dto: "+dto.toString());
 
-        String jwt = tokenService.generateToken(credentials.getEmail(), dto.get().getRole());
+        String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole());
         int expiresIn = tokenService.getExpiredIn();
-        System.out.println(tokenService.generateToken(credentials.getEmail(), dto.get().getRole()));
+        //System.out.println(tokenService.generateToken(credentials.getEmail(), dto.get().getRole()));
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
     }
 

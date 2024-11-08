@@ -29,6 +29,20 @@ public class UserDto {
         this.activationToken = activationToken;
     }
 
+    @Override
+    public String toString() {
+        return "UserDto{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", role=" + role +
+                ", userPhoto='" + userPhoto + '\'' +
+                ", isActive=" + isActive +
+                ", password='" + password + '\'' +
+                ", activationToken='" + activationToken + '\'' +
+                ", passwordChanged=" + passwordChanged +
+                '}';
+    }
+
     // Constructor to initialize UserDto from User entity
     public UserDto(User user) {
         this.id = user.getId();

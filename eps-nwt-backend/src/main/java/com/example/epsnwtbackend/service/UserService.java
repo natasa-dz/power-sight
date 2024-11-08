@@ -85,25 +85,26 @@ public class UserService implements UserDetailsService {
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByUsername(username);
 
-        User user = userOptional.orElseThrow(() ->
-                new UsernameNotFoundException("User not found")
-        );
+        Optional<User> user = userRepository.findByUsername(username);
 
-        return (UserDetails) user;
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
+        } else {
+            return user.get();
+        }
     }
 
     @PostConstruct
     private void createSuperAdminIfNotExists() {
 
-        if (userRepository.findByUsername("admin").isEmpty()) {
+        if (userRepository.findByUsername("admin@gmail.com").isEmpty()) {
             String randomPassword = generateRandomPassword();
             User superAdmin = new User();
             superAdmin.setPassword(bCryptPasswordEncoder.encode(randomPassword));
             superAdmin.setRole(Role.SUPERADMIN);
             superAdmin.setActive(true);
-            superAdmin.setUsername("admin");
+            superAdmin.setUsername("admin@gmail.com");
             superAdmin.setPasswordChanged(false); // Set initial password change requirement
             userRepository.save(superAdmin);
             savePasswordToFile(randomPassword);
