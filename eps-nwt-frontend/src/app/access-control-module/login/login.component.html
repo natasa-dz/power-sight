@@ -2,18 +2,29 @@
   <div class="login-left">
     <h2>Welcome to Electro Power ⚡</h2>
     <p>Login to access your energy management dashboard</p>
-    <form>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
       <label for="email">Email</label>
-      <input type="email" id="email" name="email" placeholder="Enter your email">
+      <input type="email" id="email" formControlName="email" placeholder="Enter your email" aria-label="Email Address">
+      <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error">
+        Please enter a valid email.
+      </div>
+
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="Enter your password">
-      <button type="submit" class="btn btn-signin">Sign In</button>
+      <input type="password" id="password" formControlName="password" placeholder="Enter your password" aria-label="Password">
+      <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error">
+        Password is required.
+      </div>
+
+      <button type="submit" class="btn btn-signin" [disabled]="loginForm.invalid">Sign In</button>
     </form>
+
     <div class="highlight-box">
       <strong>Tip:</strong> Keep track of your energy consumption and bills seamlessly!
     </div>
-    <p>Don't have an account? <a routerLink = "/register" href="#">Sign Up Now</a></p>
+
+    <p>Don't have an account? <a routerLink="/register">Sign Up Now</a></p>
   </div>
+
   <div class="login-right">
     <div class="login-info">
       <h3>Why Login?</h3>

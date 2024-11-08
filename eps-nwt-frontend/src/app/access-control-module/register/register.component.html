@@ -2,25 +2,25 @@
   <div class="register-left">
     <h2>Create Your Account ⚡</h2>
     <p>Fill in the details to get started with your energy dashboard</p>
-    <form>
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
       <label for="username">Username</label>
-      <input type="text" id="username" name="username" placeholder="Enter your username">
+      <input type="text" id="username" formControlName="username" placeholder="Enter your username">
 
       <label for="email">Email</label>
-      <input type="email" id="email" name="email" placeholder="Enter your email">
+      <input type="email" id="email" formControlName="email" placeholder="Enter your email">
 
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="Enter your password">
+      <input type="password" id="password" formControlName="password" placeholder="Enter your password">
 
       <label for="profilePic">Profile Picture</label>
-      <input type="file" id="profilePic" name="profilePic" accept="image/*">
+      <input type="file" id="profilePic" (change)="onFileSelected($event)" accept="image/*">
 
-      <button type="submit" class="btn btn-register">Register</button>
+      <button type="submit" class="btn btn-register" [disabled]="registerForm.invalid">Register</button>
     </form>
     <div class="highlight-box">
       <strong>Note:</strong> Your email will be used for account activation. Please provide a valid address.
     </div>
-    <p>Already have an account? <a href="#">Sign In Now</a></p>
+    <p>Already have an account? <a routerLink="/login">Sign In Now</a></p>
   </div>
   <div class="register-right">
     <div class="register-info">
@@ -29,4 +29,14 @@
       <img src="assets/energy-insights.png" alt="Energy Insights Preview">
     </div>
   </div>
+
+  <!-- Activation Token Prompt -->
+  <div *ngIf="showActivationPrompt" class="activation-prompt">
+    <h3>Activate Your Account</h3>
+    <p>Please enter the activation token sent to your email:</p>
+    <label for="activationToken">Activation Token</label>
+    <input type="text" id="activationToken" [(ngModel)]="activationToken" placeholder="Enter activation token">
+    <button (click)="activateAccount()" class="btn btn-activate">Activate Account</button>
+  </div>
+
 </div>
