@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Input, Output } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Router} from "@angular/router";
 import {UserService} from "../../service/user.service";
@@ -12,15 +12,15 @@ import {ChangePasswordComponent} from "../../change-password/change-password.com
   styleUrls: ['./login.component.css']  // Make sure it's styleUrls (plural)
 })
 
-export class LoginComponent {
-  @Input() title: string = "";
-  @Input() primaryBtnText: string = "";
-  @Input() secondaryBtnText: string = "";
+export class LoginComponent implements OnInit {
+  @Input() title: string = "Login to Electro Power";
+  @Input() primaryBtnText: string = "Sign In";
+  @Input() secondaryBtnText: string = "Sign Up";
   @Input() disablePrimaryBtn: boolean = true;
   @Output() onSubmit = new EventEmitter();
-
   @Output("navigate") onNavigate = new EventEmitter();
-  loginForm: FormGroup;
+
+  loginForm!: FormGroup;
   currentUser: any;
 
   constructor(
@@ -29,17 +29,18 @@ export class LoginComponent {
     private userService: UserService,
     private router: Router,
     public dialog: MatDialog  // Inject MatDialog service
-
-  ) {
+  ) {}
+  ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
   }
 
-  submit() {
+  login() {
+
     if (this.loginForm.valid) {
-      this.onSubmit.emit();
+      //this.onSubmit.emit();
       const loginData = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password
