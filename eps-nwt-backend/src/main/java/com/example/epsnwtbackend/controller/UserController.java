@@ -78,7 +78,6 @@ public class UserController {
     @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> logInProcess(@RequestBody UserCredentials credentials){
 
-
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 credentials.getEmail(), credentials.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -106,7 +105,6 @@ public class UserController {
             String activationLink = "http://localhost:8080/api/auth/activate?token=" + activationToken;
             emailService.sendActivationEmail(dto.getUsername(), activationLink);
             return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
-
 
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

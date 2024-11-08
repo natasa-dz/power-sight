@@ -21,7 +21,7 @@ public class ActivationController {
         User user = userRepository.findByActivationToken(token);
         if (user != null && !user.isActive()) {
             user.setActive(true);
-            user.setActivationToken(null); // Clear the activation token
+            user.setActivationToken(null);
             userRepository.save(user);
             return ResponseEntity.ok("Account activated successfully!");
         } else {

@@ -19,6 +19,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
@@ -44,9 +45,13 @@ public class UserService implements UserDetailsService {
 
     @PostConstruct
     public void init() {
-        createSuperAdminIfNotExists();
+        try {
+            createSuperAdminIfNotExists();
+        } catch (Exception e) {
+            System.err.println("Error initializing UserService: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-
     //todo: STUDENT 1
     // 4.2 --> registration x login [activation link] --> image compression x resizing x async
     // save it to .txt, export filePath via app.prop or config,
@@ -65,10 +70,15 @@ public class UserService implements UserDetailsService {
 
     }
 
-    private void savePasswordToFile(String password){
+    private void savePasswordToFile(String password) {
+        try {
+            // Create directories if they don't exist
+            File file = new File(passwordFilePath);
+            file.getParentFile().mkdirs(); // Create the parent directories
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(passwordFilePath))) {
-            writer.write(password);
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(passwordFilePath))) {
+                writer.write(password);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,8 +102,9 @@ public class UserService implements UserDetailsService {
             User superAdmin = new User();
             superAdmin.setPassword(bCryptPasswordEncoder.encode(randomPassword));
             superAdmin.setRole(Role.SUPERADMIN);
+            superAdmin.setActive(true);
+            superAdmin.setUsername("admin");
             superAdmin.setPasswordChanged(false); // Set initial password change requirement
-
             userRepository.save(superAdmin);
             savePasswordToFile(randomPassword);
         }

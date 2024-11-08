@@ -24,8 +24,7 @@ public class User {
     private Role role;
 
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "user_photo" )  // Make it nullable if user photo is optional
     private String userPhoto;
 
     private String secret;
