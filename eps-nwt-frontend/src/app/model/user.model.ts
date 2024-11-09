@@ -25,8 +25,6 @@ export class User {
     isActive:boolean,
     userPhoto: string,
     activationToken: string
-
-
   ) {
 
     this.username = email;
