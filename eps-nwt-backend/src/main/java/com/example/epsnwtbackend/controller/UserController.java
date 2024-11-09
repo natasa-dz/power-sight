@@ -84,11 +84,8 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Optional<UserDto> dto = userDetailsService.findUser(credentials.getEmail());
 
-        System.out.println("Dto: "+dto.toString());
-
         String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole());
         int expiresIn = tokenService.getExpiredIn();
-        //System.out.println(tokenService.generateToken(credentials.getEmail(), dto.get().getRole()));
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
     }
 
@@ -135,7 +132,7 @@ public class UserController {
 
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto dto) {
-        boolean isChanged = userService.changePassword(dto.getUsername(), dto.getOldPassword(), dto.getNewPassword());
+        boolean isChanged = userService.changePassword(dto.getUsername(), dto.getConfirmPassword(), dto.getNewPassword());
 
         if (isChanged) {
             return ResponseEntity.ok("Password updated successfully");

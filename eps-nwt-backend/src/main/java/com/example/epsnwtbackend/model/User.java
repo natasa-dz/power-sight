@@ -34,7 +34,6 @@ public class User implements UserDetails {
     private String secret;
 
     //TODO: Kreiraj konstruktore do kraja!
-    // Default constructor
     public User() {
     }
 

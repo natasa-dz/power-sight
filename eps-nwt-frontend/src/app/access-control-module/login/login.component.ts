@@ -5,6 +5,7 @@ import {UserService} from "../../service/user.service";
 import {AuthService} from "../auth.service";
 import {MatDialog} from "@angular/material/dialog";
 import {ChangePasswordComponent} from "../../change-password/change-password.component";
+import {Role} from "../../model/user.model";
 
 @Component({
   selector: 'app-login',
@@ -40,7 +41,6 @@ export class LoginComponent implements OnInit {
   login() {
 
     if (this.loginForm.valid) {
-      //this.onSubmit.emit();
       const loginData = {
         email: this.loginForm.value.email,
         password: this.loginForm.value.password
@@ -51,24 +51,27 @@ export class LoginComponent implements OnInit {
           if (!response) {
             alert("Account not verified yet!");
           } else {
+
             localStorage.setItem('user', response.accessToken);
             this.userService.setUserDetails();
 
             this.userService.getCurrentUser().subscribe((user: any) => {
               this.currentUser = user;
-
-              if (!user.isActive) {
-
+              console.log(user);
+              if(user.role === Role.SUPERADMIN || user.role === Role.ADMIN){
+                user.isActive = true;
+              }
+             if (user.role === Role.SUPERADMIN && !user.passwordChanged) {
+               alert('Please change your default password.');
+               this.openChangePasswordDialog();
+              }
+              else if (!user.isActive) {
                 alert('Account not activated. Please check your email.');
                 this.authService.logout();
-
-              } else if (user.role === 'admin' && !user.passwordChanged) {
-                alert('Please change your default password.');
-                this.openChangePasswordDialog();
-
-              } else {
-
+              }
+              else {
                 this.router.navigate(['main']);
+                console.log("Uspesno ulogovan korisnik!");
               }
             });
           }

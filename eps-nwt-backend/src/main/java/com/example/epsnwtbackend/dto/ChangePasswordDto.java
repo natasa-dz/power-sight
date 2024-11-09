@@ -3,16 +3,14 @@ package com.example.epsnwtbackend.dto;
 public class ChangePasswordDto {
 
     private String username;
-    private String oldPassword;
     private String newPassword;
     private String confirmPassword;
 
     // Constructors
     public ChangePasswordDto() {}
 
-    public ChangePasswordDto(String username, String oldPassword, String newPassword, String confirmPassword) {
+    public ChangePasswordDto(String username, String newPassword, String confirmPassword) {
         this.username = username;
-        this.oldPassword = oldPassword;
         this.newPassword = newPassword;
         this.confirmPassword = confirmPassword;
     }
@@ -24,14 +22,6 @@ public class ChangePasswordDto {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getOldPassword() {
-        return oldPassword;
-    }
-
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
     }
 
     public String getNewPassword() {

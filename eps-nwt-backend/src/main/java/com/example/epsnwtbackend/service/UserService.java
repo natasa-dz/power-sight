@@ -52,10 +52,6 @@ public class UserService implements UserDetailsService {
             e.printStackTrace();
         }
     }
-    //todo: STUDENT 1
-    // 4.2 --> registration x login [activation link] --> image compression x resizing x async
-    // save it to .txt, export filePath via app.prop or config,
-    // filePath set in userManual
 
     private String generateRandomPassword(){
         int length = 12; // Length of the password
@@ -124,13 +120,13 @@ public class UserService implements UserDetailsService {
         return Optional.empty();
     }
 
-
-    public boolean changePassword(String username, String oldPassword, String newPassword) {
+    public boolean changePassword(String username, String confirmPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            return false; // Old password is incorrect
+        // Check if the new password and confirm password match
+        if (!newPassword.equals(confirmPassword)) {
+            throw new RuntimeException("New password and confirm password do not match.");
         }
 
         // Set the new password and mark the password as changed
