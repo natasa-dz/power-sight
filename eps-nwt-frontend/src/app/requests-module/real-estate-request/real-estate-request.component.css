@@ -1,0 +1,32 @@
+.stepper-container {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.stepper-header {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.stepper-header div {
+  cursor: pointer;
+  padding: 10px;
+  border-bottom: 2px solid transparent;
+}
+
+.stepper-header .active {
+  border-color: #007bff;
+  font-weight: bold;
+}
+
+.stepper-content {
+  padding: 10px;
+}
+
+button {
+  margin-top: 10px;
+}
