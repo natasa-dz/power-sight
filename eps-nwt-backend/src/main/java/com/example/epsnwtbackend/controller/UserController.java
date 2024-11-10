@@ -146,8 +146,6 @@ public class UserController {
                 String activationToken = UUID.randomUUID().toString();
                 userService.saveActivationToken(dto.getUsername(), activationToken);  // Save token and set user as inactive
 
-                // Generate the activation link
-                //String activationLink = "http://localhost:8080/api/auth/activate?token=" + activationToken;
                 String activationLink = "http://localhost:4200/activate?token=" + activationToken;
                 emailService.sendActivationEmail(dto.getUsername(), activationLink);
 

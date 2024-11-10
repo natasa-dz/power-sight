@@ -14,7 +14,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
-    User findByActivationToken(String token);
+    @Query("SELECT u FROM User u WHERE u.activationToken = :token")
+    User findByActivationToken(@Param("token") String token);
 
     @Query("SELECT u.userPhoto FROM User u WHERE u.id = :userId")
     String findUserPhotoPathById(@Param("userId") Long userId);
