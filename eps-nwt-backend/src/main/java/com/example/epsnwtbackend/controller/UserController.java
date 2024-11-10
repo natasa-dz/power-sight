@@ -4,6 +4,8 @@ import com.example.epsnwtbackend.dto.ChangePasswordDto;
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
+import com.example.epsnwtbackend.model.Role;
+import com.example.epsnwtbackend.model.User;
 import com.example.epsnwtbackend.service.EmailService;
 import com.example.epsnwtbackend.service.UserService;
 import com.example.epsnwtbackend.utils.TokenUtils;
@@ -24,6 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -90,22 +95,70 @@ public class UserController {
     }
 
     @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto, @RequestParam("recaptchaToken") String recaptchaToken){
+    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto){
         Optional<UserCredentials> credentials = userDetailsService.register(dto);
 
         if (credentials.isPresent()){
+            System.out.println("Usao u credentialsPresent!!!");
+
             tokenService.generateToken(dto.getUsername(), dto.getRole());
 
             String activationToken = UUID.randomUUID().toString();
             userService.saveActivationToken(dto.getUsername(), activationToken); // Save token and set user as inactive
 
             // generate unique activation token and send activation email as well
-            String activationLink = "http://localhost:8080/api/auth/activate?token=" + activationToken;
+            String activationLink = "http://localhost:8080/users/api/auth/activate?token=" + activationToken;
             emailService.sendActivationEmail(dto.getUsername(), activationLink);
             return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
 
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+
+    @PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserCredentials> registerUser(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("role") String role,
+            @RequestParam("userPhoto") MultipartFile userPhoto) {
+
+        try {
+            String uploadDir = "uploads/";  // Directory to store user photos
+            File uploadDirectory = new File(uploadDir);
+            if (!uploadDirectory.exists()) {
+                uploadDirectory.mkdir();
+            }
+
+            // Generate unique file name based on the username
+            String fileName = username + "_profile.jpg";
+            Path filePath = Paths.get(uploadDir + fileName);
+            Files.write(filePath, userPhoto.getBytes());  // Save the photo to the file system
+
+            // Create a new UserDto (or User entity if you have one) with the path to the saved image
+            UserDto dto = new UserDto(username, password, Role.valueOf(role), filePath.toString(), false,true, ""); // Assume 'false' for isActive
+
+            // Register user credentials
+            Optional<UserCredentials> credentials = userDetailsService.register(dto);
+
+            if (credentials.isPresent()) {
+                // Generate and save activation token
+                String activationToken = UUID.randomUUID().toString();
+                userService.saveActivationToken(dto.getUsername(), activationToken);  // Save token and set user as inactive
+
+                // Generate the activation link
+                //String activationLink = "http://localhost:8080/api/auth/activate?token=" + activationToken;
+                String activationLink = "http://localhost:4200/activate?token=" + activationToken;
+                emailService.sendActivationEmail(dto.getUsername(), activationLink);
+
+                return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
+            }
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Handle errors like file storage issues
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // In case registration fails
     }
 
     @PreAuthorize("permitAll()")
