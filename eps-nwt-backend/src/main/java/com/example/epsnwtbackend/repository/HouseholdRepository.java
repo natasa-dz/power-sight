@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface HouseholdRepository extends JpaRepository<Household, Long> {
 
-    @Query("SELECT h FROM Household h JOIN h.realEstate r WHERE r.address LIKE %:address%")
-    List<Household> findAllOnAddress(@Param("address") String address);
+    @Query("SELECT h FROM Household h JOIN h.realEstate r WHERE r.municipality = :municipality AND r.address LIKE %:address%")
+    List<Household> findAllOnAddress(@Param("municipality") String municipality, @Param("address") String address);
 }

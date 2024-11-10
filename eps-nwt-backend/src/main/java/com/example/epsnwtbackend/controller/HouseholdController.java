@@ -1,5 +1,6 @@
 package com.example.epsnwtbackend.controller;
 
+import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
 import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.service.HouseholdService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,13 @@ public class HouseholdController {
         }
     }
 
-    @GetMapping(path = "/search/{address}/{apartmentNumber}")
-    public ResponseEntity<List<Household>> search(@PathVariable String address, @PathVariable int apartmentNumber) {
-        List<Household> households = householdService.search(address, apartmentNumber);
+    // na katastru se u opstini unosi adresa ili broj parcele
+    // za pretragu domacinstava je mozda najbolje opstina + adresa + broj stana
+    // if apartment number is 0 than all on address are returned
+    @GetMapping(path = "/search/{municipality}/{address}/{apartmentNumber}")
+    public ResponseEntity<List<HouseholdSearchDTO>> search(@PathVariable String municipality, @PathVariable String address, @PathVariable int apartmentNumber) {
+        if(apartmentNumber < 0) return ResponseEntity.badRequest().build();
+        List<HouseholdSearchDTO> households = householdService.search(municipality, address, apartmentNumber);
         return ResponseEntity.ok(households);
     }
 

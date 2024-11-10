@@ -75,7 +75,7 @@ public class WebSecurityConfig{
                 .requestMatchers("/users/{email}").permitAll()
                 .requestMatchers("/users").permitAll()
                 .requestMatchers("/household/find-by-id/{id}").permitAll()
-                .requestMatchers("/household/search/{address}/{apartmentNumber}").permitAll()
+                .requestMatchers("/household/search/{municipality}/{address}/{apartmentNumber}").permitAll()
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
                 // koji tip korisnika moze da pristupi odgovarajucoj ruti. Npr. ukoliko zelimo da definisemo da ruti 'admin' moze da pristupi
                 // samo korisnik koji ima rolu 'ADMIN', navodimo na sledeci nacin:

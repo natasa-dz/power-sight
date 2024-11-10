@@ -1,7 +1,9 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
 import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.repository.HouseholdRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -25,16 +27,33 @@ public class HouseholdService {
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
     }
 
-    public List<Household> search(String address, int apartmentNumber) {
-        List<Household> households = householdRepository.findAllOnAddress(address);
-        if(apartmentNumber != 0) {
-            List<Household> filteredHouseholds = new ArrayList<>();
-            for (Household household : households) {
-                if (household.getApartmentNumber().equals(apartmentNumber)) {
-                    filteredHouseholds.add(household);
-                }
+    public List<HouseholdSearchDTO> search(String municipality, String address, int apartmentNumber) {
+        //all on address in municipality
+        List<Household> householdEntities = householdRepository.findAllOnAddress(municipality, address);
+        List<HouseholdSearchDTO> households = getHouseholdSearchDTOS(householdEntities);
+        if(apartmentNumber == 0) { return households; }
+        //filtering by apartment number
+        List<HouseholdSearchDTO> filteredHouseholds = new ArrayList<>();
+        for (HouseholdSearchDTO household : households) {
+            if (household.getApartmentNumber().equals(apartmentNumber)) {
+                filteredHouseholds.add(household);
             }
-            return filteredHouseholds;
+        }
+        return filteredHouseholds;
+    }
+
+    @NotNull
+    private static List<HouseholdSearchDTO> getHouseholdSearchDTOS(List<Household> householdEntities) {
+        List<HouseholdSearchDTO> households = new ArrayList<>();
+        for (Household household : householdEntities) {
+            HouseholdSearchDTO householdDTO = new HouseholdSearchDTO();
+            householdDTO.setId(household.getId());
+            householdDTO.setFloor(household.getFloor());
+            householdDTO.setOwnerId(household.getOwner().getId());
+            householdDTO.setApartmentNumber(household.getApartmentNumber());
+            householdDTO.setSquareFootage(household.getSquareFootage());
+            householdDTO.setRealEstateId(household.getRealEstate().getId());
+            households.add(householdDTO);
         }
         return households;
     }
