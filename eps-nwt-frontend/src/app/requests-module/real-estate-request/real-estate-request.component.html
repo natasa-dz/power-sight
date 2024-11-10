@@ -1,44 +1,56 @@
-<div class="stepper-container">
-  <div class="stepper-header">
-    <div [class.active]="currentStep === 1" (click)="goToStep(1)">1: Real Estate</div>
-    <div [class.active]="currentStep === 2" (click)="goToStep(2)">2: Households</div>
-    <div [class.active]="currentStep === 3" (click)="goToStep(3)">3: Documentation</div>
-  </div>
-
-  <div class="stepper-content">
-    <div *ngIf="currentStep === 1">
-      <form [formGroup]="realEstateForm" (ngSubmit)="nextStep()">
-        <label>Address:</label>
-        <input formControlName="address" type="text" />
-        <label>Municipality:</label>
-        <input formControlName="municipality" type="text" />
-        <label>Town:</label>
-        <input formControlName="town" type="text" />
-        <label>Floors:</label>
-        <input formControlName="floors" type="text" />
-        <label>Images:</label>
-        <input formControlName="images" type="text" />
-        <button type="submit">Next</button>
-      </form>
+<div class="body">
+  <div class="stepper-container">
+    <div class="stepper-header">
+      <div [class.active]="currentStep === 1" (click)="goToStep(1)">1 - Real Estate</div>
+      <div [class.active]="currentStep === 2" (click)="goToStep(2)">2 - Households</div>
+      <div [class.active]="currentStep === 3" (click)="goToStep(3)">3 - Documentation</div>
     </div>
 
-    <div *ngIf="currentStep === 2">
-      <form [formGroup]="householdForm" (ngSubmit)="addHousehold()">
-        <label>Floor:</label>
-        <input formControlName="floor" type="number" />
-        <label>Square footage:</label>
-        <input formControlName="squareFootage" type="number" />
-        <label>Apartment number:</label>
-        <input formControlName="apartmentNumber" type="number" />
-        <button type="submit">Add household</button>
-      </form>
-      <button (click)="nextStep()">Next</button>
-    </div>
+    <div class="content-container">
+      <div class="stepper-content">
+        <div *ngIf="currentStep === 1">
+          <form class="content-form" [formGroup]="realEstateForm" (ngSubmit)="nextStep()">
+            <label>Address:</label>
+            <input formControlName="address" type="text" />
+            <label>Municipality:</label>
+            <input formControlName="municipality" type="text" />
+            <label>Town:</label>
+            <input formControlName="town" type="text" />
+            <label>Floors:</label>
+            <input formControlName="floors" type="number" />
+            <label>Images:</label>
+            <input class="file-input" type="file" (change)="onFileSelected($event)" multiple />
+            <div class="files"></div>
+            <div class="next-btn-container">
+              <button class="next-btn" type="submit">Next</button>
+            </div>
+          </form>
+        </div>
 
-    <div *ngIf="currentStep === 3">
-      <label>Add documentation:</label>
-      <input type="file" (change)="onFileSelected($event)" multiple />
-      <button (click)="submit()">Submit</button>
+        <div *ngIf="currentStep === 2">
+          <form class="content-form" [formGroup]="householdForm" (ngSubmit)="addHousehold()">
+            <label>Floor:</label>
+            <input formControlName="floor" type="number" />
+            <label>Square footage:</label>
+            <input formControlName="squareFootage" type="number" />
+            <label>Apartment number:</label>
+            <input formControlName="apartmentNumber" type="number" />
+            <button class="add-btn" type="submit">Add household</button>
+          </form>
+          <div class="next-btn-container">
+            <button class="next-btn" (click)="nextStep()">Next</button>
+          </div>
+        </div>
+
+        <div class="content-form" *ngIf="currentStep === 3">
+          <label>Documentation:</label>
+          <input class="file-input" type="file" (change)="onFileSelected($event)" multiple />
+          <div class="files"></div>
+          <div class="next-btn-container">
+            <button class="next-btn" (click)="submit()">Submit</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

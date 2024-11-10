@@ -1,32 +1,139 @@
+.body{
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f4f8;
+}
+
 .stepper-container {
   width: 80%;
-  margin: auto;
+  margin: 40px 0;
   padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 6px;
 }
 
 .stepper-header {
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+  color: #37474f;
 }
 
 .stepper-header div {
+  position: relative;
   cursor: pointer;
   padding: 10px;
-  border-bottom: 2px solid transparent;
+}
+
+.stepper-header div::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #0d47a1;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.stepper-header div:hover::before {
+  width: 100%;
+  left: 0;
+}
+
+.stepper-header .active::before {
+  width: 100%;
+  left: 0;
+  background-color: #0d47a1;
 }
 
 .stepper-header .active {
-  border-color: #007bff;
   font-weight: bold;
+}
+
+.content-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .stepper-content {
   padding: 10px;
+  width: 50%;
 }
 
-button {
-  margin-top: 10px;
+.content-form{
+  display: flex;
+  flex-direction: column;
+}
+
+.content-form label{
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #37474f;
+}
+
+.content-form input {
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #37474f;
+}
+
+.content-form input:focus {
+  border-color: #37474f;
+  outline: none;
+}
+
+.content-form .file-input{
+  border: 0;
+  padding: 0.1rem;
+}
+
+.files{
+  height: 7vh;
+  margin: 0.3rem;
+  padding: 0.3rem;
+}
+
+.next-btn-container {
+  display: flex;
+  justify-content: right;
+}
+
+.next-btn{
+  width: 30%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #0288d1;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.next-btn:hover {
+  background-color: #01579b;
+}
+
+.add-btn{
+  width: 30%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #37474f;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+  background-color: #01579b;
 }
