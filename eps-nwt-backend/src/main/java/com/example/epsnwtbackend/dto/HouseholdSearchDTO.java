@@ -14,4 +14,12 @@ public class HouseholdSearchDTO {
     private Integer apartmentNumber;
     private Long realEstateId;
     private Long ownerId;
+
+    public HouseholdSearchDTO(Long id, Integer floor, Integer apartmentNumber, Float squareFootage, Long realEstateId) {
+        this.id = id;
+        this.floor = floor;
+        this.apartmentNumber = apartmentNumber;
+        this.squareFootage = squareFootage;
+        this.realEstateId = realEstateId;
+    }
 }
