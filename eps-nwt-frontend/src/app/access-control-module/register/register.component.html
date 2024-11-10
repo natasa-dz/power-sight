@@ -6,9 +6,6 @@
       <label for="username">Username</label>
       <input type="text" id="username" formControlName="username" placeholder="Enter your username">
 
-      <label for="email">Email</label>
-      <input type="email" id="email" formControlName="email" placeholder="Enter your email">
-
       <label for="password">Password</label>
       <input type="password" id="password" formControlName="password" placeholder="Enter your password">
 
@@ -30,13 +27,13 @@
     </div>
   </div>
 
-  <!-- Activation Token Prompt -->
-  <div *ngIf="showActivationPrompt" class="activation-prompt">
-    <h3>Activate Your Account</h3>
-    <p>Please enter the activation token sent to your email:</p>
-    <label for="activationToken">Activation Token</label>
-    <input type="text" id="activationToken" [(ngModel)]="activationToken" placeholder="Enter activation token">
-    <button (click)="activateAccount()" class="btn btn-activate">Activate Account</button>
-  </div>
+<!--  &lt;!&ndash; Activation Token Prompt &ndash;&gt;-->
+<!--  <div *ngIf="showActivationPrompt" class="activation-prompt">-->
+<!--    <h3>Activate Your Account</h3>-->
+<!--    <p>Please enter the activation token sent to your email:</p>-->
+<!--    <label for="activationToken">Activation Token</label>-->
+<!--    <input type="text" id="activationToken" [(ngModel)]="activationToken" placeholder="Enter activation token">-->
+<!--    <button (click)="activateAccount()" class="btn btn-activate">Activate Account</button>-->
+<!--  </div>-->
 
 </div>

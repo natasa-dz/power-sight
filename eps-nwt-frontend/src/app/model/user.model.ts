@@ -18,16 +18,17 @@ export class User {
 
 
   constructor(
-    email: string,
+    username: string,
     password: string,
     role: Role,
     passwordChanged: boolean,  // Whether the user has changed their password
     isActive:boolean,
     userPhoto: string,
     activationToken: string
+
   ) {
 
-    this.username = email;
+    this.username = username;
     this.password = password;
     this.role = role;
     this.passwordChanged = passwordChanged;
