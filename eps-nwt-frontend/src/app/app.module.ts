@@ -9,10 +9,11 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { routes } from './app.routes';
 import { ReactiveFormsModule } from '@angular/forms';
 
-import {ChangePasswordComponent} from "./change-password/change-password.component";  // Import routes from app.routes.ts
+import {ChangePasswordComponent} from "./change-password/change-password.component";
+import {ActivateComponent} from "./activate/activate.component";  // Import routes from app.routes.ts
 
 @NgModule({
-  declarations: [AppComponent, ChangePasswordComponent], // Add all components here
+  declarations: [ActivateComponent,AppComponent, ChangePasswordComponent], // Add all components here
   imports: [HttpClientModule,ReactiveFormsModule,RouterModule.forRoot(routes), BrowserModule, AccessControlModule], // Add other necessary Angular modules like FormsModule, etc.
   bootstrap: [AppComponent],
   providers: [provideAnimationsAsync()] // Bootstraps the application with AppComponent
