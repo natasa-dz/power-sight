@@ -1,18 +1,16 @@
 package com.example.epsnwtbackend.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "households")
+@Table(name = "household_requests")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Household {
-
+public class HouseholdRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,15 +23,4 @@ public class Household {
 
     @Column
     private Integer apartmentNumber;
-
-    @OneToOne(mappedBy = "household", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Meter meters;
-
-    @ManyToOne
-    @JoinColumn(name = "real_estate_id", nullable = false)
-    private RealEstate realEstate;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User owner;
 }
