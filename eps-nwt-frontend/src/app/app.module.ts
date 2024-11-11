@@ -10,11 +10,13 @@ import { routes } from './app.routes';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import {ChangePasswordComponent} from "./change-password/change-password.component";
-import {ActivateComponent} from "./activate/activate.component";  // Import routes from app.routes.ts
+import {ActivateComponent} from "./activate/activate.component";
+import {MainComponent} from "./main/main.component";
+import {BaseModule} from "./base/base.module";  // Import routes from app.routes.ts
 
 @NgModule({
-  declarations: [ActivateComponent,AppComponent, ChangePasswordComponent], // Add all components here
-  imports: [HttpClientModule,ReactiveFormsModule,RouterModule.forRoot(routes), BrowserModule, AccessControlModule], // Add other necessary Angular modules like FormsModule, etc.
+  declarations: [MainComponent,ActivateComponent,AppComponent, ChangePasswordComponent], // Add all components here
+  imports: [BaseModule,HttpClientModule,ReactiveFormsModule,RouterModule.forRoot(routes), BrowserModule, AccessControlModule], // Add other necessary Angular modules like FormsModule, etc.
   bootstrap: [AppComponent],
   providers: [provideAnimationsAsync()] // Bootstraps the application with AppComponent
 })

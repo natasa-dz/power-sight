@@ -69,7 +69,6 @@ export class ChangePasswordComponent {
     }
   }
 
-
   cancel() {
     this.dialogRef.close(false);  // Close dialog without success
   }
