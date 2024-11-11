@@ -12,6 +12,16 @@
   padding: 2rem;
 }
 
+/* Logo Styling */
+.logo {
+  width: 300px;
+  height: auto;
+  margin: 20px;
+  border-radius: 20px;
+  border: none; /* Remove any default border */
+  outline: none; /* Remove any default outline */
+}
+
 .register-left {
   flex-direction: column;
   background-color: #f0f4f8;

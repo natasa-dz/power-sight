@@ -186,8 +186,9 @@ public class UserController {
         boolean isChanged = userService.changePassword(dto.getUsername(), dto.getConfirmPassword(), dto.getNewPassword());
 
         if (isChanged) {
-            return ResponseEntity.ok("Password updated successfully");
+            return ResponseEntity.ok().build(); // Status 200 (OK), with no body
+            //
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password change failed");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 }

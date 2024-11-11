@@ -39,6 +39,7 @@ export class ChangePasswordComponent {
     if (this.changePasswordForm.valid) {
       const { newPassword } = this.changePasswordForm.value;
       const {confirmPassword} = this.changePasswordForm.value;
+
       this.userService.getCurrentUser().subscribe((user: any) => {
         this.currentUser = user;
 
@@ -56,9 +57,14 @@ export class ChangePasswordComponent {
 
         // Call the changePassword API
         this.userService.changePassword(changePasswordDto).subscribe({
-          next: () => {
-            alert('Password changed successfully');
-            this.dialogRef.close(true);  // Close dialog and return success
+          next: (response) => {
+            if (response.status === 200) {
+              alert('Password changed successfully');
+              this.dialogRef.close(true);  // Close dialog and return success
+            }
+            else {
+              alert('Failed to change password: ' + response.body);
+            }
           },
           error: (error) => {
             console.error('Error changing password: ', error);
