@@ -43,8 +43,8 @@ public class User implements UserDetails {
         this.password = dto.getPassword(); // Ensure password is encoded before setting
         this.role = dto.getRole();
         this.userPhoto = dto.getUserPhoto();
-        this.isActive = false; // Set to false initially, activated via token
-        this.passwordChanged = false; // Default to false, updated after first login change
+        this.isActive = dto.isActive(); // Set to false initially, activated via token
+        this.passwordChanged = dto.isPasswordChanged(); // Default to false, updated after first login change
         this.activationToken = dto.getActivationToken(); // Set if generated in service
     }
     public String getUserPhoto() {

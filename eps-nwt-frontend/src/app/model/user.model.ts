@@ -12,7 +12,7 @@ export class User {
   password: string;
   role: Role;
   passwordChanged: boolean;  // Whether the user has changed their password
-  isActive:boolean;
+  active:boolean;
   userPhoto: string;
   activationToken: string;
 
@@ -22,7 +22,7 @@ export class User {
     password: string,
     role: Role,
     passwordChanged: boolean,  // Whether the user has changed their password
-    isActive:boolean,
+    active:boolean,
     userPhoto: string,
     activationToken: string
 
@@ -32,7 +32,7 @@ export class User {
     this.password = password;
     this.role = role;
     this.passwordChanged = passwordChanged;
-    this.isActive = isActive;
+    this.active = active;
     this.userPhoto = userPhoto;
     this.activationToken = activationToken;
   }
