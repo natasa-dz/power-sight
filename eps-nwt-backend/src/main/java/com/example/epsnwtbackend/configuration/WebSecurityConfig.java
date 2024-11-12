@@ -78,9 +78,10 @@ public class WebSecurityConfig{
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/search-no-owner/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}?apartmentNumber").permitAll()
-                .requestMatchers(HttpMethod.GET, "/household/search-no-owner/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/availability/{name}/{timeRange}").permitAll()
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
                 // koji tip korisnika moze da pristupi odgovarajucoj ruti. Npr. ukoliko zelimo da definisemo da ruti 'admin' moze da pristupi
                 // samo korisnik koji ima rolu 'ADMIN', navodimo na sledeci nacin:
@@ -113,7 +114,8 @@ public class WebSecurityConfig{
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
-                        "/household/find-by-id/", "/household/search/", "household/search-no-owner/");
+                        "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
+                        "/household/availability/");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

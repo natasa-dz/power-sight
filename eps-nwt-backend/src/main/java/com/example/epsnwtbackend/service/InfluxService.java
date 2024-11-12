@@ -1,20 +1,24 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.dto.AvailabilityData;
 import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.QueryApi;
 import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.influxdb.query.FluxRecord;
+import com.influxdb.query.FluxTable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Map;
+import java.time.*;
+import java.util.*;
 
 @Service
 public class InfluxService {
+
+    @Value("${influxdb.bucket.heartbeat}")
+    private String heartbeatBucket;
 
     private final InfluxDBClient influxDbClientHeartbeat;
     private final InfluxDBClient influxDbClientConsumption;
@@ -48,4 +52,26 @@ public class InfluxService {
         writeApi.writePoint(point);
     }
 
+    public List<AvailabilityData> getAvailabilityByTimeRange(String measurementName, String duration) {
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") |> range(start: -%s, stop: now()) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"value\")" +
+                        "|> yield(name: \"mean\")",
+                this.heartbeatBucket, duration.toString(), measurementName);
+        return this.queryAvailability(fluxQuery);
+    }
+
+    private List<AvailabilityData> queryAvailability(String fluxQuery) {
+        List<AvailabilityData> result = new ArrayList<>();
+        QueryApi queryApi = this.influxDbClientHeartbeat.getQueryApi();
+        List<FluxTable> tables = queryApi.query(fluxQuery);
+        for (FluxTable fluxTable : tables) {
+            for (FluxRecord record : fluxTable.getRecords()) {
+                boolean isOnline = ((Double) record.getValue()).intValue() == 1;
+                result.add(new AvailabilityData(record.getTime(), isOnline));
+            }
+        }
+        return result;
+    }
 }
