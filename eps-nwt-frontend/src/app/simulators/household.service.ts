@@ -3,13 +3,15 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {HouseholdSearchDTO} from "../model/household-search-dto.model";
 import {Page} from "../model/page.model";
 import {Observable} from "rxjs";
+import {Household} from "../model/household.model";
+import {ViewHouseholdDto} from "../model/view-household-dto.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class HouseholdService {
 
-  private apiUrl = 'http://localhost:8080/household/search';  // Adjust to your backend URL
+  private apiUrl = 'http://localhost:8080/household';  // Adjust to your backend URL
 
   constructor(private http: HttpClient) {}
 
@@ -22,7 +24,12 @@ export class HouseholdService {
       params = params.set('apartmentNumber', apartmentNumber.toString());
     }
 
-    const url = `${this.apiUrl}/${municipality}/${address}`;
+    const url = `${this.apiUrl}/search/${municipality}/${address}`;
     return this.http.get<Page<HouseholdSearchDTO>>(url, { params });
   }
+
+  findById(id: number): Observable<ViewHouseholdDto> {
+    return this.http.get<ViewHouseholdDto>(`${this.apiUrl}/find-by-id/${id}`);
+  }
+
 }

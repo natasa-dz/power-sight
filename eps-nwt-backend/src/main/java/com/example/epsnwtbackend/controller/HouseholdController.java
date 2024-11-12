@@ -1,6 +1,7 @@
 package com.example.epsnwtbackend.controller;
 
 import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
+import com.example.epsnwtbackend.dto.ViewHouseholdDTO;
 import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.service.HouseholdService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,9 @@ public class HouseholdController {
     private HouseholdService householdService;
 
     @GetMapping(path = "/find-by-id/{id}")
-    public ResponseEntity<Household> findById(@PathVariable Long id) {
+    public ResponseEntity<ViewHouseholdDTO> findById(@PathVariable Long id) {
         try {
-            Household household = householdService.getHousehold(id);
+            ViewHouseholdDTO household = householdService.getHousehold(id);
             return ResponseEntity.ok(household);
         } catch (NoResourceFoundException e) {
             return ResponseEntity.notFound().build();

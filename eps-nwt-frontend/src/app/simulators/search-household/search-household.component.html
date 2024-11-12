@@ -16,7 +16,9 @@
   <h3>Results:</h3>
   <ul>
     <li *ngFor="let household of page?.content">
-      {{ municipality }} - {{ address }}, {{ household.apartmentNumber }}
+      <a [routerLink]="['/household', household.id]">
+        {{ municipality }} - {{ address }}, {{ household.apartmentNumber }}
+      </a>
     </li>
   </ul>
 

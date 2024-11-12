@@ -1,6 +1,7 @@
 package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
+import com.example.epsnwtbackend.dto.ViewHouseholdDTO;
 import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.repository.HouseholdRepository;
 import org.jetbrains.annotations.NotNull;
@@ -23,9 +24,23 @@ public class HouseholdService {
     @Autowired
     private HouseholdRepository householdRepository;
 
-    public Household getHousehold(Long id) throws NoResourceFoundException {
+    public ViewHouseholdDTO getHousehold(Long id) throws NoResourceFoundException {
         Optional<Household> reference = householdRepository.findById(id);
-        if (reference.isPresent()) { return reference.get(); }
+        if (reference.isPresent()) {
+            Household household = reference.get();
+            ViewHouseholdDTO viewHouseholdDTO = new ViewHouseholdDTO();
+            viewHouseholdDTO.setId(household.getId());
+            viewHouseholdDTO.setFloor(household.getFloor());
+            viewHouseholdDTO.setApartmentNumber(household.getApartmentNumber());
+            viewHouseholdDTO.setSquareFootage(household.getSquareFootage());
+
+            viewHouseholdDTO.setOwnerId(household.getOwner() == null ? null : household.getOwner().getId());
+
+            viewHouseholdDTO.setAddress(household.getRealEstate().getAddress());
+            viewHouseholdDTO.setTown(household.getRealEstate().getTown());
+            viewHouseholdDTO.setMunicipality(household.getRealEstate().getMunicipality());
+            return viewHouseholdDTO;
+        }
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
     }
 
