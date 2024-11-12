@@ -40,25 +40,7 @@ export class NavbarSuperadminComponent {
       case 'add-admin':
         this.router.navigate(['/manage']);
         break;
-      // case 'reviews/apartments/approval':
-      //   this.router.navigate(['reviews/apartments/approval']);
-      //   break;
-      // case 'reviews/owners/approval':
-      //   this.router.navigate(['reviews/owners/approval']);
-      //   break;
-      // case 'accommodation-approval':
-      //   this.router.navigate(['/accommodation-approval'])
-      //   break;
-      // //TODO:
-      // case 'get-all-certificates':
-      //   this.router.navigate(['/allCertificates']);
-      //   break;
-      // case 'generate-certificate':
-      //   this.router.navigate(['/generateCertificate']);
-      //   break;
-      // case 'user-blocking':
-      //   this.router.navigate(['/user-blocking'])
-      //   break;
+
       default:
         break;
     }

@@ -69,11 +69,7 @@ export class RegisterComponent {
   }
 
 
-    // Convert base64 string back to a File object
 
-
-
-  //TODO: RESI NULL PIC REFERENCE!!!
   register(): void {
     console.log(this.registerForm.get('username')?.value);
     console.log(this.registerForm.get('password')?.value);
@@ -81,7 +77,13 @@ export class RegisterComponent {
     // Check if the form is valid and the file is selected
     if (this.registerForm.valid && this.selectedFile != null) {
       const formData = new FormData();
-      formData.append('role', 'CITIZEN')
+      let role = 'CITIZEN';
+      if (this.authService.getRole() === Role.SUPERADMIN) {
+        role = 'ADMIN';
+      }
+      console.log("Role: ", role)
+      formData.append('role', role)
+
       formData.append('username', this.registerForm.get('username')?.value);
       formData.append('password', this.registerForm.get('password')?.value);
       formData.append('userPhoto', this.selectedFile);  // Send the selected file
