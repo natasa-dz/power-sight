@@ -31,7 +31,6 @@ public class HouseholdController {
 
     // na katastru se u opstini unosi adresa ili broj parcele
     // za pretragu domacinstava je mozda najbolje opstina + adresa + broj stana
-    // if apartment number is 0 than all on address are returned
     @GetMapping(path = "/search/{municipality}/{address}")
     public ResponseEntity<Page<HouseholdSearchDTO>> search(@PathVariable String municipality,
            @PathVariable String address, @RequestParam(required = false) Integer apartmentNumber, Pageable pageable) {
