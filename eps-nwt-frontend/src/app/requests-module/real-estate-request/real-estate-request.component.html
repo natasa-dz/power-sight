@@ -12,10 +12,13 @@
           <form class="content-form" [formGroup]="realEstateForm" (ngSubmit)="nextStep()">
             <label>*Address</label>
             <input formControlName="address" type="text" />
+            <label>*City</label>
+            <select formControlName="city" (change)="onCityChange($event)">
+              <option *ngFor="let city of cities" [value]="city">{{ city }}</option></select>
             <label>*Municipality</label>
-            <input formControlName="municipality" type="text" />
-            <label>*Town</label>
-            <input formControlName="town" type="text" />
+            <select formControlName="municipality">
+              <option *ngFor="let municipality of citiesAndMunicipalities[selectedCity] || []" [value]="municipality">{{ municipality }}</option>
+            </select>
             <label>*Floors
               <span style="font-size:0.7em;color:rgb(128,128,128);">(min: 0)</span></label>
             <input formControlName="floors" type="number" />

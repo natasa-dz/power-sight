@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -15,6 +15,7 @@ import {HouseholdRequestDTO} from "../../model/create-household-request-dto.mode
 import {RealEstateRequestDTO} from "../../model/create-real-estate-request-dto.model";
 import {RealEstateRequestStatus} from "../../enum/real-estate-request-status";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-real-estate-request',
@@ -29,15 +30,20 @@ import {RealEstateRequestService} from "../../service/real-estate-request.servic
   templateUrl: './real-estate-request.component.html',
   styleUrl: './real-estate-request.component.css'
 })
-export class RealEstateRequestComponent {
+export class RealEstateRequestComponent implements OnInit{
   currentStep = 1;
   realEstateForm: FormGroup;
   householdForm: FormGroup;
   households: HouseholdRequestDTO[] = [];
   documentationFiles: File[] = [];
+  citiesAndMunicipalities: any = {};
+  cities: string[] = [];
+  selectedCity: string = '';
+  selectedMunicipality: string = '';
 
   constructor(private fb: FormBuilder,
-              private service: RealEstateRequestService) {
+              private service: RealEstateRequestService,
+              private http: HttpClient) {
     this.realEstateForm = this.fb.group({
       address: new FormControl('', [Validators.required]),
       municipality: new FormControl('', [Validators.required]),
@@ -56,6 +62,22 @@ export class RealEstateRequestComponent {
         Validators.min(1)]),
     });
   }
+
+  ngOnInit() {
+    this.http.get('/assets/municipality.json').subscribe(data => {
+      this.citiesAndMunicipalities = data;
+      this.cities = Object.keys(this.citiesAndMunicipalities);
+    });
+  }
+
+  onCityChange(event: Event) {
+    const target = event.target as HTMLSelectElement;
+    if (target && target.value) {
+      this.selectedCity = target.value;
+      this.selectedMunicipality = '';
+    }
+  }
+
 
   minArrayLength(min: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
@@ -116,7 +138,7 @@ export class RealEstateRequestComponent {
             owner: 1,
             address: this.realEstateForm.get('address')?.value,
             municipality: this.realEstateForm.get('municipality')?.value,
-            town: this.realEstateForm.get('town')?.value,
+            town: this.realEstateForm.get('city')?.value,
             floors: this.realEstateForm.get('floors')?.value,
             images: null,
             documentation: null,
