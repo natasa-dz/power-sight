@@ -3,6 +3,8 @@ package com.example.epsnwtbackend.dto;
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
 
+import java.io.File;
+
 public class UserDto {
 
     private Long id;
@@ -19,10 +21,10 @@ public class UserDto {
     // Constructors
     public UserDto() {}
 
-    public UserDto(Long id, String username, Role role, String userPhoto, boolean isActive, boolean passwordChanged, String activationToken) {
-        this.id = id;
+    public UserDto(String username, String password, Role role, String userPhoto, boolean isActive, boolean passwordChanged, String activationToken) {
         this.username = username;
         this.role = role;
+        this.password = password;
         this.userPhoto = userPhoto;
         this.isActive = isActive;
         this.passwordChanged = passwordChanged;
@@ -56,7 +58,7 @@ public class UserDto {
 
     // Constructors
 
-    public UserDto(Long id, String username, Role role, String userPhoto, boolean isActive, boolean passwordChanged) {
+    public UserDto(String username, Role role, String userPhoto, boolean isActive, boolean passwordChanged) {
         this.id = id;
         this.username = username;
         this.role = role;

@@ -1,0 +1,24 @@
+<mat-toolbar color="primary">
+  <img src="../../../assets/electric-tower.png" alt="Logo" class="logo">
+  <h1 class="title">Electro Power </h1>
+  <span class="spacer"></span>
+  <mat-icon class="icon">
+    <span class="material-icons-outlined">menu</span>
+  </mat-icon>
+  <!--
+<span class="material-icons special-icon">account_circle</span>
+-->
+
+  <button mat-button type="button" class="text1" [matMenuTriggerFor]="accountMenu">My Account</button>
+  <mat-menu class="mat-menu-panel" #accountMenu="matMenu">
+    <button routerLink="/main" type="button" mat-menu-item class="text"><span class="material-icons">home</span>
+      Home</button>
+
+    <button mat-menu-item class="text" type="button" routerLink="/register">
+      <span class="material-icons">edit</span>Add an admin</button>
+
+  </mat-menu>
+
+  <div class="rectangle37"></div>
+
+</mat-toolbar>

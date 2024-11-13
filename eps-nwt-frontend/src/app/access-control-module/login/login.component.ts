@@ -58,14 +58,12 @@ export class LoginComponent implements OnInit {
             this.userService.getCurrentUser().subscribe((user: any) => {
               this.currentUser = user;
               console.log(user);
-              if(user.role === Role.SUPERADMIN || user.role === Role.ADMIN){
-                user.isActive = true;
-              }
+              console.log("IsActive: ", user.active)
              if (user.role === Role.SUPERADMIN && !user.passwordChanged) {
                alert('Please change your default password.');
                this.openChangePasswordDialog();
               }
-              else if (!user.isActive) {
+              else if (!user.active) {
                 alert('Account not activated. Please check your email.');
                 this.authService.logout();
               }

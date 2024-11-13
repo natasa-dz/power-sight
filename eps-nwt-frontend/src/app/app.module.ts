@@ -12,12 +12,17 @@ import {RequestsModuleModule} from "./requests-module/requests-module.module";
 import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";  // Import routes from app.routes.ts
 import { ReactiveFormsModule } from '@angular/forms';
-
 import {ChangePasswordComponent} from "./change-password/change-password.component";
 import {SearchHouseholdComponent} from "./simulators/search-household/search-household.component";  // Import routes from app.routes.ts
+import {ActivateComponent} from "./activate/activate.component";
+import {MainComponent} from "./main/main.component";
+import {BaseModule} from "./base/base.module";  // Import routes from app.routes.ts
 
 @NgModule({
-  declarations: [AppComponent, ChangePasswordComponent], // Add all components here
+  declarations: [AppComponent,
+    ChangePasswordComponent,
+    MainComponent,
+    ActivateComponent], // Add all components here
   imports: [RouterModule.forRoot(routes),
     BrowserModule,
     AccessControlModule,
@@ -29,7 +34,8 @@ import {SearchHouseholdComponent} from "./simulators/search-household/search-hou
     RouterModule.forRoot(routes),
     BrowserModule,
     AccessControlModule,
-    SearchHouseholdComponent],
+    SearchHouseholdComponent,
+    BaseModule],
   bootstrap: [AppComponent],
   providers: [provideAnimationsAsync()] // Bootstraps the application with AppComponent
 })

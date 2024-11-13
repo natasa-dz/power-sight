@@ -2,3 +2,36 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Customize the mat-menu */
+.mat-menu-panel {
+  background-color: white !important;  /* Set the menu background to white */
+  border-radius: 8px;  /* Optional: add rounded corners to the menu */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Optional: subtle shadow for the dropdown */
+}
+
+/* Button Styling */
+button.mat-button.mat-accent {
+  color: #0d47a1; /* Deep blue from login theme */
+}
+
+button.mat-button.mat-accent:hover {
+  background-color: transparent;
+}
+
+.mat-menu-item {
+  color: #0d47a1;  /* Make the menu item text deep blue */
+  font-weight: normal;  /* Optional: adjust font weight */
+}
+
+.mat-menu-item:hover {
+  background-color: #e3f2fd;  /* Light blue hover background */
+  color: #0d47a1;  /* Ensure text stays blue on hover */
+}
+
+
+/* Style the lines between menu items */
+.mat-menu-item {
+  border-bottom: 1px rgba(8, 0, 103, 1); /* Changes text color to blue */
+
+}
