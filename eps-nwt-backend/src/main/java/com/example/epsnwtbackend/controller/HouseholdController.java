@@ -11,9 +11,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @RestController
@@ -62,32 +65,67 @@ public class HouseholdController {
     }
 
     @GetMapping(value = "/availability/{name}/{timeRange}")
-    public ResponseEntity<List<AvailabilityData>> getAvailability(
+    public ResponseEntity<?> getAvailability(
             @PathVariable String name, @PathVariable String timeRange) {
-        String duration = parseTimeRange(timeRange);
-        List<AvailabilityData> summary = influxService.getAvailabilityByTimeRange(name, duration);
+        String duration = null;
+        LocalDate[] dateRange = null;
+
+        try {
+            if (timeRange.contains("-")) {
+                dateRange = parseDateRange(timeRange);
+            } else {
+                duration = parseTimeRange(timeRange);
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        List<AvailabilityData> summary;
+        if (dateRange != null) {
+            summary = influxService.getAvailabilityByDateRange(name, dateRange[0], dateRange[1]);
+        } else {
+            summary = influxService.getAvailabilityByTimeRange(name, duration);
+        }
+
         return new ResponseEntity<>(summary, HttpStatus.OK);
     }
 
     public String parseTimeRange(String timeRange) {
-        if (timeRange.equalsIgnoreCase("3")) {
-            return "3h";
-        } else if (timeRange.equalsIgnoreCase("6")) {
-            return "6h";
-        } else if (timeRange.equalsIgnoreCase("12")) {
-            return "12h";
-        } else if (timeRange.equalsIgnoreCase("24")) {
-            return "1d";
-        } else if (timeRange.equalsIgnoreCase("week")) {
-            return "7d";
-        } else if (timeRange.equalsIgnoreCase("month")) {
-            return "30d";
-        } else if (timeRange.equalsIgnoreCase("3months")) {
-            return "90d";
-        } else if (timeRange.equalsIgnoreCase("year")) {
-            return "365d";
-        } else {
-            throw new IllegalArgumentException("Invalid time range format: " + timeRange);
+        switch (timeRange.toLowerCase()) {
+            case "3":
+                return "3h";
+            case "6":
+                return "6h";
+            case "12":
+                return "12h";
+            case "24":
+                return "1d";
+            case "week":
+                return "7d";
+            case "month":
+                return "30d";
+            case "3months":
+                return "90d";
+            case "year":
+                return "365d";
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid time range format!");
+        }
+    }
+
+    public LocalDate[] parseDateRange(String timeRange) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+        String[] dates = timeRange.split("-");
+
+        try {
+            LocalDate startDate = LocalDate.parse(dates[0].trim(), formatter);
+            LocalDate endDate = LocalDate.parse(dates[1].trim(), formatter);
+            if (startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date range must be at least 1 day!");
+            }
+            return new LocalDate[]{startDate, endDate};
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date range format!");
         }
     }
 
