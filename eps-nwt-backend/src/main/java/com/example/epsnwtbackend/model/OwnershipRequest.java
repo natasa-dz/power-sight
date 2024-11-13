@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class OwnershipRequest {
     @Id
@@ -17,13 +19,35 @@ public class OwnershipRequest {
 
     private String reason;
 
+    private LocalDateTime submittedAt;
+    private LocalDateTime updatedAt;
+
+    public LocalDateTime getSubmittedAt() {
+        return submittedAt;
+    }
+
+    public void setSubmittedAt(LocalDateTime submittedAt) {
+        this.submittedAt = submittedAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public OwnershipRequest(){}
-    public OwnershipRequest(Long id, String householdId, String userId, Status status, String reason) {
+
+    public OwnershipRequest(Long id, String householdId, String userId, Status status, String reason, LocalDateTime submittedAt, LocalDateTime updatedAt) {
         this.id = id;
         this.householdId = householdId;
         this.userId = userId;
         this.status = status;
         this.reason = reason;
+        this.submittedAt = submittedAt;
+        this.updatedAt = updatedAt;
     }
 
     @Override

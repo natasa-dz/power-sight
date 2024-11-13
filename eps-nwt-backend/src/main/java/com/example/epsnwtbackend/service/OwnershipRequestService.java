@@ -6,6 +6,7 @@ import com.example.epsnwtbackend.repository.OwnershipRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -20,6 +21,8 @@ public class OwnershipRequestService {
         return ownershipRequestRepository.findByStatus(Status.PENDING);
     }
 
+
+    // TODO: assign an owner to a household
     public void processRequest(Long requestId, boolean approved, String reason) {
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));
@@ -36,6 +39,8 @@ public class OwnershipRequestService {
             request.setReason(reason);
             emailService.sendRejectionEmail(request.getUserId(), reason);
         }
+
+        request.setUpdatedAt(LocalDateTime.now());
 
         ownershipRequestRepository.save(request);
     }
