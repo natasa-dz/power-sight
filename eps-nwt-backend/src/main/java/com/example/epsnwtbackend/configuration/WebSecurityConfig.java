@@ -77,6 +77,7 @@ public class WebSecurityConfig{
                 .requestMatchers("/household/find-by-id/{id}").permitAll()
                 .requestMatchers("/household/search/{address}/{apartmentNumber}").permitAll()
                 .requestMatchers("/real-estate-request/registration").permitAll()
+                .requestMatchers("/real-estate-request").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -119,7 +120,7 @@ public class WebSecurityConfig{
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
-                        "/household/availability/");
+                        "/household/availability/", "/real-estate-request");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/real-estate-request")
@@ -61,5 +59,11 @@ public class RealEstateRequestController {
         service.saveData(realEstateRequest, imagePaths, docPaths);
 
         return new ResponseEntity<>("Real estate request created successfully!", HttpStatus.OK);
+    }
+
+    @GetMapping(value = "")
+    public Map<String, List<String>> getCitiesWithMunicipalities() {
+        System.out.println("pogadja metodu");
+        return service.getCitiesWithMunicipalities();
     }
 }

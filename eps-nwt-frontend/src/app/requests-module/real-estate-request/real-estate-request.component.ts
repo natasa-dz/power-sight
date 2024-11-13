@@ -47,7 +47,7 @@ export class RealEstateRequestComponent implements OnInit{
     this.realEstateForm = this.fb.group({
       address: new FormControl('', [Validators.required]),
       municipality: new FormControl('', [Validators.required]),
-      town: new FormControl('', [Validators.required]),
+      city: new FormControl('', [Validators.required]),
       floors: new FormControl('', [Validators.required,
         Validators.min(0)]),
       images: new FormControl([], [this.minArrayLength(1)]),
@@ -64,7 +64,7 @@ export class RealEstateRequestComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.http.get('/assets/municipality.json').subscribe(data => {
+    this.service.getCitiesWithMunicipalities().subscribe(data => {
       this.citiesAndMunicipalities = data;
       this.cities = Object.keys(this.citiesAndMunicipalities);
     });
