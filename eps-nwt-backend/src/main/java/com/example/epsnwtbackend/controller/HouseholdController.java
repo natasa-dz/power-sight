@@ -14,10 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/household")
@@ -67,8 +73,9 @@ public class HouseholdController {
     @GetMapping(value = "/availability/{name}/{timeRange}")
     public ResponseEntity<?> getAvailability(
             @PathVariable String name, @PathVariable String timeRange) {
-        String duration = null;
+
         LocalDate[] dateRange = null;
+        String duration = null;
 
         try {
             if (timeRange.contains("-")) {
@@ -87,30 +94,108 @@ public class HouseholdController {
             summary = influxService.getAvailabilityByTimeRange(name, duration);
         }
 
-        return new ResponseEntity<>(summary, HttpStatus.OK);
+        summary.sort(Comparator.comparing(AvailabilityData::getTimestamp));
+
+        long onlineDuration = 0;
+        long offlineDuration = 0;
+        final long interval = 15;
+
+        if (duration != null) {
+            Instant startInstant = Instant.now().minus(parseDuration(duration));
+            int i = -1;
+            for (AvailabilityData data : summary) {
+                i++;
+                Instant currentTime = data.getTimestamp();
+                long timeSinceStart = ChronoUnit.SECONDS.between(startInstant, currentTime);
+
+                if (timeSinceStart < 0) continue;
+
+                long timeDifference = 0;
+                if (i < summary.size() - 1) {
+                    AvailabilityData next = summary.get(i + 1);
+                    Instant nextTime = next.getTimestamp();
+                    timeDifference = ChronoUnit.SECONDS.between(currentTime, nextTime);
+                } else {
+                    timeDifference = ChronoUnit.SECONDS.between(currentTime, Instant.now());
+                }
+
+                if(i == 0) {
+                    offlineDuration += Math.max(0, timeSinceStart - interval);
+                }
+
+                if (data.isOnline()) {
+                    onlineDuration += Math.min(timeDifference, interval);
+                } else {
+                    offlineDuration += timeDifference;
+                }
+            }
+
+        } else {
+            Instant startInstant = dateRange[0].atStartOfDay(ZoneId.of("UTC")).toInstant();
+            Instant endInstant = dateRange[1].atStartOfDay(ZoneId.of("UTC")).plusDays(1).toInstant();
+
+            if (!summary.isEmpty()) {
+                AvailabilityData first = summary.get(0);
+                Instant firstTimestamp = first.getTimestamp();
+
+                long offlineBeforeStart = ChronoUnit.SECONDS.between(startInstant, firstTimestamp);
+                if (offlineBeforeStart > 0) {
+                    offlineDuration += offlineBeforeStart;
+                }
+            }
+            for (int i = 0; i < summary.size() - 1; i++) {
+                AvailabilityData current = summary.get(i);
+                AvailabilityData next = summary.get(i + 1);
+
+                Instant currentTime = current.getTimestamp();
+                Instant nextTime = next.getTimestamp();
+
+                long timeDifference = ChronoUnit.SECONDS.between(currentTime, nextTime);
+
+                if (current.isOnline()) {
+                    onlineDuration += Math.min(timeDifference, interval);
+                } else {
+                    offlineDuration += timeDifference;
+                }
+            }
+            if (!summary.isEmpty()) {
+                AvailabilityData last = summary.get(summary.size() - 1);
+                Instant lastTime = last.getTimestamp();
+                long lastPeriod = ChronoUnit.SECONDS.between(lastTime, endInstant);
+
+                if (!last.isOnline()) {
+                    offlineDuration += lastPeriod;
+                } else {
+                    onlineDuration += lastPeriod;
+                }
+            }
+        }
+
+        long totalDuration = onlineDuration + offlineDuration;
+        double onlinePercentage = (onlineDuration * 100.0) / totalDuration;
+        double offlinePercentage = 100.0 - onlinePercentage;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("onlinePercentage", onlinePercentage);
+        response.put("offlinePercentage", offlinePercentage);
+        response.put("onlineDuration", onlineDuration);
+        response.put("offlineDuration", offlineDuration);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public String parseTimeRange(String timeRange) {
-        switch (timeRange.toLowerCase()) {
-            case "3":
-                return "3h";
-            case "6":
-                return "6h";
-            case "12":
-                return "12h";
-            case "24":
-                return "1d";
-            case "week":
-                return "7d";
-            case "month":
-                return "30d";
-            case "3months":
-                return "90d";
-            case "year":
-                return "365d";
-            default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid time range format!");
-        }
+        return switch (timeRange.toLowerCase()) {
+            case "3" -> "3h";
+            case "6" -> "6h";
+            case "12" -> "12h";
+            case "24" -> "1d";
+            case "week" -> "7d";
+            case "month" -> "30d";
+            case "3months" -> "90d";
+            case "year" -> "365d";
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid time range format!");
+        };
     }
 
     public LocalDate[] parseDateRange(String timeRange) {
@@ -126,6 +211,18 @@ public class HouseholdController {
             return new LocalDate[]{startDate, endDate};
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date range format!");
+        }
+    }
+
+    private Duration parseDuration(String duration) {
+        if (duration.endsWith("h")) {
+            return Duration.parse("PT" + duration.toUpperCase());
+        } else if (duration.endsWith("d")) {
+            return Duration.parse("P" + duration.toUpperCase());
+        } else if (duration.endsWith("m")) {
+            return Duration.parse("PT" + duration.toUpperCase());
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported duration format!");
         }
     }
 
