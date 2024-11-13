@@ -19,9 +19,11 @@ public class RealEstateRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User owner;
+    /*@ManyToOne
+    @JoinColumn(name = "user_id", nullable = true)
+    private User owner;*/
+    @Column
+    private Long owner;
 
     @Column
     private String address;

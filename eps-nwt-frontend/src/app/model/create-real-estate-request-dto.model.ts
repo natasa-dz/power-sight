@@ -1,8 +1,8 @@
+import {User} from "./user.model";
+import {HouseholdRequestDTO} from "./create-household-request-dto.model";
 import {RealEstateRequestStatus} from "../enum/real-estate-request-status";
-import {HouseholdRequest} from "./household-request.model";
 
-export interface RealEstateRequest {
-  id: number;
+export interface RealEstateRequestDTO {
   owner: number;
   address: string;
   municipality: string;
@@ -11,7 +11,7 @@ export interface RealEstateRequest {
   images: File[] | null;
   documentation: File[] | null;
   status: RealEstateRequestStatus;
-  householdRequests: HouseholdRequest[];
+  householdRequests: HouseholdRequestDTO[];
   createdAt: Date;
   approvedAt: Date | null;
   adminNote: string;
