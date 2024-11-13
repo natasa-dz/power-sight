@@ -1,0 +1,17 @@
+<div class="household-container" *ngIf="household">
+  <div class="household-left">
+    <h2>Household Information: </h2>
+    <p><strong>Apartment Number:</strong> {{ household?.apartmentNumber }}</p>
+    <p><strong>Square Footage:</strong> {{ household?.squareFootage }} m<sup>2</sup></p>
+    <p><strong>Floor:</strong> {{ household?.floor }}</p>
+    <p><strong>Address:</strong> {{ household?.address }}</p>
+    <p><strong>Municipality:</strong> {{ household?.municipality }}</p>
+    <p><strong>Town:</strong> {{ household?.town }}</p>
+    <p><strong>Owner ID:</strong> {{ household?.ownerId }}</p>
+  </div>
+
+  <div class="household-right">
+    <h3>Availability: </h3>
+    <p>Graphs that show availability of simulators for this household</p>
+  </div>
+</div>

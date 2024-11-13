@@ -13,7 +13,8 @@ import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";  // Import routes from app.routes.ts
 import { ReactiveFormsModule } from '@angular/forms';
 
-import {ChangePasswordComponent} from "./change-password/change-password.component";  // Import routes from app.routes.ts
+import {ChangePasswordComponent} from "./change-password/change-password.component";
+import {SearchHouseholdComponent} from "./simulators/search-household/search-household.component";  // Import routes from app.routes.ts
 
 @NgModule({
   declarations: [AppComponent, ChangePasswordComponent], // Add all components here
@@ -23,11 +24,12 @@ import {ChangePasswordComponent} from "./change-password/change-password.compone
     RequestsModuleModule,
     CommonModule,
     FormsModule,
-    HttpClientModule, 
+    HttpClientModule,
     ReactiveFormsModule,
     RouterModule.forRoot(routes),
-    BrowserModule, 
-    AccessControlModule],
+    BrowserModule,
+    AccessControlModule,
+    SearchHouseholdComponent],
   bootstrap: [AppComponent],
   providers: [provideAnimationsAsync()] // Bootstraps the application with AppComponent
 })
