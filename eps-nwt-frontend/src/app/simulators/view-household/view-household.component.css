@@ -40,16 +40,77 @@
 .household-right {
   flex: 2;
   background-color: #e3f2fd;
-  padding: 0.8rem 2rem;
+  padding: 1rem 2rem;
 }
 
-h3 {
-  font-size: 2.5rem;
+.household-right h3 {
+  font-size: 2rem;
   color: #0d47a1;
-  margin-bottom: 0.2rem;
+  margin-bottom: 1rem;
 }
 
-p {
+.household-right select, .household-right input[type="date"], .household-right button {
   font-size: 1rem;
+  padding: 0.6rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: 1px solid #0d47a1;
+  background-color: #ffffff;
   color: #37474f;
+  transition: all 0.3s ease;
+}
+
+.household-right select:hover, .household-right input[type="date"]:hover, .household-right button:hover {
+  background-color: #bbdefb;
+  color: #0d47a1;
+  border-color: #0d47a1;
+}
+
+.household-right select:focus, .household-right input[type="date"]:focus, .household-right button:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(13, 71, 161, 0.4);
+  border-color: #0d47a1;
+}
+
+.household-right button {
+  cursor: pointer;
+  background-color: #0d47a1;
+  color: #ffffff;
+}
+
+.household-right button:hover {
+  background-color: #0a3680;
+}
+
+.household-right canvas {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.time-range-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.time-range-container select,
+.time-range-container input[type="date"] {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #0d47a1;
+  background-color: #ffffff;
+  color: #37474f;
+}
+
+.time-range-container input[type="date"] {
+  max-width: 10rem;
 }

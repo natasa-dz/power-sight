@@ -12,6 +12,30 @@
 
   <div class="household-right">
     <h3>Availability: </h3>
-    <p>Graphs that show availability of simulators for this household</p>
+    <div class="time-range-container">
+      <select id="timeRange" [(ngModel)]="timeRange" (ngModelChange)="updateChart()">
+        <option value="3">Last 3 Hours</option>
+        <option value="6">Last 6 Hours</option>
+        <option value="12">Last 12 Hours</option>
+        <option value="24">Last 24 Hours</option>
+        <option value="week">Last 7 Days</option>
+        <option value="month">Last Month</option>
+        <option value="3months">Last 3 Months</option>
+        <option value="year">Last Year</option>
+        <option value="custom">Custom dates</option>
+      </select>
+
+      <input type="date" id="startDate" [(ngModel)]="startDate">
+      <input type="date" id="endDate" [(ngModel)]="endDate">
+
+      <button (click)="updateChart()">Fetch Data</button>
+    </div>
+
+    <div class="availability-data" *ngIf="onlinePercentage !== undefined">
+      <p><strong>Online Duration:</strong> {{ onlineDuration }} seconds</p>
+      <p><strong>Offline Duration:</strong> {{ offlineDuration }} seconds</p>
+      <p><strong>Online Percentage:</strong> {{ onlinePercentage | number:'1.2-2' }}%</p>
+      <p><strong>Offline Percentage:</strong> {{ offlinePercentage | number:'1.2-2' }}%</p>
+    </div>
   </div>
 </div>

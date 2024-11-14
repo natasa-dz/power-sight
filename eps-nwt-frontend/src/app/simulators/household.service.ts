@@ -32,4 +32,8 @@ export class HouseholdService {
     return this.http.get<ViewHouseholdDto>(`${this.apiUrl}/find-by-id/${id}`);
   }
 
+  getAvailability(name: string, timeRange: string): Observable<Map<string, string>> {
+    return this.http.get<Map<string, string>>(`${this.apiUrl}/availability/${name}/${timeRange}`);
+  }
+
 }
