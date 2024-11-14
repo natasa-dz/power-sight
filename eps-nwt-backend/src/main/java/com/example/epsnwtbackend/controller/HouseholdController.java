@@ -97,7 +97,7 @@ public class HouseholdController {
         summary.sort(Comparator.comparing(AvailabilityData::getTimestamp));
 
         long onlineDuration = 0;
-        long offlineDuration = 0;
+        long totalDuration = getSeconds(timeRange);
         final long interval = 15;
 
         if (duration != null) {
@@ -119,30 +119,14 @@ public class HouseholdController {
                     timeDifference = ChronoUnit.SECONDS.between(currentTime, Instant.now());
                 }
 
-                if(i == 0) {
-                    offlineDuration += Math.max(0, timeSinceStart - interval);
-                }
-
                 if (data.isOnline()) {
                     onlineDuration += Math.min(timeDifference, interval);
-                } else {
-                    offlineDuration += timeDifference;
                 }
             }
 
         } else {
-            Instant startInstant = dateRange[0].atStartOfDay(ZoneId.of("UTC")).toInstant();
             Instant endInstant = dateRange[1].atStartOfDay(ZoneId.of("UTC")).plusDays(1).toInstant();
 
-            if (!summary.isEmpty()) {
-                AvailabilityData first = summary.get(0);
-                Instant firstTimestamp = first.getTimestamp();
-
-                long offlineBeforeStart = ChronoUnit.SECONDS.between(startInstant, firstTimestamp);
-                if (offlineBeforeStart > 0) {
-                    offlineDuration += offlineBeforeStart;
-                }
-            }
             for (int i = 0; i < summary.size() - 1; i++) {
                 AvailabilityData current = summary.get(i);
                 AvailabilityData next = summary.get(i + 1);
@@ -154,8 +138,6 @@ public class HouseholdController {
 
                 if (current.isOnline()) {
                     onlineDuration += Math.min(timeDifference, interval);
-                } else {
-                    offlineDuration += timeDifference;
                 }
             }
             if (!summary.isEmpty()) {
@@ -163,15 +145,14 @@ public class HouseholdController {
                 Instant lastTime = last.getTimestamp();
                 long lastPeriod = ChronoUnit.SECONDS.between(lastTime, endInstant);
 
-                if (!last.isOnline()) {
-                    offlineDuration += lastPeriod;
-                } else {
+                if (last.isOnline()) {
                     onlineDuration += lastPeriod;
                 }
             }
         }
 
-        long totalDuration = onlineDuration + offlineDuration;
+        long offlineDuration = totalDuration - onlineDuration;
+
         double onlinePercentage = (onlineDuration * 100.0) / totalDuration;
         double offlinePercentage = 100.0 - onlinePercentage;
 
@@ -224,6 +205,22 @@ public class HouseholdController {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported duration format!");
         }
+    }
+
+    private Long getSeconds(String timeRange) {
+        long secondsInDay = 24 * 60 * 60L;
+        switch (timeRange) {
+                case "3": return 3*60*60L;
+                case "6": return 6*60*60L;
+                case "12": return 12*60*60L;
+                case "24": return secondsInDay;
+                case "week": return 7*secondsInDay;
+                case "month": return 30*secondsInDay;
+                case "3months": return 90*secondsInDay;
+                case "year": return 365*secondsInDay;
+        }
+        LocalDate[] dateRange = parseDateRange(timeRange);
+        return (dateRange[1].toEpochDay() - dateRange[0].toEpochDay()) * secondsInDay;
     }
 
 }
