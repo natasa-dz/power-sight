@@ -1,5 +1,6 @@
 package com.example.epsnwtbackend.controller;
 
+import com.example.epsnwtbackend.dto.AggregatedAvailabilityData;
 import com.example.epsnwtbackend.dto.AvailabilityData;
 import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
 import com.example.epsnwtbackend.dto.ViewHouseholdDTO;
@@ -14,16 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/household")
@@ -68,6 +63,38 @@ public class HouseholdController {
         Page<HouseholdSearchDTO> households = householdService.searchNoOwner(municipality, address,
                 apartmentNumber, pageable);
         return ResponseEntity.ok(households);
+    }
+
+    @GetMapping(value = "/graph/{name}/{timeRange}")
+    public ResponseEntity<List<AggregatedAvailabilityData>> getDataForGraph(
+            @PathVariable String name, @PathVariable String timeRange) {
+
+        LocalDate[] dateRange = null;
+        String duration = null;
+
+        try {
+            if (timeRange.contains("-")) {
+                dateRange = parseDateRange(timeRange);
+            } else {
+                duration = parseTimeRange(timeRange);
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        List<AvailabilityData> allData;
+        if (dateRange != null) {
+            allData = influxService.getAvailabilityByDateRange(name, dateRange[0], dateRange[1]);
+        } else {
+            allData = influxService.getAvailabilityByTimeRange(name, duration);
+        }
+        String aggregationPeriod = householdService.determineAggregationPeriod(timeRange);
+
+        List<AggregatedAvailabilityData> aggregatedData = householdService.aggregateData(allData, aggregationPeriod);
+
+        aggregatedData = householdService.fillMissingData(aggregatedData, aggregationPeriod, timeRange);
+
+        return ResponseEntity.ok(aggregatedData);
     }
 
     @GetMapping(value = "/availability/{name}/{timeRange}")
