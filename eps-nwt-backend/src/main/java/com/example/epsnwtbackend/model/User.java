@@ -1,12 +1,17 @@
 package com.example.epsnwtbackend.model;
 
+import com.example.epsnwtbackend.dto.UserDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,8 +27,70 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+
+    @Column(name = "user_photo" )  // Make it nullable if user photo is optional
+    private String userPhoto;
+
+    private String secret;
+
+    //TODO: Kreiraj konstruktore do kraja!
+    public User() {
+    }
+
+    // Constructor to create User from UserDto
+    public User(UserDto dto) {
+        this.username = dto.getUsername();
+        this.password = dto.getPassword(); // Ensure password is encoded before setting
+        this.role = dto.getRole();
+        this.userPhoto = dto.getUserPhoto();
+        this.isActive = dto.isActive(); // Set to false initially, activated via token
+        this.passwordChanged = dto.isPasswordChanged(); // Default to false, updated after first login change
+        this.activationToken = dto.getActivationToken(); // Set if generated in service
+    }
+    public String getUserPhoto() {
+        return userPhoto;
+    }
+
+    public void setUserPhoto(String userPhoto) {
+        this.userPhoto = userPhoto;
+    }
+
+    public boolean isPasswordChanged() {
+        return passwordChanged;
+    }
+
+    public void setPasswordChanged(boolean passwordChanged) {
+        this.passwordChanged = passwordChanged;
+    }
+
+    @Column(nullable = false)
+    private boolean passwordChanged = false;
+
     public Long getId() {
         return id;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = false;
+
+    @Column(name = "activation_token")
+    private String activationToken;
+
+
+    public String getActivationToken() {
+        return activationToken;
+    }
+
+    public void setActivationToken(String activationToken) {
+        this.activationToken = activationToken;
     }
 
     public void setId(Long id) {
@@ -34,8 +101,39 @@ public class User {
         return username;
     }
 
+    @JsonIgnore
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @JsonIgnore
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
+
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @JsonIgnore
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
     public String getPassword() {
@@ -66,4 +164,27 @@ public class User {
     private Set<Household> households;
 
 
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
+                ", userPhoto='" + userPhoto + '\'' +
+                ", secret='" + secret + '\'' +
+                ", passwordChanged=" + passwordChanged +
+                ", isActive=" + isActive +
+                ", activationToken='" + activationToken + '\'' +
+                ", households=" + households +
+                '}';
+    }
 }

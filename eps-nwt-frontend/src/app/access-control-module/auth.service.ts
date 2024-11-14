@@ -42,10 +42,9 @@ export class AuthService {
     return this.userState;
   }
 
-  login(auth: any, recaptchaToken: string): Observable<AuthResponse> {
+  login(auth: any): Observable<AuthResponse> {
     const body = {
       ...auth,
-      recaptchaToken: recaptchaToken
     };
     return this.http.post<AuthResponse>(`${environment.apiHost}users/login`, body);
   }
@@ -60,12 +59,6 @@ export class AuthService {
     // return this.http.get(environment.apiHost + 'users/login', {
     //   responseType: 'text',
     }
-
-  verifyOtp(email: string, otp: string): Observable<AuthResponse> {
-    const body = { email, otp };
-    return this.http.post<AuthResponse>(`${environment.apiHost}users/verify-otp`, body);
-  }
-
 
 
   // logOut(): Observable<any> {

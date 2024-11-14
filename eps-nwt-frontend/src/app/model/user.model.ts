@@ -5,32 +5,35 @@ export enum Role {
   CITIZEN='CITIZEN',
   UNKNOWN = 'UNKNOWN',
 }
-export enum UserStatus {
-  PENDING = 'PENDING',
-  ACTIVE = 'ACTIVE'
-}
+
 
 export class User {
   username: string;
   password: string;
   role: Role;
-  confirmPassword:string;
-  status: UserStatus;
+  passwordChanged: boolean;  // Whether the user has changed their password
+  active:boolean;
+  userPhoto: string;
+  activationToken: string;
 
 
   constructor(
-    email: string,
+    username: string,
     password: string,
     role: Role,
-    confirm:string,
-    status: UserStatus,
+    passwordChanged: boolean,  // Whether the user has changed their password
+    active:boolean,
+    userPhoto: string,
+    activationToken: string
 
   ) {
 
-    this.username = email;
+    this.username = username;
     this.password = password;
     this.role = role;
-    this.confirmPassword=confirm;
-    this.status = status;
+    this.passwordChanged = passwordChanged;
+    this.active = active;
+    this.userPhoto = userPhoto;
+    this.activationToken = activationToken;
   }
 }

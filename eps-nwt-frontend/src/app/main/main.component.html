@@ -1,0 +1,15 @@
+<div *ngIf="userRole === Role.SUPERADMIN">
+  <!-- Owner Navbar Links -->
+  <app-navbar-superadmin></app-navbar-superadmin>
+</div>
+
+<div *ngIf="userRole === Role.ADMIN">
+  <!-- Owner Navbar Links -->
+  <app-navbar-admin></app-navbar-admin>
+</div>
+
+
+<div *ngIf="userRole === Role.CITIZEN">
+  <!-- Owner Navbar Links -->
+  <app-navbar-citizen></app-navbar-citizen>
+</div>
