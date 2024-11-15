@@ -128,6 +128,36 @@ export class ViewHouseholdComponent implements OnInit {
   fetchGraphData(name: string, timeRange: string) {
     this.householdService.getGraphData(name, timeRange).subscribe(
       (graphData: any[]) => {
+        graphData.sort((a, b) => {
+          const isHour = /^\d{2}h$/.test(a.name); // Matches "08h", "21h"
+          const isDate = /^\d{2}\.\d{2}\.\d{4}\.$/.test(a.name); // Matches "12.12.2023."
+          const isWeek = /^\d{1,2}st$/.test(a.name); // Matches "1st", "2nd", "5th"
+          const isMonth = /^[A-Za-z]{3}$/.test(a.name); // Matches "Jan", "Feb", etc.
+
+          if (isHour) {
+            const hourA = parseInt(a.name.slice(0, 2), 10);
+            const hourB = parseInt(b.name.slice(0, 2), 10);
+            return hourA - hourB;
+          } else if (isDate) {
+            const dateA = new Date(a.name.split('.').reverse().join('-'));
+            const dateB = new Date(b.name.split('.').reverse().join('-'));
+            return dateA.getTime() - dateB.getTime();
+          } else if (isWeek) {
+            const weekA = parseInt(a.name.replace(/\D/g, ''), 10);
+            const weekB = parseInt(b.name.replace(/\D/g, ''), 10);
+            return weekA - weekB;
+          } else if (isMonth) {
+            const monthMap = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
+            // @ts-ignore
+            const monthA = monthMap[a.name];
+            // @ts-ignore
+            const monthB = monthMap[b.name];
+            return monthA - monthB;
+          }
+
+          return 0;
+        });
+
         this.chartData.labels = graphData.map(item => item.name);
         this.chartData.datasets[0].data = graphData.map(item => item.availability);
         if (this.chart) {
@@ -139,6 +169,7 @@ export class ViewHouseholdComponent implements OnInit {
       }
     );
   }
+
 
   updateChartType(): void {
     if (this.chart) {
