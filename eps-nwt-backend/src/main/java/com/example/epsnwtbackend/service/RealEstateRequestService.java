@@ -1,5 +1,6 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.dto.AllRealEstateRequestsDTO;
 import com.example.epsnwtbackend.dto.CreateRealEstateRequestDTO;
 import com.example.epsnwtbackend.enums.RealEstateRequestStatus;
 import com.example.epsnwtbackend.model.*;
@@ -15,10 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class RealEstateRequestService {
@@ -82,6 +81,16 @@ public class RealEstateRequestService {
         }
         System.out.println(citiesWithMunicipalities);
         return citiesWithMunicipalities;
+    }
+
+    public List<AllRealEstateRequestsDTO> getAllForOwner(Long ownerId){
+        List<RealEstateRequest> requests = repository.getAllForOwner(ownerId);
+        List<AllRealEstateRequestsDTO> dtos = new ArrayList<>();
+        for (RealEstateRequest r : requests) {
+            dtos.add(new AllRealEstateRequestsDTO(r.getId(), r.getOwner(), r.getStatus(),
+                    r.getCreatedAt(), r.getApprovedAt(), r.getAddress(), r.getMunicipality(), r.getTown()));
+        }
+        return dtos;
     }
 
 }

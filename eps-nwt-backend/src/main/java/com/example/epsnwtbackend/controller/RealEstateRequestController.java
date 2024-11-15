@@ -1,11 +1,13 @@
 package com.example.epsnwtbackend.controller;
 
+import com.example.epsnwtbackend.dto.AllRealEstateRequestsDTO;
 import com.example.epsnwtbackend.dto.CreateRealEstateRequestDTO;
 import com.example.epsnwtbackend.dto.HouseholdRequestDTO;
 import com.example.epsnwtbackend.model.HouseholdRequest;
 import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.service.HouseholdRequestService;
 import com.example.epsnwtbackend.service.RealEstateRequestService;
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -65,5 +67,11 @@ public class RealEstateRequestController {
     public Map<String, List<String>> getCitiesWithMunicipalities() {
         System.out.println("pogadja metodu");
         return service.getCitiesWithMunicipalities();
+    }
+
+    @GetMapping(value = "/{ownerId}/all")
+    public List<AllRealEstateRequestsDTO> getAllForOwner(@PathVariable("ownerId")Long ownerId){
+        System.out.println(ownerId + " hhhhhhhhhhhhhhhhhhhhhhhhhh");
+        return service.getAllForOwner(ownerId);
     }
 }
