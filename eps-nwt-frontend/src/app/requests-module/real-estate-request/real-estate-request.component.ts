@@ -160,7 +160,8 @@ export class RealEstateRequestComponent implements OnInit{
             },
             error: (mess:any) => {
               if(mess.status === 200){
-                console.log(mess.error.text)
+                alert(mess.error.text);
+                location.reload();
               } else{
                 console.log("Error with creating real estate request");
               }
