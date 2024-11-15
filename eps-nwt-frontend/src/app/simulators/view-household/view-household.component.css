@@ -114,3 +114,16 @@
 .time-range-container input[type="date"] {
   max-width: 10rem;
 }
+
+.graph-container {
+  margin-top: 20px;
+  height: 40%;
+  width: 100%;
+}
+
+.chart-type-selector {
+  margin-bottom: 10px;
+}
+.chart-type-selector label {
+  margin-right: 5px;
+}

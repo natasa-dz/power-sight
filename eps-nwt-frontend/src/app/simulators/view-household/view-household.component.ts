@@ -4,6 +4,21 @@ import {ActivatedRoute} from "@angular/router";
 import {DatePipe, DecimalPipe, NgIf} from "@angular/common";
 import {ViewHouseholdDto} from "../../model/view-household-dto.model";
 import {FormsModule} from "@angular/forms";
+import { BaseChartDirective } from 'ng2-charts';
+import {
+  Chart,
+  BarElement,
+  BarController,
+  CategoryScale,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  ChartType,
+  ChartData, LineElement, PointElement, LineController
+} from 'chart.js';
+import { ViewChild } from '@angular/core';
+
 
 @Component({
   selector: 'app-view-household',
@@ -11,7 +26,8 @@ import {FormsModule} from "@angular/forms";
   imports: [
     NgIf,
     DecimalPipe,
-    FormsModule
+    FormsModule,
+    BaseChartDirective
   ],
   providers: [DatePipe],
   templateUrl: './view-household.component.html',
@@ -26,6 +42,20 @@ export class ViewHouseholdComponent implements OnInit {
   timeRange = '3';
   startDate: string | undefined;
   endDate: string | undefined;
+  chartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: [
+      {
+        label: 'Availability',
+        data: [],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }
+    ]
+  };
+  chartType: ChartType = 'bar';
+  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,6 +64,19 @@ export class ViewHouseholdComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    Chart.register(
+      BarElement,
+      BarController,
+      CategoryScale,
+      LinearScale,
+      Title,
+      Tooltip,
+      Legend,
+      LineController,
+      PointElement,
+      LineElement
+    );
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.householdService.findById(+id).subscribe(
@@ -67,7 +110,6 @@ export class ViewHouseholdComponent implements OnInit {
   }
 
   async fetchAvailabilityData(name: string, timeRange: string) {
-    console.log(name, timeRange);
     this.householdService.getAvailability(name, timeRange).subscribe(
       (data: any) => {
         this.onlinePercentage = isNaN(data.onlinePercentage) ? '0' : data.onlinePercentage;
@@ -75,10 +117,33 @@ export class ViewHouseholdComponent implements OnInit {
         this.onlineDuration = isNaN(data.onlineDuration) ? '0' : data.onlineDuration;
         this.offlineDuration = isNaN(data.offlineDuration) ? '0' : data.offlineDuration;
 
+        this.fetchGraphData(name, timeRange);
       },
       (error) => {
         console.error("Error fetching household details", error);
       }
     );
   }
+
+  fetchGraphData(name: string, timeRange: string) {
+    this.householdService.getGraphData(name, timeRange).subscribe(
+      (graphData: any[]) => {
+        this.chartData.labels = graphData.map(item => item.name);
+        this.chartData.datasets[0].data = graphData.map(item => item.availability);
+        if (this.chart) {
+          this.chart.update();
+        }
+      },
+      (error) => {
+        console.error("Error fetching graph data", error);
+      }
+    );
+  }
+
+  updateChartType(): void {
+    if (this.chart) {
+      this.chart.update();
+    }
+  }
+
 }

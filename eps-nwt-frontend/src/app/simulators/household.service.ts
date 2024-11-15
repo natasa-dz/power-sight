@@ -36,4 +36,8 @@ export class HouseholdService {
     return this.http.get<Map<string, string>>(`${this.apiUrl}/availability/${name}/${timeRange}`);
   }
 
+  getGraphData(name: string, timeRange: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/graph/${name}/${timeRange}`);
+  }
+
 }

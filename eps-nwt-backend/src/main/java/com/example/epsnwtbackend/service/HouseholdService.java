@@ -89,7 +89,7 @@ public class HouseholdService {
                             "06h", "07h", "08h", "09h", "10h", "11h", "12h", "13h",
                             "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h",
                             "22h", "23h", "00h"};
-                    for (int i = 0; i < hoursBack - aggregatedData.size(); i++) {
+                    for (int i = 0; i < hoursBack - aggregatedData.size() + 1; i++) {
                         int hourIndex = (startHour + i + 1) % 24;
                         String hour = hoursInDay[hourIndex];
                         if (filledData.stream().noneMatch(data -> data.getName().equals(hour))) {

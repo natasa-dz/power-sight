@@ -37,5 +37,24 @@
       <p><strong>Online Percentage:</strong> {{ onlinePercentage | number:'1.2-2' }}%</p>
       <p><strong>Offline Percentage:</strong> {{ offlinePercentage | number:'1.2-2' }}%</p>
     </div>
+
+    <div class="graph-container" *ngIf="chartData.labels != undefined && chartData.labels.length > 0">
+      <div class="time-range-container">
+      <h4>Availability chart: </h4>
+      <div class="chart-type-selector">
+        <label for="chartType">Select Chart Type:</label>
+        <select id="chartType" [(ngModel)]="chartType" (ngModelChange)="updateChartType()">
+          <option value="bar">Bar Chart</option>
+          <option value="line">Line Chart</option>
+        </select>
+      </div>
+      </div>
+      <canvas
+        baseChart
+        [type]="chartType"
+        [data]="chartData"
+        [options]="{ responsive: true, maintainAspectRatio: false }">
+      </canvas>
+    </div>
   </div>
 </div>
