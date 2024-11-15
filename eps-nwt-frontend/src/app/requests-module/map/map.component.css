@@ -1,0 +1,16 @@
+.map-container {
+  margin-top: 20px;
+  margin-right: 20px;
+  height: 25rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+}
+
+.map-frame {
+  height: 100%;
+}
+
+#map {
+  height: 100%;
+  border-radius: 6px;
+}
