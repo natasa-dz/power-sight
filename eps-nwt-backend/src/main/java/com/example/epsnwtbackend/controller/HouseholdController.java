@@ -152,7 +152,7 @@ public class HouseholdController {
             }
 
         } else {
-            Instant endInstant = dateRange[1].atStartOfDay(ZoneId.of("UTC")).plusDays(1).toInstant();
+            Instant endInstant = dateRange[1].atStartOfDay(ZoneOffset.ofHours(1)).plusDays(1).toInstant();
 
             for (int i = 0; i < summary.size() - 1; i++) {
                 AvailabilityData current = summary.get(i);

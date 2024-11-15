@@ -10,10 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -57,58 +61,115 @@ public class HouseholdService {
     }
 
     public List<AggregatedAvailabilityData> fillMissingData(List<AggregatedAvailabilityData> aggregatedData,
-                                                            String aggregationPeriod, String timeRange) {
+                                                             String aggregationPeriod, String timeRange) {
         List<AggregatedAvailabilityData> filledData = new ArrayList<>(aggregatedData);
+
+        LocalDate[] dateRange = null;
+        try {
+            dateRange = parseDateRange(timeRange);
+        } catch (Exception e) {
+        }
+
         switch (aggregationPeriod) {
             case "hourly":
-                String[] hoursInDay = {"00h", "01h", "02h", "03h", "04h", "05h",
-                        "06h", "07h", "08h", "09h", "10h", "11h", "12h", "13h",
-                        "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h",
-                        "22h", "23h"};
-                int hoursBack = Integer.parseInt(timeRange);
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.HOUR_OF_DAY, -hoursBack-1);
-                int startHour = cal.get(Calendar.HOUR_OF_DAY);
-                for (int i = 0; i < hoursBack; i++) {
-                    int hourIndex = (startHour + i) % 24;
-                    String hour = hoursInDay[hourIndex];
-                    if (filledData.stream().noneMatch(data -> data.getName().equals(hour))) {
-                        filledData.add(new AggregatedAvailabilityData(hour, 0));
+                if (dateRange != null) {
+                    long hoursBack = ChronoUnit.HOURS.between(dateRange[0].atStartOfDay(), dateRange[1].atStartOfDay());
+                    for (long i = 0; i <= hoursBack; i++) {
+                        String hour = dateRange[0].atTime((int) (i % 24), 0).format(DateTimeFormatter.ofPattern("HH'h'"));
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(hour))) {
+                            filledData.add(new AggregatedAvailabilityData(hour, 0));
+                        }
+                    }
+                } else {
+                    int hoursBack = Integer.parseInt(timeRange);
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.HOUR_OF_DAY, -hoursBack - 1);
+                    int startHour = cal.get(Calendar.HOUR_OF_DAY);
+                    String[] hoursInDay = {"01h", "02h", "03h", "04h", "05h",
+                            "06h", "07h", "08h", "09h", "10h", "11h", "12h", "13h",
+                            "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h",
+                            "22h", "23h", "00h"};
+                    for (int i = 0; i < hoursBack - aggregatedData.size(); i++) {
+                        int hourIndex = (startHour + i + 1) % 24;
+                        String hour = hoursInDay[hourIndex];
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(hour))) {
+                            filledData.add(new AggregatedAvailabilityData(hour, 0));
+                        }
                     }
                 }
                 break;
             case "daily":
-                String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-                for (String day : daysOfWeek) {
-                    if (filledData.stream().noneMatch(data -> data.getName().equals(day))) {
-                        filledData.add(new AggregatedAvailabilityData(day, 0));
+                if (dateRange != null) {
+                    long daysBack = ChronoUnit.DAYS.between(dateRange[0], dateRange[1]);
+                    for (long i = 0; i <= daysBack; i++) {
+                        String day = dateRange[0].plusDays(i).format(DateTimeFormatter.ofPattern("dd.MM.yyyy."));
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(day))) {
+                            filledData.add(new AggregatedAvailabilityData(day, 0));
+                        }
+                    }
+                } else {
+                    int daysBack = 6;   //only week has aggregation by days, so today + 6 days back
+                    LocalDate startDate = LocalDate.now().minusDays(daysBack);
+                    for (long i = 0; i <= daysBack; i++) {
+                        String day = startDate.plusDays(i).format(DateTimeFormatter.ofPattern("dd.MM.yyyy."));
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(day))) {
+                            filledData.add(new AggregatedAvailabilityData(day, 0));
+                        }
                     }
                 }
                 break;
             case "weekly":
-                String[] weeksOfMonth = {"1st", "2nd", "3rd", "4th", "5th"};
-                for (String week : weeksOfMonth) {
-                    if (filledData.stream().noneMatch(data -> data.getName().equals(week))) {
-                        filledData.add(new AggregatedAvailabilityData(week, 0));
+                if (dateRange != null) {
+                    long weeksBack = ChronoUnit.WEEKS.between(dateRange[0], dateRange[1]);
+                    for (long i = 0; i <= weeksBack; i++) {
+                        String week = "";
+                        switch ((int) i + 1) {
+                            case 1: week = "1st"; break;
+                            case 2: week = "2nd"; break;
+                            case 3: week = "3rd"; break;
+                            default: week = i + "th"; break;
+                        }
+                        String finalWeek = week;
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(finalWeek))) {
+                            filledData.add(new AggregatedAvailabilityData(week, 0));
+                        }
+                    }
+                } else {
+                    String[] weeksOfMonth = {"1st", "2nd", "3rd", "4th", "5th"};
+                    for (String week : weeksOfMonth) {
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(week))) {
+                            filledData.add(new AggregatedAvailabilityData(week, 0));
+                        }
                     }
                 }
                 break;
             case "monthly":
-                String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
-                        "Aug", "Sep", "Oct", "Nov", "Dec"};
-                int monthsBack = timeRange.equals("3months") ? 3 : 12;
-                int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
-                for (int i = 0; i < monthsBack; i++) {
-                    int monthIndex = (currentMonth - i + 12) % 12;
-                    String month = months[monthIndex];
-                    if (filledData.stream().noneMatch(data -> data.getName().equals(month))) {
-                        filledData.add(new AggregatedAvailabilityData(month, 0));
+                if (dateRange != null) {
+                    long monthsBack = ChronoUnit.MONTHS.between(YearMonth.from(dateRange[0]), YearMonth.from(dateRange[1]));
+                    for (long i = 0; i <= monthsBack; i++) {
+                        String month = dateRange[0].plusMonths(i).format(DateTimeFormatter.ofPattern("MMM yyyy"));
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(month))) {
+                            filledData.add(new AggregatedAvailabilityData(month, 0));
+                        }
+                    }
+                } else {
+                    String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+                            "Aug", "Sep", "Oct", "Nov", "Dec"};
+                    int monthsBack = timeRange.equals("3months") ? 3 : 12;
+                    int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
+                    for (int i = 0; i < monthsBack; i++) {
+                        int monthIndex = (currentMonth - i + 12) % 12;
+                        String month = months[monthIndex];
+                        if (filledData.stream().noneMatch(data -> data.getName().equals(month))) {
+                            filledData.add(new AggregatedAvailabilityData(month, 0));
+                        }
                     }
                 }
                 break;
         }
         return filledData;
     }
+
 
     public List<AggregatedAvailabilityData> aggregateData(List<AvailabilityData> allData, String aggregationPeriod) {
         Map<LocalDateTime, List<AvailabilityData>> groupedData;
@@ -137,19 +198,19 @@ public class HouseholdService {
 
     private Map<LocalDateTime, List<AvailabilityData>> groupByHour(List<AvailabilityData> data) {
         return data.stream().collect(Collectors.groupingBy(
-                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.UTC).truncatedTo(ChronoUnit.HOURS)
+                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.ofHours(1)).truncatedTo(ChronoUnit.HOURS)
         ));
     }
 
     private Map<LocalDateTime, List<AvailabilityData>> groupByDay(List<AvailabilityData> data) {
         return data.stream().collect(Collectors.groupingBy(
-                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.UTC).toLocalDate().atStartOfDay()
+                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.ofHours(1)).toLocalDate().atStartOfDay()
         ));
     }
 
     private Map<LocalDateTime, List<AvailabilityData>> groupByWeek(List<AvailabilityData> data) {
         return data.stream().collect(Collectors.groupingBy(
-                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.UTC)
+                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.ofHours(1))
                         .with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
                         .truncatedTo(ChronoUnit.DAYS)
         ));
@@ -157,7 +218,7 @@ public class HouseholdService {
 
     private Map<LocalDateTime, List<AvailabilityData>> groupByMonth(List<AvailabilityData> data) {
         return data.stream().collect(Collectors.groupingBy(
-                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.UTC)
+                d -> LocalDateTime.ofInstant(d.getTimestamp(), ZoneOffset.ofHours(1))
                         .withDayOfMonth(1)
                         .truncatedTo(ChronoUnit.DAYS)
         ));
@@ -194,7 +255,7 @@ public class HouseholdService {
         if ("hourly".equals(aggregationPeriod)) {
             name = periodStart.format(DateTimeFormatter.ofPattern("HH'h'"));
         } else if ("daily".equals(aggregationPeriod)) {
-            name = periodStart.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+            name = periodStart.format(DateTimeFormatter.ofPattern("dd.MM.yyyy."));
         } else if ("weekly".equals(aggregationPeriod)) {
             int weekOfYear = periodStart.get(WeekFields.ISO.weekOfMonth());
             switch (weekOfYear) {
@@ -210,13 +271,41 @@ public class HouseholdService {
     }
 
     public String determineAggregationPeriod(String timeRange) {
-        if (timeRange.equalsIgnoreCase("3") || timeRange.equalsIgnoreCase("6") || timeRange.equalsIgnoreCase("12")) {
+        if (timeRange.equalsIgnoreCase("3") || timeRange.equalsIgnoreCase("6") || timeRange.equalsIgnoreCase("12") || timeRange.equalsIgnoreCase("24")) {
             return "hourly";
         } else if (timeRange.equalsIgnoreCase("week")) {
             return "daily";
         } else if (timeRange.equalsIgnoreCase("month")) {
             return "weekly";
+        } else if (timeRange.equalsIgnoreCase("3months") || timeRange.equalsIgnoreCase("year")) {
+            return "monthly";
+        } else {
+            LocalDate[] dateRange = parseDateRange(timeRange);
+            long daysBetween = ChronoUnit.DAYS.between(dateRange[0], dateRange[1]);
+            long weeksBetween = ChronoUnit.WEEKS.between(dateRange[0], dateRange[1]);
+            if (daysBetween < 15) {
+                return "daily";
+            } else if (weeksBetween <= 6) {
+                return "weekly";
+            } else {
+                return "monthly";
+            }
         }
-        return "monthly";
+    }
+
+    private LocalDate[] parseDateRange(String timeRange) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+        String[] dates = timeRange.split("-");
+
+        try {
+            LocalDate startDate = LocalDate.parse(dates[0].trim(), formatter);
+            LocalDate endDate = LocalDate.parse(dates[1].trim(), formatter);
+            if (startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date range must be at least 1 day!");
+            }
+            return new LocalDate[]{startDate, endDate};
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date range format!");
+        }
     }
 }
