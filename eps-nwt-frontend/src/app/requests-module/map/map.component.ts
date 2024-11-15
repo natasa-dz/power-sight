@@ -1,5 +1,6 @@
-import {AfterViewInit, Component} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Output} from '@angular/core';
 import * as L from "leaflet";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-map',
@@ -9,7 +10,11 @@ import * as L from "leaflet";
   styleUrl: './map.component.css'
 })
 export class MapComponent implements AfterViewInit{
-  map : any;
+  map : L.Map | undefined;
+
+  @Output() addressChange = new EventEmitter<string>();
+
+  constructor(private http: HttpClient) {}
 
   private initMap(): void {
     // Novi Sad
@@ -26,8 +31,27 @@ export class MapComponent implements AfterViewInit{
     });
 
     tiles.addTo(this.map);
-  }
 
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+      this.http
+        .get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+        .subscribe((data: any) => {
+          const road = data?.address?.road || 'Unknown road';
+          if (road === 'Unknown road') {
+            alert("Unknown address")
+            return
+          }
+          const number = data?.address?.house_number || 'Unknown number';
+          const fullAddress = `${road} ${number !== 'Unknown number' ? number : 'bb'}`;
+          this.addressChange.emit(fullAddress);
+          const popup = L.popup()
+            .setLatLng([lat, lng])
+            .setContent(`<p>Location:</p><p>${road} ${number !== 'Unknown number' ? number : 'bb'}</p`)
+            .openOn(this.map!);
+        });
+    });
+  }
 
   ngAfterViewInit(): void {
     this.initMap();

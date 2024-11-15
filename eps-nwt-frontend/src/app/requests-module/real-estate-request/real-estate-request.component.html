@@ -9,7 +9,7 @@
     <div class="content-container">
       <div class="stepper-content">
         <div class="helper-div" *ngIf="currentStep === 1">
-          <app-map></app-map>
+          <app-map (addressChange)="onAddressChange($event)"></app-map>
           <form class="content-form" [formGroup]="realEstateForm" (ngSubmit)="nextStep()">
             <label>*Address</label>
             <input formControlName="address" type="text" />

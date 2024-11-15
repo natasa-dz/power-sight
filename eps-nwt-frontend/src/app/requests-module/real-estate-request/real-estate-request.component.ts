@@ -80,6 +80,10 @@ export class RealEstateRequestComponent implements OnInit{
     }
   }
 
+  onAddressChange(newAddress: string): void {
+    this.realEstateForm.get('address')?.setValue(newAddress);
+  }
+
 
   minArrayLength(min: number): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {

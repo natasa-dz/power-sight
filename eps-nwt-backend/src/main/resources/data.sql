@@ -1,3 +1,9 @@
+DELETE FROM municipalities;
+DELETE FROM cities;
+
+--ALTER TABLE cities ADD CONSTRAINT unique_name UNIQUE (name);
+--ALTER TABLE municipalities ADD CONSTRAINT unique_municipality_name UNIQUE (name);
+
 INSERT INTO cities (name) VALUES
 ('Beograd'),
 ('Bačka Topola'),
