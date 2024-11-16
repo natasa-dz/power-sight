@@ -7,12 +7,14 @@ import {SearchHouseholdComponent} from "./simulators/search-household/search-hou
 import {ViewHouseholdComponent} from "./simulators/view-household/view-household.component";
 import {ActivateComponent} from "./activate/activate.component";
 import {MainComponent} from "./main/main.component";
+import {OwnerRequestListingComponent} from "./requests-module/owner-request-listing/owner-request-listing.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'real-estate-registration', component: RealEstateRequestComponent },
+  { path: 'real-estate-requests/:ownerId/all', component: OwnerRequestListingComponent },
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
   { path: 'main', component: MainComponent },

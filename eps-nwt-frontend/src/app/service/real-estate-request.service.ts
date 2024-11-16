@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {RealEstateRequestDTO} from "../model/create-real-estate-request-dto.model";
-import {CityMunicipality} from "../model/CityMunicipality";
+import {CityMunicipality} from "../model/city-municipality";
 import {Observable} from "rxjs";
+import {AllRealEstateRequestsDto} from "../model/all-real-estate-requests-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +33,9 @@ export class RealEstateRequestService {
 
   getCitiesWithMunicipalities(): Observable<CityMunicipality> {
     return this.http.get<CityMunicipality>(this.apiUrl);
+  }
+
+  getAllRequestsForOwner(ownerId: number) : Observable<AllRealEstateRequestsDto[]> {
+    return this.http.get<AllRealEstateRequestsDto[]>(`${this.apiUrl}/${ownerId}/all`)
   }
 }

@@ -1,0 +1,43 @@
+.background {
+  background-color: #f0f4f8;
+  min-height: 100vh;
+  height: fit-content;
+  padding: 2rem 10rem;
+}
+
+.placeholder {
+  height: fit-content;
+  padding: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.h-background{
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h2{
+  color: #0d47a1;
+  margin: 15px 50px;
+  width: fit-content;
+  font-size: 30px;
+  font-stretch: extra-expanded;
+}
+
+app-owner-request-card {
+  background-color: transparent;
+  height: fit-content;
+}
+
+.card_div {
+  width: 50%;
+  height: fit-content;
+  max-height: min-content;
+  margin: 2px;
+}

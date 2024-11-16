@@ -1,0 +1,10 @@
+<div class="background">
+  <div class="placeholder">
+    <div class="h-background">
+      <h2>Real Estate Requests</h2>
+    </div>
+    <div *ngFor="let request of requests" class="card_div">
+      <app-owner-request-card [request]="request" ></app-owner-request-card>
+    </div>
+  </div>
+</div>
