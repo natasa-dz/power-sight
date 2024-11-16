@@ -69,32 +69,8 @@ public class HouseholdController {
     public ResponseEntity<List<AggregatedAvailabilityData>> getDataForGraph(
             @PathVariable String name, @PathVariable String timeRange) {
 
-        LocalDate[] dateRange = null;
-        String duration = null;
-
-        try {
-            if (timeRange.contains("-")) {
-                dateRange = parseDateRange(timeRange);
-            } else {
-                duration = parseTimeRange(timeRange);
-            }
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        List<AvailabilityData> allData;
-        if (dateRange != null) {
-            allData = influxService.getAvailabilityByDateRange(name, dateRange[0], dateRange[1]);
-        } else {
-            allData = influxService.getAvailabilityByTimeRange(name, duration);
-        }
-        String aggregationPeriod = householdService.determineAggregationPeriod(timeRange);
-
-        List<AggregatedAvailabilityData> aggregatedData = householdService.aggregateData(allData, aggregationPeriod);
-
-        aggregatedData = householdService.fillMissingData(aggregatedData, aggregationPeriod, timeRange);
-
-        return ResponseEntity.ok(aggregatedData);
+        List<AggregatedAvailabilityData> data = householdService.getDataForGraph(name, timeRange);
+        return ResponseEntity.ok(data);
     }
 
     @GetMapping(value = "/availability/{name}/{timeRange}")

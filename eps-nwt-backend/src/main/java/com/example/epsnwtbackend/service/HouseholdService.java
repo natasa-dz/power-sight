@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -31,6 +32,9 @@ public class HouseholdService {
 
     @Autowired
     private HouseholdRepository householdRepository;
+
+    @Autowired
+    private InfluxService influxService;
 
     public ViewHouseholdDTO getHousehold(Long id) throws NoResourceFoundException {
         Optional<Household> reference = householdRepository.findById(id);
@@ -308,4 +312,60 @@ public class HouseholdService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date range format!");
         }
     }
+
+    public List<AggregatedAvailabilityData> getDataForGraph(
+            @PathVariable String name, @PathVariable String timeRange) {
+        LocalDate[] dateRange = null;
+        String duration = parseTimeRange(timeRange);
+
+        List<AvailabilityData> allData;
+        if (dateRange != null) {
+            allData = influxService.getAvailabilityByDateRange(name, dateRange[0], dateRange[1]);
+        } else {
+            allData = influxService.getAvailabilityByTimeRange(name, duration);
+        }
+        String aggregationPeriod = determineAggregationPeriod(timeRange);
+
+        List<AggregatedAvailabilityData> aggregatedData = aggregateData(allData, aggregationPeriod);
+
+        aggregatedData = fillMissingData(aggregatedData, aggregationPeriod, timeRange);
+
+        return aggregatedData;
+    }
+
+    public String parseTimeRange(String timeRange) {
+        return switch (timeRange.toLowerCase()) {
+            case "3" -> "3h";
+            case "6" -> "6h";
+            case "12" -> "12h";
+            case "24" -> "1d";
+            case "week" -> "7d";
+            case "month" -> "30d";
+            case "3months" -> "90d";
+            case "year" -> "365d";
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid time range format!");
+        };
+    }
+
+//    @Scheduled(fixedRate = 3000, initialDelay = 2000)
+//    public void streamData() throws JsonProcessingException {
+//        System.out.println("Publishing measurement data");
+//        List<AvailabilityData> allData = getAvailabilityByTimeRange(name, duration);
+//        for (String measurement : this.measurements) {
+//            for (String endpoint : this.endpoints) {
+//                List<Measurement> data = switch (endpoint) {
+//                    case "10" -> this.measurementService.findLastTenByName(measurement);
+//                    case "last" -> this.measurementService.findLastByName(measurement);
+//                    case "aggregated" -> this.measurementService.findAggregatedDataByName(measurement);
+//                    default -> this.measurementService.findDeviationFromMeanByName(measurement);
+//                };
+//                Map<String, Object> message = Map.of("data", data);
+//                this.template.convertAndSend(
+//                        String.format("/data/%s/%s", endpoint, measurement),
+//                        this.mapper.writeValueAsString(message)
+//                );
+//            }
+//        }
+//        this.log.debug("Measurement data published");
+//    }
 }

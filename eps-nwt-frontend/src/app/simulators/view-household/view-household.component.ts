@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Renderer2} from '@angular/core';
 import {HouseholdService} from "../household.service";
 import {ActivatedRoute} from "@angular/router";
 import {DatePipe, DecimalPipe, NgIf} from "@angular/common";
@@ -18,6 +18,7 @@ import {
   ChartData, LineElement, PointElement, LineController
 } from 'chart.js';
 import { ViewChild } from '@angular/core';
+import {WebSocketService} from "../../service/websocket.service";
 
 
 @Component({
@@ -60,10 +61,23 @@ export class ViewHouseholdComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private householdService: HouseholdService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private webSocketService: WebSocketService,
+    private renderer: Renderer2
   ) {}
 
   ngOnInit(): void {
+
+    const script1 = this.renderer.createElement('script');
+    script1.src = 'assets/stomp.min.js';
+    script1.type = 'text/javascript';
+    this.renderer.appendChild(document.head, script1);
+
+    const script2 = this.renderer.createElement('script');
+    script2.src = 'assets/query.js';
+    script2.type = 'text/javascript';
+    this.renderer.appendChild(document.head, script2);
+
     Chart.register(
       BarElement,
       BarController,
@@ -78,15 +92,46 @@ export class ViewHouseholdComponent implements OnInit {
     );
 
     const id = this.route.snapshot.paramMap.get('id');
+    if (typeof id === "string") {
+      localStorage.setItem("simulator-id", id)
+    }
     if (id) {
       this.householdService.findById(+id).subscribe(
         (household) => {
           this.household = household;
+          const simulatorName = `simulator-${this.household?.id}`;
+          this.initWebSocket(simulatorName);
         },
         (error) => {
           console.error("Error fetching household details", error);
         }
       );
+    }
+  }
+
+  initWebSocket(simulatorName: string): void {
+    this.webSocketService.connect();
+    this.webSocketService.subscribe(`/data/graph/${simulatorName}`);
+    this.updateChart();
+    this.webSocketService.data$.subscribe((data) => {
+      this.updateChartSocket(data);
+    });
+  }
+
+  updateChartSocket(data: any): void {
+    console.log('updating');
+    this.chartData.labels = data.map((item: any) => item.name);
+    this.chartData.datasets = [
+      {
+        label: 'Availability',
+        data: data.map((item: any) => item.availability),
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+      },
+    ];
+    if (this.chart) {
+      this.chart.update();
     }
   }
 
