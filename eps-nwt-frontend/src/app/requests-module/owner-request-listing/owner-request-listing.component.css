@@ -2,7 +2,7 @@
   background-color: #f0f4f8;
   min-height: 100vh;
   height: fit-content;
-  padding: 2rem 10rem;
+  padding: 2rem 8rem;
 }
 
 .placeholder {
@@ -41,3 +41,42 @@ app-owner-request-card {
   max-height: min-content;
   margin: 2px;
 }
+
+.sort-filter{
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.sort{
+  flex: 1;
+  color: #00796b;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter{
+  flex: 1;
+  color: #00796b;
+}
+
+.filer label, .sort label {
+  width: fit-content;
+}
+
+.filter select, .sort select {
+  padding: 5px;
+  margin-top: 5px;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #00796b;
+}
+
+.filter select, .sort select:focus {
+  border-color: #37474f;
+  outline: none;
+}
+
+
+

@@ -3,6 +3,21 @@
     <div class="h-background">
       <h2>Real Estate Requests</h2>
     </div>
+    <div class="sort-filter">
+      <div class="filter">
+        <label>Filter by:&nbsp;&nbsp;&nbsp;</label>
+
+      </div>
+      <div class="sort">
+        <label >Sort by:&nbsp;&nbsp;&nbsp;</label>
+        <select [(ngModel)]="sortType" (ngModelChange)="sortRequests()" >
+          <option value="createdAtAsc">Created Date (Ascending)</option>
+          <option value="createdAtDesc">Created Date (Descending)</option>
+          <option value="approvedAtAsc">Approved Date (Ascending)</option>
+          <option value="approvedAtDesc">Approved Date (Descending)</option>
+        </select>
+      </div>
+    </div>
     <div *ngFor="let request of requests" class="card_div">
       <app-owner-request-card [request]="request" ></app-owner-request-card>
     </div>
