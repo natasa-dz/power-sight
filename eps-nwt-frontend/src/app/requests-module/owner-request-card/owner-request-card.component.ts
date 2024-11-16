@@ -28,7 +28,7 @@ export class OwnerRequestCardComponent implements OnInit{
 
   status: string = "";
   createdAt: string = "";
-  approvedAt: string = "";
+  finishedAt: string = "";
 
   constructor(private router: Router, private service: RealEstateRequestService) {
     this.request = {
@@ -36,7 +36,7 @@ export class OwnerRequestCardComponent implements OnInit{
       owner: 0,
       status: undefined,
       createdAt: null,
-      approvedAt: null,
+      finishedAt: null,
       address: '',
       municipality: '',
       town: '',
@@ -53,10 +53,10 @@ export class OwnerRequestCardComponent implements OnInit{
       } else{
         this.createdAt = 'Unknown';
       }
-      if (this.request.approvedAt !== null) {
-        this.approvedAt = format(new Date(this.request.approvedAt), 'dd.MM.yyyy.');
+      if (this.request.finishedAt !== undefined && this.request.finishedAt !== null) {
+        this.finishedAt = format(new Date(this.request.finishedAt), 'dd.MM.yyyy.');
       } else{
-        this.approvedAt = 'Unknown';
+        this.finishedAt = 'Unknown';
       }
     }
   }

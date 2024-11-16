@@ -151,7 +151,7 @@ export class RealEstateRequestComponent implements OnInit{
             status: RealEstateRequestStatus.WAITING,
             householdRequests: this.households,
             createdAt: new Date(),
-            approvedAt: null,
+            finishedAt: null,
             adminNote: ''
           };
           this.service.createRequest(realEstateRequest, this.realEstateForm.get('images')?.value, this.documentationFiles).subscribe({

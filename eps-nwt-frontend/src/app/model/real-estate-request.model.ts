@@ -13,6 +13,6 @@ export interface RealEstateRequest {
   status: RealEstateRequestStatus;
   householdRequests: HouseholdRequest[];
   createdAt: Date;
-  approvedAt: Date | null;
+  finishedAt: Date | null;
   adminNote: string;
 }

@@ -54,7 +54,7 @@ public class RealEstateRequest {
     private Date createdAt;
 
     @Column
-    private Date approvedAt;
+    private Date finishedAt;
 
     @Column
     private String adminNote;

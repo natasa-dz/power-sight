@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -45,7 +44,7 @@ public class RealEstateRequestService {
         request.setCreatedAt(requestDTO.getCreatedAt());
         request.setStatus(RealEstateRequestStatus.CREATED);
         request.setHouseholdRequests(householdRequests);
-        request.setApprovedAt(null);
+        request.setFinishedAt(null);
         request.setAdminNote(null);
         request.setImages(null);
         request.setDocumentation(null);
@@ -88,7 +87,7 @@ public class RealEstateRequestService {
         List<AllRealEstateRequestsDTO> dtos = new ArrayList<>();
         for (RealEstateRequest r : requests) {
             dtos.add(new AllRealEstateRequestsDTO(r.getId(), r.getOwner(), r.getStatus(),
-                    r.getCreatedAt(), r.getApprovedAt(), r.getAddress(), r.getMunicipality(), r.getTown()));
+                    r.getCreatedAt(), r.getFinishedAt(), r.getAddress(), r.getMunicipality(), r.getTown()));
         }
         return dtos;
     }

@@ -1,7 +1,6 @@
 package com.example.epsnwtbackend.dto;
 
 import com.example.epsnwtbackend.enums.RealEstateRequestStatus;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,7 @@ public class AllRealEstateRequestsDTO {
     private Long owner;
     private RealEstateRequestStatus status;
     private Date createdAt;
-    private Date approvedAt;
+    private Date finishedAt;
     private String address;
     private String municipality;
     private String town;

@@ -13,6 +13,6 @@ export interface RealEstateRequestDTO {
   status: RealEstateRequestStatus;
   householdRequests: HouseholdRequestDTO[];
   createdAt: Date;
-  approvedAt: Date | null;
+  finishedAt: Date | null;
   adminNote: string;
 }

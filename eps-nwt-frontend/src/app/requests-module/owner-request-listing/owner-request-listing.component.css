@@ -49,6 +49,19 @@ app-owner-request-card {
   width: fit-content;
 }
 
+.toggle-filters-btn{
+  width: fit-content;
+  height: fit-content;
+  padding: 0.60rem;
+  margin-top: 1rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: white;
+  color: #00796b;
+  transition: background-color 0.3s;
+}
+
 .sort{
   flex: 1;
   color: #00796b;
@@ -57,15 +70,25 @@ app-owner-request-card {
 }
 
 .filter{
-  flex: 1;
+  flex: 4;
   color: #00796b;
+  display: flex;
+  flex-direction: column;
 }
 
 .filer label, .sort label {
   width: fit-content;
 }
 
-.filter select, .sort select {
+.dates, .address{
+  margin-top: 20px;
+}
+
+.dates label, .address label{
+    margin-right: 15px;
+}
+
+.dates input, .address input{
   padding: 5px;
   margin-top: 5px;
   border: 1px solid #90a4ae;
@@ -73,9 +96,39 @@ app-owner-request-card {
   color: #00796b;
 }
 
-.filter select, .sort select:focus {
+.dates input:focus, .address input:focus {
+    border-color: #37474f;
+    outline: none;
+}
+
+.filter-select, .sort select {
+  padding: 5px;
+  margin-top: 5px;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #00796b;
+}
+
+.filter-select:focus, .sort select:focus {
   border-color: #37474f;
   outline: none;
+}
+
+.reset-btn {
+  width: 20%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #0288d1;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.reset-btn:hover {
+  background-color: #01579b;
 }
 
 

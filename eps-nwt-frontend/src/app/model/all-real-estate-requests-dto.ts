@@ -5,7 +5,7 @@ export interface AllRealEstateRequestsDto{
   owner : number;
   status? : RealEstateRequestStatus;
   createdAt: Date | null;
-  approvedAt: Date | null;
+  finishedAt: Date | null;
   address: string;
   municipality: string;
   town: string;
