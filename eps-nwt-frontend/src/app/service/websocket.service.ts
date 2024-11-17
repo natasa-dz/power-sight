@@ -24,29 +24,12 @@ export class WebSocketService {
 
     this.client.connect({ Authorization: `Bearer ${accessToken}` }, (frame) => {
       // @ts-ignore
-      this.client.subscribe('/data/graph/' + simulatorId, function(messageOutput) {
-        console.log("STIGLE PORUKE U SERVIS" + messageOutput.body);
+      this.client.subscribe('/data/graph/' + simulatorId, (messageOutput) => {
+        const data = JSON.parse(messageOutput.body);
+        this.dataSubject.next(data);
       });
     }, (error) => {
       console.error('WebSocket connection error', error);
-    });
-  }
-
-  subscribe(simulatorId: string): void {
-    if (!this.isConnected || !this.client) return;
-
-    const topic = `/data/graph/${simulatorId}`;
-    console.log(`Subscribing to topic: ${topic}`);
-
-    this.client.subscribe(topic, (message: Message) => {
-      console.log('Received message:', message);
-      try {
-        const body = JSON.parse(message.body);
-        console.log('Parsed data:', body);
-        this.dataSubject.next(body.data); // Push data to the subject
-      } catch (error) {
-        console.error('Error parsing message body:', error);
-      }
     });
   }
 

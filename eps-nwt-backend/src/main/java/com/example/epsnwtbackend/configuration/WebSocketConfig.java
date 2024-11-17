@@ -48,7 +48,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Scheduled(fixedRate = 3000, initialDelay = 2000)
     public void streamData() throws JsonProcessingException {
         for (String simulatorId : householdService.getAllSimulatorIds()) {
-            List<AggregatedAvailabilityData> data = householdService.getDataForGraph(simulatorId, "3");
+            List<AggregatedAvailabilityData> data = householdService.getDataForGraph("simulator-" + simulatorId, "3");
             Map<String, Object> message = Map.of("data", data);
             template.convertAndSend(
                     "/data/graph/" + simulatorId,

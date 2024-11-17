@@ -96,35 +96,28 @@ export class ViewHouseholdComponent implements OnInit {
         }
       );
     }
+    this.webSocketService.data$.subscribe(data => {
+      this.updateChartSocket(data); // Update chart with the new data
+    });
   }
 
   initWebSocket(simulatorId: string): void {
     console.log("Subscribing to WebSocket for simulator:", simulatorId);
     this.webSocketService.connect();
-    /*this.webSocketService.subscribe(simulatorId);
-    this.webSocketService.data$.subscribe((data) => {
-      console.log('Received data in component:', data);
-      this.updateChartSocket(data);  // Update chart with new data
-    });*/
   }
 
   updateChartSocket(data: any): void {
-    console.log('Updating chart with data:', data);
-
-    // If data is an array or object, ensure it's being processed correctly
-    if (Array.isArray(data)) {
-      this.chartData.labels = data.map((item: any) => item.name);
-      this.chartData.datasets = [
-        {
-          label: 'Availability',
-          data: data.map((item: any) => item.value), // Assuming 'value' field in your data
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1
-        }
-      ];
+    if (Array.isArray(data.data)) {
+      var data2 = data.data;
+      data2.sort((a: any, b: any) => {
+        const hourA = parseInt(a.name.replace('h', ''), 10);
+        const hourB = parseInt(b.name.replace('h', ''), 10);
+        return hourA - hourB;
+      });
+      this.chartData.labels = data2.map((item: any) => item.name);
+      this.chartData.datasets[0].data = data2.map((item: any) => item.availability);
       if (this.chart) {
-        this.chart.update(); // Update the chart after receiving new data
+        this.chart.update();
       }
     } else {
       console.error('Invalid data format:', data);
