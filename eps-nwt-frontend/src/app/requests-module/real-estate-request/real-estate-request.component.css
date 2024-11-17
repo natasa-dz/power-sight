@@ -61,10 +61,25 @@
 
 .stepper-content {
   padding: 10px;
-  width: 50%;
+  width: 90%;
+  display: flex;
+  justify-content: center;
+}
+
+.helper-div {
+  width: 100%;
+  display: flex;
+  gap: 20px;
+}
+
+app-map {
+  flex: 1;
+  max-width: 50%;
 }
 
 .content-form{
+  flex: 1;
+  max-width: 50%;
   display: flex;
   flex-direction: column;
 }
@@ -83,7 +98,20 @@
   color: #37474f;
 }
 
+.content-form select {
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #37474f;
+}
+
 .content-form input:focus {
+  border-color: #37474f;
+  outline: none;
+}
+
+.content-form select:focus {
   border-color: #37474f;
   outline: none;
 }
@@ -136,4 +164,50 @@
 
 .add-btn:hover {
   background-color: #01579b;
+}
+
+.helper-div2 {
+  width: 50%;
+}
+
+.content-form2 {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-form2 label{
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #37474f;
+}
+
+.content-form2 input {
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #37474f;
+}
+
+.content-form2 select {
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #37474f;
+}
+
+.content-form2 input:focus {
+  border-color: #37474f;
+  outline: none;
+}
+
+.content-form2 select:focus {
+  border-color: #37474f;
+  outline: none;
+}
+
+.content-form2 .file-input{
+  border: 0;
+  padding: 0.1rem;
 }

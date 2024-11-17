@@ -1,76 +1,97 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {AuthService} from "../auth.service";
 import {UserService} from "../../service/user.service";
 import {Role} from "../../model/user.model";
-
+import {ImageCompress} from "ngx-image-compress/lib/image-compress";
+import {NgxImageCompressService} from "ngx-image-compress";
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
+
   registerForm: FormGroup;
   selectedFile: File | null = null;
-  profilePicBase64: string | null = null;
+  profilePic: string | null = null;
   showActivationPrompt: boolean = false;
   activationToken: string = '';
-
-
-
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private imageCompress: NgxImageCompressService,
+    private route:ActivatedRoute
+
   ) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       profilePic: [null]
     });
   }
 
+  // ngOnInit(): void {
+  //   // Check for the activation token in the URL on component initialization
+  //   this.route.queryParams.subscribe(params => {
+  //     const token = params['token'];
+  //     if (token) {
+  //       this.activateAccount(token);
+  //     }
+  //   });
+  // }
+
+  base64ToFile(base64String: string, fileName: string): File {
+    const arr = base64String.split(',');
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], fileName, { type: mime });
+  }
+
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
-      this.registerForm.patchValue({ profilePic: file });
+      this.imageCompress.compressFile(URL.createObjectURL(file), -1, 50, 50).then(
+        (compressedImage) => {
+          this.profilePic = compressedImage;
+          this.selectedFile = this.base64ToFile(compressedImage, file.name); // Convert base64 back to File        }
+        });
     }
-  }
-
-  private convertToBase64(file: File): void {
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.profilePicBase64 = reader.result as string;  // Store base64 string
-    };
-    reader.readAsDataURL(file);
   }
 
 
 
   register(): void {
+    console.log(this.registerForm.get('username')?.value);
+    console.log(this.registerForm.get('password')?.value);
 
-    if (this.registerForm.valid && this.profilePicBase64!=null) {
-      const user = {
-        username:this.registerForm.get('username')?.value,
-        email:this.registerForm.get('email')?.value,
-        password:this.registerForm.get('password')?.value,
-        isActive: false,
-        activationToken:'',
-        passwordChanged:true,
-        role: Role.CITIZEN,
-        userPhoto: this.profilePicBase64// Include base64 profile picture
+    // Check if the form is valid and the file is selected
+    if (this.registerForm.valid && this.selectedFile != null) {
+      const formData = new FormData();
+      let role = 'CITIZEN';
+      if (this.authService.getRole() === Role.SUPERADMIN) {
+        role = 'ADMIN';
       }
+      console.log("Role: ", role)
+      formData.append('role', role)
 
-
-      this.userService.registerUser(user).subscribe({
+      formData.append('username', this.registerForm.get('username')?.value);
+      formData.append('password', this.registerForm.get('password')?.value);
+      formData.append('userPhoto', this.selectedFile);  // Send the selected file
+      console.log(formData)
+      this.userService.registerUser(formData).subscribe({
         next: (response) => {
           alert('Registration successful! Please check your email to activate your account.');
-          this.showActivationPrompt = true; // Show the token input form
+          this.router.navigate(['/login']);
         },
         error: () => {
           alert('Registration failed. Please try again.');
@@ -80,22 +101,4 @@ export class RegisterComponent {
       alert('Please fill out all required fields with valid information.');
     }
   }
-
-  isFormValid(): boolean {
-    // Add validation logic for user registration form
-    return true;
-  }
-
-  activateAccount(){
-    this.userService.activateAccount(this.activationToken).subscribe({
-      next:(response)=>{
-        alert(response);
-        this.router.navigate(['login']);
-      },
-      error:()=>{
-        alert('Activation failed. Please check your token and try again! ')
-      }
-    });
-  }
-
 }

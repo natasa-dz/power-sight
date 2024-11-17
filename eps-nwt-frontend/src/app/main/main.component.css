@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  //background-image: url( "../../assets/pexels-googledeepmind-18069490.jpg"); /* Make sure the image path is correct */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Keeps the image fixed while scrolling */
+}
+
+/* Add the overlay for transparency effect */
+:host::after {
+  content: "";
+  position:absolute;
+  margin-top: 62px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(19, 39, 51, 0.2); /* Adjust color and opacity */
+  pointer-events: none; /* Allows interaction with underlying elements */
+}

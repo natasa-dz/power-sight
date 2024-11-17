@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse} from "@angular/common/http";
 import {BehaviorSubject, map, Observable, of, throwError} from "rxjs";
 import { catchError } from "rxjs/operators";
 import {Role, User} from "../model/user.model";
@@ -59,16 +59,17 @@ export class UserService {
         });
     }
 
-  registerUser(user: User): Observable<User> {
+  registerUser(user: FormData): Observable<User> {
     const url = `${this.apiUrl}/register`;
 
     return this.http.post<User>(url, user).pipe(
-      catchError((error:any) => {
+      catchError((error: any) => {
         console.error('Error registering user:', error);
         return throwError(error);
       })
     );
   }
+
 
   private handleError(error: HttpErrorResponse) {
     console.error('Error:', error);
@@ -151,7 +152,7 @@ export class UserService {
 
   activateAccount(token: string): Observable<string> {
     const params = new HttpParams().set('token', token);
-    return this.http.get<string>(`${this.apiUrl}/activate`, { params });
+    return this.http.patch<string>(`${this.apiUrl}/auth/activate`, null, { params });
   }
 
   login(auth: any): Observable<AuthResponse> {
@@ -169,11 +170,12 @@ export class UserService {
       //   responseType: 'text',
   }
 
-  changePassword(dto: ChangePasswordDto): Observable<string> {
+  changePassword(dto: ChangePasswordDto): Observable<HttpResponse<string>> {
     return this.http.post<string>(`${this.apiUrl}/change-password`, dto, {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
-      })
+      }),
+      observe: 'response'
     });
   }
 }

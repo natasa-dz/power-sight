@@ -146,11 +146,6 @@ public class UserService implements UserDetailsService {
         System.out.println(dto.getPassword());
         //TODO: Add missing fields!!!!
 
-//        System.out.println(dto.getConfirmPassword());
-//
-//        if(!dto.getPassword().equals(dto.getConfirmPassword())){
-//            return Optional.empty();
-//        }
         if(userRepository.findByUsername(dto.getUsername()).isPresent()){
             return Optional.empty();
         }

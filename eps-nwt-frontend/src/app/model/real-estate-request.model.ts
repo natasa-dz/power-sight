@@ -1,19 +1,18 @@
-import {User} from "./user.model";
-import {HouseholdRequest} from "./household-request.model";
 import {RealEstateRequestStatus} from "../enum/real-estate-request-status";
+import {HouseholdRequest} from "./household-request.model";
 
 export interface RealEstateRequest {
   id: number;
-  owner: User;
+  owner: number;
   address: string;
   municipality: string;
   town: string;
   floors: string;
-  images: string[];
-  documentation: string[];
+  images: File[] | null;
+  documentation: File[] | null;
   status: RealEstateRequestStatus;
   householdRequests: HouseholdRequest[];
   createdAt: Date;
-  approvedAt: Date | null;
+  finishedAt: Date | null;
   adminNote: string;
 }

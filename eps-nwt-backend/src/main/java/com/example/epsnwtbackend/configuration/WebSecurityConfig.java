@@ -75,6 +75,10 @@ public class WebSecurityConfig{
                 .requestMatchers("/users/{email}").permitAll()
                 .requestMatchers("/users").permitAll()
                 .requestMatchers("/household/find-by-id/{id}").permitAll()
+                .requestMatchers("/household/search/{address}/{apartmentNumber}").permitAll()
+                .requestMatchers("/real-estate-request/registration").permitAll()
+                .requestMatchers("/real-estate-request").permitAll()
+                .requestMatchers("/real-estate-request/{ownerId}/all").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -86,6 +90,7 @@ public class WebSecurityConfig{
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
+                .requestMatchers("/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
                 // koji tip korisnika moze da pristupi odgovarajucoj ruti. Npr. ukoliko zelimo da definisemo da ruti 'admin' moze da pristupi
                 // samo korisnik koji ima rolu 'ADMIN', navodimo na sledeci nacin:
@@ -116,10 +121,12 @@ public class WebSecurityConfig{
         // Zahtevi koji se mecuju za web.ignoring().antMatchers() nemaju pristup SecurityContext-u
         // Dozvoljena POST metoda na ruti /auth/login, za svaki drugi tip HTTP metode greska je 401 Unauthorized
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
+                .requestMatchers(HttpMethod.POST, "/real-estate-request/registration")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
-                        "/household/availability/", "household/graph/", "/socket/info/", "/socket/");
+                        "/household/availability/", "household/graph/", "/socket/info/", "/socket/",
+                        "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
