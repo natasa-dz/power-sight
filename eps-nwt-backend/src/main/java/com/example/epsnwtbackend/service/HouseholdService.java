@@ -347,25 +347,9 @@ public class HouseholdService {
         };
     }
 
-//    @Scheduled(fixedRate = 3000, initialDelay = 2000)
-//    public void streamData() throws JsonProcessingException {
-//        System.out.println("Publishing measurement data");
-//        List<AvailabilityData> allData = getAvailabilityByTimeRange(name, duration);
-//        for (String measurement : this.measurements) {
-//            for (String endpoint : this.endpoints) {
-//                List<Measurement> data = switch (endpoint) {
-//                    case "10" -> this.measurementService.findLastTenByName(measurement);
-//                    case "last" -> this.measurementService.findLastByName(measurement);
-//                    case "aggregated" -> this.measurementService.findAggregatedDataByName(measurement);
-//                    default -> this.measurementService.findDeviationFromMeanByName(measurement);
-//                };
-//                Map<String, Object> message = Map.of("data", data);
-//                this.template.convertAndSend(
-//                        String.format("/data/%s/%s", endpoint, measurement),
-//                        this.mapper.writeValueAsString(message)
-//                );
-//            }
-//        }
-//        this.log.debug("Measurement data published");
-//    }
+    public List<String> getAllSimulatorIds() {
+        return householdRepository.findAll().stream()
+                .map(Household::getSimulatorId)
+                .collect(Collectors.toList());
+    }
 }

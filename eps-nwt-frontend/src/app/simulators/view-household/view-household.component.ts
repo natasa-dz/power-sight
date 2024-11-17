@@ -67,17 +67,6 @@ export class ViewHouseholdComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
-    const script1 = this.renderer.createElement('script');
-    script1.src = 'assets/stomp.min.js';
-    script1.type = 'text/javascript';
-    this.renderer.appendChild(document.head, script1);
-
-    const script2 = this.renderer.createElement('script');
-    script2.src = 'assets/query.js';
-    script2.type = 'text/javascript';
-    this.renderer.appendChild(document.head, script2);
-
     Chart.register(
       BarElement,
       BarController,
@@ -93,14 +82,14 @@ export class ViewHouseholdComponent implements OnInit {
 
     const id = this.route.snapshot.paramMap.get('id');
     if (typeof id === "string") {
-      localStorage.setItem("simulator-id", id)
+      localStorage.setItem("simulator-id", id);
     }
     if (id) {
       this.householdService.findById(+id).subscribe(
         (household) => {
           this.household = household;
-          const simulatorName = `simulator-${this.household?.id}`;
-          this.initWebSocket(simulatorName);
+          const simulatorName = `${this.household?.id}`;
+          this.initWebSocket(simulatorName);  // Only call connect & subscribe here
         },
         (error) => {
           console.error("Error fetching household details", error);
@@ -109,31 +98,39 @@ export class ViewHouseholdComponent implements OnInit {
     }
   }
 
-  initWebSocket(simulatorName: string): void {
+  initWebSocket(simulatorId: string): void {
+    console.log("Subscribing to WebSocket for simulator:", simulatorId);
     this.webSocketService.connect();
-    this.webSocketService.subscribe(`/data/graph/${simulatorName}`);
-    this.updateChart();
+    /*this.webSocketService.subscribe(simulatorId);
     this.webSocketService.data$.subscribe((data) => {
-      this.updateChartSocket(data);
-    });
+      console.log('Received data in component:', data);
+      this.updateChartSocket(data);  // Update chart with new data
+    });*/
   }
 
   updateChartSocket(data: any): void {
-    console.log('updating');
-    this.chartData.labels = data.map((item: any) => item.name);
-    this.chartData.datasets = [
-      {
-        label: 'Availability',
-        data: data.map((item: any) => item.availability),
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1,
-      },
-    ];
-    if (this.chart) {
-      this.chart.update();
+    console.log('Updating chart with data:', data);
+
+    // If data is an array or object, ensure it's being processed correctly
+    if (Array.isArray(data)) {
+      this.chartData.labels = data.map((item: any) => item.name);
+      this.chartData.datasets = [
+        {
+          label: 'Availability',
+          data: data.map((item: any) => item.value), // Assuming 'value' field in your data
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }
+      ];
+      if (this.chart) {
+        this.chart.update(); // Update the chart after receiving new data
+      }
+    } else {
+      console.error('Invalid data format:', data);
     }
   }
+
 
   updateChart(): void {
     const name = "simulator-" + this.household?.id.toString();

@@ -25,7 +25,6 @@ import java.util.Map;
 @EnableScheduling
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final Map<String, WebSocketSession> activeSessions = new HashMap<>();
 
     @Autowired private HouseholdService householdService;
     @Autowired @Lazy
@@ -37,7 +36,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
                 .setAllowedOrigins("http://localhost:4200")
-                .addInterceptors(new SimulatorHandshakeInterceptor(activeSessions))
                 .withSockJS();
     }
 
@@ -49,17 +47,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Scheduled(fixedRate = 3000, initialDelay = 2000)
     public void streamData() throws JsonProcessingException {
-        for (String simulatorId : this.activeSessions.keySet()) {
-            WebSocketSession session = this.activeSessions.get(simulatorId);
-            if (session.isOpen()) {
-                List<AggregatedAvailabilityData> data = householdService.getDataForGraph(simulatorId, "3");
-                        Map<String, Object> message = Map.of("data", data);
-                        this.template.convertAndSendToUser(simulatorId,
-                                String.format("/data/graph/%s", simulatorId),
-                                this.mapper.writeValueAsString(message)
-                        );
-            }
-            System.out.println("Measurement data published for " + simulatorId);
+        for (String simulatorId : householdService.getAllSimulatorIds()) {
+            List<AggregatedAvailabilityData> data = householdService.getDataForGraph(simulatorId, "3");
+            Map<String, Object> message = Map.of("data", data);
+            template.convertAndSend(
+                    "/data/graph/" + simulatorId,
+                    message
+            );
         }
     }
 

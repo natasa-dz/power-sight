@@ -9,38 +9,44 @@ import { Subject } from 'rxjs';
 export class WebSocketService {
   private client: Client | null = null;
   private isConnected = false;
-
   private dataSubject = new Subject<any>();
   public data$ = this.dataSubject.asObservable();
 
-  private serverUrl = 'http://localhost:8080/socket'; // This is the base URL
+  private serverUrl = 'http://localhost:8080/socket'; // Base URL
 
   connect(): void {
     if (this.isConnected) return;
 
     const accessToken: any = localStorage.getItem('user');
     const simulatorId: any = localStorage.getItem('simulator-id'); // Get simulator ID from local storage
-
-    // Append simulator ID as query parameter
-    const socketUrl = `${this.serverUrl}?simulatorId=${simulatorId}`; // Using query parameter here
-    // @ts-ignore
-    const socket = new SockJS(socketUrl, null, { withCredentials: true }); // Enable credentials
+    const socket = new SockJS(this.serverUrl); // Create SockJS instance
     this.client = over(socket);
 
     this.client.connect({ Authorization: `Bearer ${accessToken}` }, (frame) => {
-      console.log('Connected: ' + frame);
-      this.isConnected = true;
+      // @ts-ignore
+      this.client.subscribe('/data/graph/' + simulatorId, function(messageOutput) {
+        console.log("STIGLE PORUKE U SERVIS" + messageOutput.body);
+      });
     }, (error) => {
       console.error('WebSocket connection error', error);
     });
   }
 
-  subscribe(topic: string): void {
+  subscribe(simulatorId: string): void {
     if (!this.isConnected || !this.client) return;
 
+    const topic = `/data/graph/${simulatorId}`;
+    console.log(`Subscribing to topic: ${topic}`);
+
     this.client.subscribe(topic, (message: Message) => {
-      const body = JSON.parse(message.body);
-      this.dataSubject.next(body);
+      console.log('Received message:', message);
+      try {
+        const body = JSON.parse(message.body);
+        console.log('Parsed data:', body);
+        this.dataSubject.next(body.data); // Push data to the subject
+      } catch (error) {
+        console.error('Error parsing message body:', error);
+      }
     });
   }
 

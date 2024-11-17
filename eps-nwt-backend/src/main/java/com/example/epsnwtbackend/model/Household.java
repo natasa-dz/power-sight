@@ -36,4 +36,7 @@ public class Household {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
+
+    @Column
+    private String simulatorId;
 }
