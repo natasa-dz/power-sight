@@ -3,6 +3,9 @@ package com.example.epsnwtbackend.model;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,6 +14,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class User implements UserDetails {
 
     @Id
@@ -33,10 +39,6 @@ public class User implements UserDetails {
 
     private String secret;
 
-    //TODO: Kreiraj konstruktore do kraja!
-    public User() {
-    }
-
     // Constructor to create User from UserDto
     public User(UserDto dto) {
         this.username = dto.getUsername();
@@ -47,59 +49,15 @@ public class User implements UserDetails {
         this.passwordChanged = dto.isPasswordChanged(); // Default to false, updated after first login change
         this.activationToken = dto.getActivationToken(); // Set if generated in service
     }
-    public String getUserPhoto() {
-        return userPhoto;
-    }
-
-    public void setUserPhoto(String userPhoto) {
-        this.userPhoto = userPhoto;
-    }
-
-    public boolean isPasswordChanged() {
-        return passwordChanged;
-    }
-
-    public void setPasswordChanged(boolean passwordChanged) {
-        this.passwordChanged = passwordChanged;
-    }
 
     @Column(nullable = false)
     private boolean passwordChanged = false;
-
-    public Long getId() {
-        return id;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = false;
 
     @Column(name = "activation_token")
     private String activationToken;
-
-
-    public String getActivationToken() {
-        return activationToken;
-    }
-
-    public void setActivationToken(String activationToken) {
-        this.activationToken = activationToken;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
 
     @JsonIgnore
     @Override
@@ -108,7 +66,6 @@ public class User implements UserDetails {
     }
 
     @JsonIgnore
-
     @Override
     public boolean isAccountNonLocked() {
         return UserDetails.super.isAccountNonLocked();
@@ -126,51 +83,18 @@ public class User implements UserDetails {
         return UserDetails.super.isEnabled();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public Set<Household> getHouseholds() {
-        return households;
-    }
-
-    public void setHouseholds(Set<Household> households) {
-        this.households = households;
-    }
-
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Household> households;
 
+    /*@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<RealEstateRequest> requests;*/
 
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
 
     @Override
     public String toString() {

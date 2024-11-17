@@ -2,53 +2,41 @@ package com.example.epsnwtbackend.model;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "households")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Household {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User owner;
 
-    public Long getId() {
-        return id;
-    }
+    @Column
+    private Integer floor;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column
+    private Float squareFootage;
 
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public Meter getMeters() {
-        return meters;
-    }
-
-    public void setMeters(Meter meters) {
-        this.meters = meters;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    @Column
+    private Integer apartmentNumber;
 
     @OneToOne(mappedBy = "household", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Meter meters;
 
-    @Column(nullable = false)
-    private String address;
+    @ManyToOne
+    @JoinColumn(name = "real_estate_id", nullable = false)
+    private RealEstate realEstate;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
+
+    @Column
+    private String simulatorId;
 }

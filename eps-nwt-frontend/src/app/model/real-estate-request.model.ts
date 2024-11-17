@@ -1,0 +1,18 @@
+import {RealEstateRequestStatus} from "../enum/real-estate-request-status";
+import {HouseholdRequest} from "./household-request.model";
+
+export interface RealEstateRequest {
+  id: number;
+  owner: number;
+  address: string;
+  municipality: string;
+  town: string;
+  floors: string;
+  images: File[] | null;
+  documentation: File[] | null;
+  status: RealEstateRequestStatus;
+  householdRequests: HouseholdRequest[];
+  createdAt: Date;
+  finishedAt: Date | null;
+  adminNote: string;
+}

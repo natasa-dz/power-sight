@@ -1,7 +1,7 @@
 :host {
   display: block;
   min-height: 100vh;
-  background-image: url( "../../assets/pexels-googledeepmind-18069490.jpg"); /* Make sure the image path is correct */
+  //background-image: url( "../../assets/pexels-googledeepmind-18069490.jpg"); /* Make sure the image path is correct */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
