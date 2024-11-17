@@ -89,7 +89,7 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Optional<UserDto> dto = userDetailsService.findUser(credentials.getEmail());
 
-        String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole());
+        String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole(), dto.get().getId());
         int expiresIn = tokenService.getExpiredIn();
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
     }
@@ -101,7 +101,7 @@ public class UserController {
         if (credentials.isPresent()){
             System.out.println("Usao u credentialsPresent!!!");
 
-            tokenService.generateToken(dto.getUsername(), dto.getRole());
+            tokenService.generateToken(dto.getUsername(), dto.getRole(), dto.getId());
 
             String activationToken = UUID.randomUUID().toString();
             userService.saveActivationToken(dto.getUsername(), activationToken); // Save token and set user as inactive

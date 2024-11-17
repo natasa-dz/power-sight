@@ -37,8 +37,8 @@ export class OwnerRequestListingComponent implements OnInit{
   constructor(private service: RealEstateRequestService) {}
 
   ngOnInit(): void {
-    //this.loggedInId = Number(localStorage.getItem("loggedId"));
-    this.loggedInId = 1;
+    this.loggedInId = Number(localStorage.getItem("userId"));
+    console.log(this.loggedInId);
     this.service.getAllRequestsForOwner(this.loggedInId).subscribe({
       next: (data: AllRealEstateRequestsDto[]) => {
         this.requests = data
