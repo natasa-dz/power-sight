@@ -6,6 +6,7 @@ import {Role, User} from "../model/user.model";
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {AuthResponse} from "../access-control-module/auth.service";
 import {ChangePasswordDto} from "../model/change-password-dto.model";
+import {RealEstateRequest} from "../model/real-estate-request.model";
 
 @Injectable({
   providedIn: 'root',
@@ -138,6 +139,8 @@ export class UserService {
               const decodedToken = helper.decodeToken(accessToken);
               console.log(decodedToken)
 
+              localStorage.setItem("userId", decodedToken.id);
+
               return decodedToken ? decodedToken.role : null;
           }
           catch (error) {
@@ -162,6 +165,7 @@ export class UserService {
   logout(): Observable<void|null> {
 
       localStorage.removeItem('user');
+      localStorage.removeItem('userId');
       this.user$.next('');
       this.userAccount$.next(null);
       console.log("You have logged out successfully!");
@@ -177,5 +181,9 @@ export class UserService {
       }),
       observe: 'response'
     });
+  }
+
+  getUserById(userId: number) : Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/byId/${userId}`)
   }
 }

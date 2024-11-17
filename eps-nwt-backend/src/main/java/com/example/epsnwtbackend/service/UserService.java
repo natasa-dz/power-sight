@@ -2,6 +2,7 @@ package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
+import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
 import jakarta.annotation.PostConstruct;
@@ -175,6 +176,10 @@ public class UserService implements UserDetailsService {
         user.setActive(false);
 
         userRepository.save(user);
+    }
+
+    public User getUserById(Long userId){
+        return userRepository.findById(userId).get();
     }
 
 

@@ -47,4 +47,16 @@ export class RealEstateRequestService {
   getRequestForAdmin(id: number) : Observable<RealEstateRequest> {
     return this.http.get<RealEstateRequest>(`${this.apiUrl}/admin/request/${id}`)
   }
+
+  getImagesByRealEstateId(realEstateId: number) {
+    return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`, {
+      responseType: 'json'
+    });
+  }
+
+  getDocumentBytes(filePath: string) {
+    return this.http.post(this.apiUrl + '/docs', filePath, {
+      responseType: 'arraybuffer'
+    });
+  }
 }

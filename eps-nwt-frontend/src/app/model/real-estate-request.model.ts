@@ -9,7 +9,7 @@ export interface RealEstateRequest {
   town: string;
   floors: string;
   images: File[] | null;
-  documentation: File[] | null;
+  documentation: string[] | null;
   status: RealEstateRequestStatus;
   householdRequests: HouseholdRequest[];
   createdAt: Date;

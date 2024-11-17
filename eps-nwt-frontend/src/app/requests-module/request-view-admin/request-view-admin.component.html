@@ -1,1 +1,57 @@
-<p>{{ request?.address }}</p>
+<div class="body">
+  <div class="details-container">
+    <h2>Real Estate Request Details</h2>
+    <div class="details-content">
+      <div class="info">
+        <p><strong>Owner:</strong> {{ owner?.username }}</p>
+        <p><strong>Address:</strong> {{ request?.address }}</p>
+        <p><strong>Municipality:</strong> {{ request?.municipality }}</p>
+        <p><strong>Town:</strong> {{ request?.town }}</p>
+        <p><strong>Floors:</strong> {{ request?.floors }}</p>
+        <p><strong>Status:</strong> {{ request?.status }}</p>
+        <p><strong>Created At:</strong> {{ this.createdAt }}</p>
+        <p *ngIf="request?.finishedAt">
+          <strong>Finished At:</strong> {{ this.finishedAt }}
+        </p>
+      </div>
+
+      <div class="images">
+        <h3>Images</h3>
+        <div class="photo-box" *ngIf="request?.images?.length; else noImages">
+          <div *ngFor="let image of this.images">
+            <img [src]="'data:image/jpeg;base64,' + image" alt="Real Estate Image" />
+          </div>
+        </div>
+        <ng-template #noImages>
+          <p>No images available.</p>
+        </ng-template>
+      </div>
+
+      <div class="documents">
+        <h3>Documentation</h3>
+        <div class="document-box" *ngIf="request?.documentation?.length; else noDocs">
+          <ul>
+            <li *ngFor="let doc of request?.documentation">
+              <button (click)="downloadDocument(doc)">{{doc.split('/')[7]}}</button>
+            </li>
+          </ul>
+        </div>
+        <ng-template #noDocs>
+          <p>No documentation available.</p>
+        </ng-template>
+      </div>
+
+      <div class="admin-note">
+        <h3>Admin Note</h3>
+        <div *ngIf="this.status === 'CREATED'">
+          <textarea [(ngModel)]="adminNote" placeholder="Add admin note"></textarea>
+          <button (click)="saveAdminNote()">Save</button>
+        </div>
+        <div *ngIf="this.status !== 'CREATED'">
+          <p>{{ request?.adminNote || 'No admin note available.' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
