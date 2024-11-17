@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
@@ -93,11 +94,21 @@ public class HouseholdService {
                             "06h", "07h", "08h", "09h", "10h", "11h", "12h", "13h",
                             "14h", "15h", "16h", "17h", "18h", "19h", "20h", "21h",
                             "22h", "23h", "00h"};
-                    for (int i = 0; i < hoursBack - aggregatedData.size() + 1; i++) {
-                        int hourIndex = (startHour + i + 1) % 24;
-                        String hour = hoursInDay[hourIndex];
-                        if (filledData.stream().noneMatch(data -> data.getName().equals(hour))) {
-                            filledData.add(new AggregatedAvailabilityData(hour, 0));
+                    if(aggregatedData.size()!=0) {
+                        for (int i = 0; i < hoursBack - aggregatedData.size() + 1; i++) {
+                            int hourIndex = (startHour + i + 1) % 24;
+                            String hour = hoursInDay[hourIndex];
+                            if (filledData.stream().noneMatch(data -> data.getName().equals(hour))) {
+                                filledData.add(new AggregatedAvailabilityData(hour, 0));
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < hoursBack; i++) {
+                            int hourIndex = (startHour + i + 1) % 24;
+                            String hour = hoursInDay[hourIndex];
+                            if (filledData.stream().noneMatch(data -> data.getName().equals(hour))) {
+                                filledData.add(new AggregatedAvailabilityData(hour, 0));
+                            }
                         }
                     }
                 }
@@ -151,7 +162,7 @@ public class HouseholdService {
                 if (dateRange != null) {
                     long monthsBack = ChronoUnit.MONTHS.between(YearMonth.from(dateRange[0]), YearMonth.from(dateRange[1]));
                     for (long i = 0; i <= monthsBack; i++) {
-                        String month = dateRange[0].plusMonths(i).format(DateTimeFormatter.ofPattern("MMM yyyy"));
+                        String month = dateRange[0].plusMonths(i).format(DateTimeFormatter.ofPattern("MMM"));
                         if (filledData.stream().noneMatch(data -> data.getName().equals(month))) {
                             filledData.add(new AggregatedAvailabilityData(month, 0));
                         }
@@ -316,7 +327,17 @@ public class HouseholdService {
     public List<AggregatedAvailabilityData> getDataForGraph(
             @PathVariable String name, @PathVariable String timeRange) {
         LocalDate[] dateRange = null;
-        String duration = parseTimeRange(timeRange);
+        String duration = null;
+
+        try {
+            if (timeRange.contains("-")) {
+                dateRange = parseDateRange(timeRange);
+            } else {
+                duration = parseTimeRange(timeRange);
+            }
+        } catch (RuntimeException e) {
+            return new ArrayList<>();
+        }
 
         List<AvailabilityData> allData;
         if (dateRange != null) {
