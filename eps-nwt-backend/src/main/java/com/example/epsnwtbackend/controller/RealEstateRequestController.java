@@ -74,4 +74,14 @@ public class RealEstateRequestController {
         System.out.println(ownerId + " hhhhhhhhhhhhhhhhhhhhhhhhhh");
         return service.getAllForOwner(ownerId);
     }
+
+    @GetMapping(value = "/admin/requests")
+    public List<AllRealEstateRequestsDTO> getAllForAdmin(){
+        return service.getAllForAdmin();
+    }
+
+    @GetMapping(value = "/admin/request/{requestId}")
+    public RealEstateRequest getRequestForAdmin(@PathVariable("requestId")Long requestId){
+        return service.getRequestForAdmin(requestId);
+    }
 }

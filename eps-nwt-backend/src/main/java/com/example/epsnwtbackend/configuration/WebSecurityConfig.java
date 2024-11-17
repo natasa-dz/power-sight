@@ -79,6 +79,8 @@ public class WebSecurityConfig{
                 .requestMatchers("/real-estate-request/registration").permitAll()
                 .requestMatchers("/real-estate-request").permitAll()
                 .requestMatchers("/real-estate-request/{ownerId}/all").permitAll()
+                .requestMatchers("/real-estate-request/admin/requests").permitAll()
+                .requestMatchers("/real-estate-request/admin/request/{requestId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -121,7 +123,8 @@ public class WebSecurityConfig{
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
-                        "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all");
+                        "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
+                        "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

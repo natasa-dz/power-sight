@@ -92,4 +92,17 @@ public class RealEstateRequestService {
         return dtos;
     }
 
+    public List<AllRealEstateRequestsDTO> getAllForAdmin(){
+        List<AllRealEstateRequestsDTO> dtos = new ArrayList<>();
+        for (RealEstateRequest r : repository.findAll()) {
+            dtos.add(new AllRealEstateRequestsDTO(r.getId(), r.getOwner(), r.getStatus(),
+                    r.getCreatedAt(), r.getFinishedAt(), r.getAddress(), r.getMunicipality(), r.getTown()));
+        }
+        return dtos;
+    }
+
+    public RealEstateRequest getRequestForAdmin(Long requestId){
+        return repository.findById(requestId).get();
+    }
+
 }
