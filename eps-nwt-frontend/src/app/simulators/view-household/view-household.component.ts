@@ -1,4 +1,4 @@
-import {Component, OnInit, Renderer2} from '@angular/core';
+import {Component, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {HouseholdService} from "../household.service";
 import {ActivatedRoute} from "@angular/router";
 import {DatePipe, DecimalPipe, NgIf} from "@angular/common";
@@ -34,7 +34,7 @@ import {WebSocketService} from "../../service/websocket.service";
   templateUrl: './view-household.component.html',
   styleUrl: './view-household.component.css'
 })
-export class ViewHouseholdComponent implements OnInit {
+export class ViewHouseholdComponent implements OnInit, OnDestroy {
   household?: ViewHouseholdDto;
   onlinePercentage: string | undefined;
   offlinePercentage: string | undefined;
@@ -62,8 +62,7 @@ export class ViewHouseholdComponent implements OnInit {
     private route: ActivatedRoute,
     private householdService: HouseholdService,
     private datePipe: DatePipe,
-    private webSocketService: WebSocketService,
-    private renderer: Renderer2
+    private webSocketService: WebSocketService
   ) {}
 
   ngOnInit(): void {
@@ -89,7 +88,9 @@ export class ViewHouseholdComponent implements OnInit {
         (household) => {
           this.household = household;
           const simulatorName = `${this.household?.id}`;
-          this.initWebSocket(simulatorName);  // Only call connect & subscribe here
+          if (this.timeRange === '3') {
+            this.initWebSocket(simulatorName);
+          }
         },
         (error) => {
           console.error("Error fetching household details", error);
@@ -97,8 +98,14 @@ export class ViewHouseholdComponent implements OnInit {
       );
     }
     this.webSocketService.data$.subscribe(data => {
-      this.updateChartSocket(data); // Update chart with the new data
+      this.updateChartSocket(data);
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.webSocketService.client && this.webSocketService.isConnected) {
+      this.webSocketService.disconnect();
+    }
   }
 
   initWebSocket(simulatorId: string): void {
@@ -140,6 +147,14 @@ export class ViewHouseholdComponent implements OnInit {
       timeRangeValue === 'custom' && formattedStartDate && formattedEndDate
         ? `${formattedStartDate}-${formattedEndDate}`
         : timeRangeValue;
+
+    if (this.timeRange !== '3' && this.webSocketService.isConnected) {
+      this.webSocketService.disconnect();
+    }
+    if (this.timeRange === '3') {
+      const simulatorName = `${this.household?.id}`;
+      this.initWebSocket(simulatorName);
+    }
 
     this.fetchAvailabilityData(name, queryParam);
   }
