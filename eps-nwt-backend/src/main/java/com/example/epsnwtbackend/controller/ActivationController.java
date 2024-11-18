@@ -3,6 +3,7 @@ package com.example.epsnwtbackend.controller;
 import com.example.epsnwtbackend.model.User;
 import com.example.epsnwtbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,9 @@ public class ActivationController {
             user.setActivationToken(null);
             System.out.println("User iz if-a: "+user.toString());
             userRepository.save(user);
-            return ResponseEntity.ok("Account activated successfully!");
+            return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.badRequest().body("Invalid or expired activation token.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 }
