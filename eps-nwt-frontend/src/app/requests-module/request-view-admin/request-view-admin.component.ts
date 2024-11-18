@@ -7,6 +7,7 @@ import {User} from "../../model/user.model";
 import {FormsModule} from "@angular/forms";
 import {format} from "date-fns";
 import {UserService} from "../../service/user.service";
+import {FinishRealEstateRequestDTO} from "../../model/finish-real-estate-request-dto";
 
 @Component({
   selector: 'app-request-view-admin',
@@ -86,7 +87,7 @@ export class RequestViewAdminComponent implements OnInit{
         const blob = new Blob([fileBytes], { type: 'application/pdf' }); // Adjust MIME type as needed
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
-        link.download = 'request' + this.request?.id + '.pdf';
+        link.download = 'request' + this.request?.id + '-' + filePath.split('/')[7];
         link.click();
       },
       error: (err) => {
@@ -95,7 +96,44 @@ export class RequestViewAdminComponent implements OnInit{
     });
   }
 
-  saveAdminNote() {
-    console.log("nista dugme")
+  finishRequest(approved: boolean) {
+    let note = false;
+    if (!note){
+      // ako se odbija
+      if(!approved) {
+        // ako nema note
+        if (this.adminNote === '') {
+          alert("Admin note is required for denied requests!\nAdd reason for denying the request.");
+        } else {
+          note = true;
+        }
+      } else {
+        note = true;
+      }
+
+    }
+    if (this.request?.id && note && this.owner?.username){
+      let finishedRequest: FinishRealEstateRequestDTO = {
+        owner: this.owner.username,
+        approved: approved,
+        note: this.adminNote
+      }
+      this.service.finishRequest(this.request.id, finishedRequest).subscribe({
+        next: (message: string) => {
+          alert(message)
+          location.reload();
+        },
+        error: (mess:any) => {
+          //console.log(mess)
+          if(mess.status === 200){
+            alert(mess.error.text);
+            location.reload();
+          } else{
+            alert(mess.error.text);
+            console.log("Error with finishing request!")
+          }
+        }
+      });
+    }
   }
 }

@@ -32,7 +32,7 @@
         <div class="document-box" *ngIf="request?.documentation?.length; else noDocs">
           <ul>
             <li *ngFor="let doc of request?.documentation">
-              <button (click)="downloadDocument(doc)">{{doc.split('/')[7]}}</button>
+              <button class="doc-btn" (click)="downloadDocument(doc)">{{doc.split('/')[7]}}</button>
             </li>
           </ul>
         </div>
@@ -40,17 +40,19 @@
           <p>No documentation available.</p>
         </ng-template>
       </div>
-
-      <div class="admin-note">
-        <h3>Admin Note</h3>
-        <div *ngIf="this.status === 'CREATED'">
-          <textarea [(ngModel)]="adminNote" placeholder="Add admin note"></textarea>
-          <button (click)="saveAdminNote()">Save</button>
-        </div>
-        <div *ngIf="this.status !== 'CREATED'">
-          <p>{{ request?.adminNote || 'No admin note available.' }}</p>
-        </div>
+    </div>
+  </div>
+  <div class="admin-container">
+    <h3>Admin Note</h3>
+    <div *ngIf="this.status === 'CREATED'">
+      <textarea [(ngModel)]="adminNote" placeholder="Add admin note"></textarea>
+      <div class="buttons">
+        <button class="btn" (click)="finishRequest(false)">Deny</button>
+        <button class="btn" (click)="finishRequest(true)">Approve</button>
       </div>
+    </div>
+    <div *ngIf="this.status !== 'CREATED'">
+      <p>{{ request?.adminNote || 'No admin note available.' }}</p>
     </div>
   </div>
 </div>

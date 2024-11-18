@@ -5,6 +5,7 @@ import {CityMunicipality} from "../model/city-municipality";
 import {Observable} from "rxjs";
 import {AllRealEstateRequestsDto} from "../model/all-real-estate-requests-dto";
 import {RealEstateRequest} from "../model/real-estate-request.model";
+import {FinishRealEstateRequestDTO} from "../model/finish-real-estate-request-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -58,5 +59,9 @@ export class RealEstateRequestService {
     return this.http.post(this.apiUrl + '/docs', filePath, {
       responseType: 'arraybuffer'
     });
+  }
+
+  finishRequest(requestId: number, finishedRequest: FinishRealEstateRequestDTO) {
+    return this.http.put<string>(`${this.apiUrl}/admin/finish/${requestId}`, finishedRequest);
   }
 }

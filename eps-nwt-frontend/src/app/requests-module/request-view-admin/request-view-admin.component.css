@@ -1,17 +1,14 @@
 .body {
   display: flex;
+  min-height: 100vh;
+  height: fit-content;
   justify-content: center;
   background-color: #f0f4f8;
-  padding: 20px;
 }
 
 .details-container {
-  width: 80%;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1.5;
+  padding: 2rem 2rem 2rem 4rem;
 }
 
 .details-container h2 {
@@ -31,8 +28,12 @@
   color: #37474f;
 }
 
-.images, .documents, .admin-note {
+.images, .documents {
   grid-column: span 2;
+}
+
+h3{
+  color: #37474f;
 }
 
 .photo-box {
@@ -46,12 +47,12 @@
   height: fit-content;
   border-radius: 6px;
   margin: 0 20px;
+  transition: width 0.5s;
 }
 
 .photo-box img:hover {
   box-shadow: 0 0 10px #3c3c3c;
   width: 150px;
-  transition: 500ms;
 }
 
 .document-box ul {
@@ -63,14 +64,30 @@
   margin: 10px 0;
 }
 
-.document-box a {
+.doc-btn{
   color: #0288d1;
   text-decoration: none;
   font-weight: bold;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  cursor: pointer;
 }
 
-.document-box a:hover {
+.doc-btn:hover {
   text-decoration: underline;
+  transition: 0.3s;
+}
+
+.admin-container{
+  flex: 1;
+  padding: 2rem 4rem 2rem 2rem;
+  background-color: #e3f2fd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #37474f;
 }
 
 textarea {
@@ -81,6 +98,7 @@ textarea {
   border-radius: 6px;
   resize: none;
   margin-top: 10px;
+  color: #37474f;
 }
 
 textarea:focus {
@@ -88,17 +106,24 @@ textarea:focus {
   outline: none;
 }
 
-button {
+.buttons{
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
   padding: 10px 20px;
-  margin-top: 10px;
+  margin: 40px 20px 20px;
   border: none;
   border-radius: 6px;
   background-color: #0288d1;
   color: white;
   font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s;
+  width: 150px;
 }
 
-button:hover {
+.btn:hover {
   background-color: #01579b;
 }

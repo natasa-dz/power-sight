@@ -2,6 +2,7 @@ package com.example.epsnwtbackend.controller;
 
 import com.example.epsnwtbackend.dto.AllRealEstateRequestsDTO;
 import com.example.epsnwtbackend.dto.CreateRealEstateRequestDTO;
+import com.example.epsnwtbackend.dto.FinishRealEstateRequestDTO;
 import com.example.epsnwtbackend.dto.HouseholdRequestDTO;
 import com.example.epsnwtbackend.model.HouseholdRequest;
 import com.example.epsnwtbackend.model.RealEstateRequest;
@@ -135,6 +136,32 @@ public class RealEstateRequestController {
                     .body(fileBytes);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping(value = "admin/finish/{requestId}")
+    public ResponseEntity<String> finishRequest(@PathVariable("requestId")Long requestId,
+                                                @RequestBody FinishRealEstateRequestDTO finishedRequest){
+        System.out.println("gadja finish!!!!!!!!!!");
+        if(!finishedRequest.getApproved()){
+            if (finishedRequest.getNote() == null || finishedRequest.getNote().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Admin note is required for denied requests.");
+            }
+        } else {
+            if (finishedRequest.getNote().equals("\"\"") || finishedRequest.getNote().isEmpty()){
+                finishedRequest.setNote(null);
+            }
+        }
+
+        int updated = service.finishRequest(requestId, finishedRequest.getApproved(), finishedRequest.getNote(), finishedRequest.getOwner());
+        if (updated == 1) {
+            return ResponseEntity.ok("Real estate request finished successfully!");
+        } else if (updated == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Real estate request not found or not updated.");
+        } else if (updated == 2) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Real estate request finished.\nEmail not sent");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Admin note is required for denied requests.");
         }
     }
 }

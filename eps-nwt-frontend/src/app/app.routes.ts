@@ -18,7 +18,7 @@ export const routes: Routes = [
   { path: 'real-estate-registration', component: RealEstateRequestComponent },
   { path: 'real-estate-requests/:ownerId/all', component: OwnerRequestListingComponent },
   { path: 'real-estate-requests/admin/requests', component: AdminRequestListingComponent },
-  { path: 'real-estate-requests/:requestId', component: RequestViewAdminComponent },
+  { path: 'real-estate-requests/admin/:requestId', component: RequestViewAdminComponent },
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
   { path: 'main', component: MainComponent },

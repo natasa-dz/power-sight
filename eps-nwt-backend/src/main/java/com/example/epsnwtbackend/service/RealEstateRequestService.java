@@ -4,13 +4,13 @@ import com.example.epsnwtbackend.dto.AllRealEstateRequestsDTO;
 import com.example.epsnwtbackend.dto.CreateRealEstateRequestDTO;
 import com.example.epsnwtbackend.enums.RealEstateRequestStatus;
 import com.example.epsnwtbackend.model.*;
-import com.example.epsnwtbackend.repository.CityRepository;
-import com.example.epsnwtbackend.repository.MunicipalityRepository;
-import com.example.epsnwtbackend.repository.RealEstateRequestRepository;
+import com.example.epsnwtbackend.repository.*;
 import com.example.epsnwtbackend.utils.ImageUploadUtil;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +32,18 @@ public class RealEstateRequestService {
 
     @Autowired
     private MunicipalityRepository municipalityRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private HouseholdRepository householdRepository;
+
+    @Autowired
+    private RealEstateRepository realEstateRepository;
 
     public RealEstateRequest createRequest(CreateRealEstateRequestDTO requestDTO,
                                            List<HouseholdRequest> householdRequests){
@@ -105,4 +117,56 @@ public class RealEstateRequestService {
         return repository.findById(requestId).get();
     }
 
+    @Transactional
+    public int finishRequest(Long requestId, Boolean approved, String adminNote, String owner) {
+        if (!approved && (adminNote == null || adminNote.trim().isEmpty())) {
+            return 3;
+        }
+        RealEstateRequestStatus status = approved ? RealEstateRequestStatus.APPROVED : RealEstateRequestStatus.DENIED;
+        int updatedRows = this.repository.finishRequest(requestId, status, adminNote);
+        System.out.println(updatedRows);
+        try {
+            emailService.sendRegistrationRequestEmail(owner, adminNote, approved);
+        } catch (MessagingException e) {
+            System.out.println("email error");
+            e.printStackTrace();
+            return 2;
+        }
+        if (approved && updatedRows==1){
+            createRealEstate(repository.findById(requestId).get());
+        }
+        // 0 - not updated in db
+        // 1 - updated in db and email sent
+        // 2 - updated in db and email not sent
+        // 3 - bad note
+        return updatedRows;
+    }
+
+    private void createRealEstate(RealEstateRequest request) {
+        RealEstate realEstate = new RealEstate();
+        realEstate.setAddress(request.getAddress());
+        realEstate.setMunicipality(request.getMunicipality());
+        realEstate.setTown(request.getTown());
+        realEstate.setFloors(request.getFloors());
+        realEstate.setImages(new ArrayList<>(request.getImages()));
+        realEstateRepository.save(realEstate);
+
+        User owner = userRepository.findById(request.getOwner()).get();
+        List<Household> households = new ArrayList<>();
+        for (HouseholdRequest hr : request.getHouseholdRequests()){
+            households.add(createHousehold(hr, realEstate, owner));
+        }
+        realEstate.setHouseholds(households);
+        realEstateRepository.save(realEstate);
+    }
+
+    private Household createHousehold(HouseholdRequest request, RealEstate realEstate, User owner){
+        Household household = new Household();
+        household.setFloor(request.getFloor());
+        household.setSquareFootage(request.getSquareFootage());
+        household.setApartmentNumber(request.getApartmentNumber());
+        household.setRealEstate(realEstate);
+        household.setOwner(owner);
+        return household;
+    }
 }
