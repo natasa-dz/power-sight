@@ -78,10 +78,12 @@ export class RegisterComponent {
     if (this.registerForm.valid && this.selectedFile != null) {
       const formData = new FormData();
       let role = 'CITIZEN';
+
       if (this.authService.getRole() === Role.SUPERADMIN) {
         role = 'ADMIN';
       }
       console.log("Role: ", role)
+
       formData.append('role', role)
 
       formData.append('username', this.registerForm.get('username')?.value);
