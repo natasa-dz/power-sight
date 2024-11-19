@@ -12,12 +12,15 @@ export class NavbarCitizenComponent implements OnInit{
 
   constructor(private router: Router, private authService:AuthService) {}
   userRole: string = Role.CITIZEN;
+  userId: number = 0;
 
   ngOnInit() {
     this.authService.getRoleObservable().subscribe(role=>{
       this.userRole=role;
       console.log(this.userRole);
     })
+    this.userId = Number(localStorage.getItem("userId"));
+    console.log(this.userId)
   }
 
   menuItemClicked(option: string) {

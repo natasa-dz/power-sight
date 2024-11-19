@@ -17,7 +17,7 @@ public class CreateRealEstateRequestDTO {
     private String address;
     private String municipality;
     private String town;
-    private String floors;
+    private Integer floors;
     private Date createdAt;
     private List<HouseholdRequestDTO> householdRequests;
 }

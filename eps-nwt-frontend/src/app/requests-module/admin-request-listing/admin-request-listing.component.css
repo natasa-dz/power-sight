@@ -2,7 +2,7 @@
   background-color: #f0f4f8;
   min-height: 84vh;
   height: fit-content;
-  padding: 2rem 8rem;
+  padding: 1rem 8rem 2rem 8rem;
 }
 
 .placeholder {
@@ -85,7 +85,7 @@ app-owner-request-card {
 }
 
 .dates label, .address label{
-    margin-right: 15px;
+  margin-right: 15px;
 }
 
 .dates input, .address input{
@@ -97,8 +97,8 @@ app-owner-request-card {
 }
 
 .dates input:focus, .address input:focus {
-    border-color: #37474f;
-    outline: none;
+  border-color: #37474f;
+  outline: none;
 }
 
 .filter-select, .sort select {

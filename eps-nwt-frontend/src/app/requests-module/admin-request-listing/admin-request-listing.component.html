@@ -1,4 +1,4 @@
-<app-navbar-citizen></app-navbar-citizen>
+<app-navbar-admin></app-navbar-admin>
 <div class="background">
   <div class="placeholder">
     <div class="h-background">
@@ -66,7 +66,7 @@
       </div>
     </div>
     <div *ngFor="let request of filteredRequests" class="card_div">
-      <app-owner-request-card [request]="request" ></app-owner-request-card>
+      <app-admin-request-card [request]="request" ></app-admin-request-card>
     </div>
   </div>
 </div>

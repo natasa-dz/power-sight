@@ -5,7 +5,7 @@ export interface RealEstate {
   address: string;
   municipality: string;
   town: string;
-  floors: string;
+  floors: number;
   images: string[];
   households: Household[];
 }

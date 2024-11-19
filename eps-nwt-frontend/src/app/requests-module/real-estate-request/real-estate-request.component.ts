@@ -17,18 +17,20 @@ import {RealEstateRequestStatus} from "../../enum/real-estate-request-status";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
 import {HttpClient} from "@angular/common/http";
 import {MapComponent} from "../map/map.component";
+import {BaseModule} from "../../base/base.module";
 
 @Component({
   selector: 'app-real-estate-request',
   standalone: true,
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    RouterLink,
-    NgIf,
-    NgFor,
-    MapComponent
-  ],
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        RouterLink,
+        NgIf,
+        NgFor,
+        MapComponent,
+        BaseModule
+    ],
   templateUrl: './real-estate-request.component.html',
   styleUrl: './real-estate-request.component.css'
 })
@@ -42,6 +44,7 @@ export class RealEstateRequestComponent implements OnInit{
   cities: string[] = [];
   selectedCity: string = '';
   selectedMunicipality: string = '';
+  loggedInId : number = 0;
 
   constructor(private fb: FormBuilder,
               private service: RealEstateRequestService,
@@ -70,6 +73,7 @@ export class RealEstateRequestComponent implements OnInit{
       this.citiesAndMunicipalities = data;
       this.cities = Object.keys(this.citiesAndMunicipalities);
     });
+    this.loggedInId = Number(localStorage.getItem("userId"));
   }
 
   onCityChange(event: Event) {
@@ -141,7 +145,7 @@ export class RealEstateRequestComponent implements OnInit{
         if (this.documentationFiles.length >= 1) {
 
           const realEstateRequest: RealEstateRequestDTO = {
-            owner: 1,
+            owner: this.loggedInId,
             address: this.realEstateForm.get('address')?.value,
             municipality: this.realEstateForm.get('municipality')?.value,
             town: this.realEstateForm.get('city')?.value,

@@ -83,12 +83,18 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/users/register").permitAll()
                 .requestMatchers("/users/login").permitAll()
                 .requestMatchers("/users/{email}").permitAll()
+                .requestMatchers("/users/byId/{userId}").permitAll()
                 .requestMatchers("/users").permitAll()
                 .requestMatchers("/household/find-by-id/{id}").permitAll()
                 .requestMatchers("/household/search/{address}/{apartmentNumber}").permitAll()
                 .requestMatchers("/real-estate-request/registration").permitAll()
                 .requestMatchers("/real-estate-request").permitAll()
                 .requestMatchers("/real-estate-request/{ownerId}/all").permitAll()
+                .requestMatchers("/real-estate-request/admin/requests").permitAll()
+                .requestMatchers("/real-estate-request/admin/request/{requestId}").permitAll()
+                .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
+                .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
+                .requestMatchers("/real-estate-request/docs").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -133,11 +139,15 @@ public class WebSecurityConfig implements WebMvcConfigurer{
         // Dozvoljena POST metoda na ruti /auth/login, za svaki drugi tip HTTP metode greska je 401 Unauthorized
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/registration")
+                .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
+                .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
-                        "/household/availability/", "household/graph/", "/socket/info/", "/socket/",
-                        "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all");
+                        "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
+                        "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
+                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 
+                        "/socket/info/", "/socket/");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

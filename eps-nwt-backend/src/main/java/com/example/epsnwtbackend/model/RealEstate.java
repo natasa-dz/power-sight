@@ -27,7 +27,7 @@ public class RealEstate {
     private String town;
 
     @Column
-    private String floors;
+    private Integer floors;
 
     @ElementCollection
     private List<String> images;

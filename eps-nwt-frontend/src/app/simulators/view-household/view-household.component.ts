@@ -19,17 +19,19 @@ import {
 } from 'chart.js';
 import { ViewChild } from '@angular/core';
 import {WebSocketService} from "../../service/websocket.service";
+import {BaseModule} from "../../base/base.module";
 
 
 @Component({
   selector: 'app-view-household',
   standalone: true,
-  imports: [
-    NgIf,
-    DecimalPipe,
-    FormsModule,
-    BaseChartDirective
-  ],
+    imports: [
+        NgIf,
+        DecimalPipe,
+        FormsModule,
+        BaseChartDirective,
+        BaseModule
+    ],
   providers: [DatePipe],
   templateUrl: './view-household.component.html',
   styleUrl: './view-household.component.css'

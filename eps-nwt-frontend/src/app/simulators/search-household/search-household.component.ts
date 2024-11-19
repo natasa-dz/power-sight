@@ -5,6 +5,7 @@ import {HouseholdService} from "../household.service";
 import {FormsModule} from "@angular/forms";
 import {NgFor, NgIf} from "@angular/common";
 import {RouterLink} from "@angular/router";
+import {BaseModule} from "../../base/base.module";
 
 @Component({
   selector: 'app-search-household',
@@ -13,7 +14,8 @@ import {RouterLink} from "@angular/router";
     FormsModule,
     NgIf,
     NgFor,
-    RouterLink
+    RouterLink,
+    BaseModule
   ],
   templateUrl: './search-household.component.html',
   styleUrl: './search-household.component.css'

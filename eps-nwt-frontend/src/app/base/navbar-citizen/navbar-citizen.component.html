@@ -13,6 +13,10 @@
   <mat-menu class="mat-menu-panel" #accountMenu="matMenu">
     <button routerLink="/main" type="button" mat-menu-item class="text"><span class="material-icons">home</span>
       Home</button>
+    <button routerLink="/real-estate-registration" type="button" mat-menu-item class="text"><span class="material-icons">add</span>
+      Register Real Estate</button>
+    <button routerLink="/real-estate-requests/{{this.userId}}/all" type="button" mat-menu-item class="text"><span class="material-icons">list</span>
+      My requests</button>
     <button mat-menu-item type="button" class="text"  (click)="menuItemClicked('logout')"><span class="material-icons">logout</span>Logout</button>
 
 

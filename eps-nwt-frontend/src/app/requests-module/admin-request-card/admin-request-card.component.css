@@ -8,7 +8,7 @@ mat-card, .mat-mdc-card{
   display: flex;
   border: 1px solid #ccc;
   border-radius: 6px;
-  height: 8rem;
+  height: 6rem;
   padding: 1.4rem;
   background-color: white;
 }

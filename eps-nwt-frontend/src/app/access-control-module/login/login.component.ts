@@ -68,7 +68,11 @@ export class LoginComponent implements OnInit {
                 this.authService.logout();
               }
               else {
-                this.router.navigate(['main']);
+                if(user.role === Role.ADMIN){
+                  this.router.navigate(['real-estate-requests/admin/requests']);
+                } else{
+                  this.router.navigate(['main']);
+                }
                 console.log("Uspesno ulogovan korisnik!");
               }
             });

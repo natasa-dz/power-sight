@@ -4,6 +4,7 @@ import com.example.epsnwtbackend.dto.ChangePasswordDto;
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
+import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
 import com.example.epsnwtbackend.service.EmailService;
@@ -171,18 +172,6 @@ public class UserController {
     }
 
     @PreAuthorize("permitAll()")
-    @GetMapping(path = "/activate/{token}")
-    public ResponseEntity<UserDto> getUserByToken(@PathVariable String token, HttpServletResponse response) {
-        Optional<UserDto> retVal = userDetailsService.findUserByToken(token);
-        if (retVal.isPresent()) {
-            return ResponseEntity.ok().body(retVal.get());
-        }
-        response.setHeader("Cache-Control", "no-store");
-        return ResponseEntity.notFound().build();
-    }
-
-
-    @PreAuthorize("permitAll()")
     @GetMapping(path = "/logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -204,4 +193,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+    @GetMapping(value = "/byId/{userId}")
+    public User getUserById(@PathVariable("userId")Long userId){
+        return userService.getUserById(userId);
+    }
 }
