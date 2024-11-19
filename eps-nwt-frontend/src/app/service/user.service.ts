@@ -150,9 +150,9 @@ export class UserService {
       }
   }
 
-  activateAccount(token: string): Observable<string> {
+  activateAccount(token: string): Observable<HttpResponse<string>> {
     const params = new HttpParams().set('token', token);
-    return this.http.patch<string>(`${this.apiUrl}/auth/activate`, null, { params });
+    return this.http.patch<string>(`${this.apiUrl}/auth/activate`, null, { params, observe:'response' , responseType: 'text' as 'json'});
   }
 
   login(auth: any): Observable<AuthResponse> {
