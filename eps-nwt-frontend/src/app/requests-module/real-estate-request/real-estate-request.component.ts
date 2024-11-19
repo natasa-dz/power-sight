@@ -17,18 +17,20 @@ import {RealEstateRequestStatus} from "../../enum/real-estate-request-status";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
 import {HttpClient} from "@angular/common/http";
 import {MapComponent} from "../map/map.component";
+import {BaseModule} from "../../base/base.module";
 
 @Component({
   selector: 'app-real-estate-request',
   standalone: true,
-  imports: [
-    FormsModule,
-    ReactiveFormsModule,
-    RouterLink,
-    NgIf,
-    NgFor,
-    MapComponent
-  ],
+    imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        RouterLink,
+        NgIf,
+        NgFor,
+        MapComponent,
+        BaseModule
+    ],
   templateUrl: './real-estate-request.component.html',
   styleUrl: './real-estate-request.component.css'
 })

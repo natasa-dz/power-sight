@@ -1,8 +1,8 @@
 .background {
   background-color: #f0f4f8;
-  min-height: 100vh;
+  min-height: 84vh;
   height: fit-content;
-  padding: 2rem 8rem;
+  padding: 1rem 8rem 2rem 8rem;
 }
 
 .placeholder {

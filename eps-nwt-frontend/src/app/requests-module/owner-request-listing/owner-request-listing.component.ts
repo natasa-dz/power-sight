@@ -4,6 +4,7 @@ import {AllRealEstateRequestsDto} from "../../model/all-real-estate-requests-dto
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
 import {NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
+import {BaseModule} from "../../base/base.module";
 
 @Component({
   selector: 'app-owner-request-listing',
@@ -12,7 +13,8 @@ import {FormsModule} from "@angular/forms";
         OwnerRequestCardComponent,
         NgForOf,
         FormsModule,
-        NgIf
+        NgIf,
+        BaseModule
     ],
   templateUrl: './owner-request-listing.component.html',
   styleUrl: './owner-request-listing.component.css'

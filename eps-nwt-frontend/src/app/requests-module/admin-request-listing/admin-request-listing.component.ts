@@ -4,16 +4,18 @@ import {NgForOf, NgIf} from "@angular/common";
 import {AdminRequestCardComponent} from "../admin-request-card/admin-request-card.component";
 import {AllRealEstateRequestsDto} from "../../model/all-real-estate-requests-dto";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
+import {BaseModule} from "../../base/base.module";
 
 @Component({
   selector: 'app-admin-request-listing',
   standalone: true,
-  imports: [
-    FormsModule,
-    NgForOf,
-    NgIf,
-    AdminRequestCardComponent
-  ],
+    imports: [
+        FormsModule,
+        NgForOf,
+        NgIf,
+        AdminRequestCardComponent,
+        BaseModule
+    ],
   templateUrl: './admin-request-listing.component.html',
   styleUrl: './admin-request-listing.component.css'
 })

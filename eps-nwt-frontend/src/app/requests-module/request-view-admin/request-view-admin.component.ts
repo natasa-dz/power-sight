@@ -8,16 +8,18 @@ import {FormsModule} from "@angular/forms";
 import {format} from "date-fns";
 import {UserService} from "../../service/user.service";
 import {FinishRealEstateRequestDTO} from "../../model/finish-real-estate-request-dto";
+import {BaseModule} from "../../base/base.module";
 
 @Component({
   selector: 'app-request-view-admin',
   standalone: true,
-  imports: [
-    NgIf,
-    DatePipe,
-    NgForOf,
-    FormsModule
-  ],
+    imports: [
+        NgIf,
+        DatePipe,
+        NgForOf,
+        FormsModule,
+        BaseModule
+    ],
   templateUrl: './request-view-admin.component.html',
   styleUrl: './request-view-admin.component.css'
 })
