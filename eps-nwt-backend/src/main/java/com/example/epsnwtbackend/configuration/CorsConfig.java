@@ -21,14 +21,20 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setAllowCredentials(true);
+        config.addAllowedMethod("*");
+        //config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        //config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.addAllowedHeader("*");
+        //config.setAllowCredentials(true);
+
+
 /*        config.addAllowedMethod(HttpMethod.GET.name());
         config.addAllowedMethod(HttpMethod.POST.name());
         config.addAllowedHeader(HttpHeaders.ACCEPT);
         config.addAllowedHeader(HttpHeaders.CONTENT_TYPE);*/
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+
+
     }
 }
