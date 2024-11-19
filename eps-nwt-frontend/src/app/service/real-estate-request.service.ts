@@ -4,6 +4,8 @@ import {RealEstateRequestDTO} from "../model/create-real-estate-request-dto.mode
 import {CityMunicipality} from "../model/city-municipality";
 import {Observable} from "rxjs";
 import {AllRealEstateRequestsDto} from "../model/all-real-estate-requests-dto";
+import {RealEstateRequest} from "../model/real-estate-request.model";
+import {FinishRealEstateRequestDTO} from "../model/finish-real-estate-request-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -37,5 +39,29 @@ export class RealEstateRequestService {
 
   getAllRequestsForOwner(ownerId: number) : Observable<AllRealEstateRequestsDto[]> {
     return this.http.get<AllRealEstateRequestsDto[]>(`${this.apiUrl}/${ownerId}/all`)
+  }
+
+  getAllRequestsForAdmin() : Observable<AllRealEstateRequestsDto[]> {
+    return this.http.get<AllRealEstateRequestsDto[]>(`${this.apiUrl}/admin/requests`)
+  }
+
+  getRequestForAdmin(id: number) : Observable<RealEstateRequest> {
+    return this.http.get<RealEstateRequest>(`${this.apiUrl}/admin/request/${id}`)
+  }
+
+  getImagesByRealEstateId(realEstateId: number) {
+    return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`, {
+      responseType: 'json'
+    });
+  }
+
+  getDocumentBytes(filePath: string) {
+    return this.http.post(this.apiUrl + '/docs', filePath, {
+      responseType: 'arraybuffer'
+    });
+  }
+
+  finishRequest(requestId: number, finishedRequest: FinishRealEstateRequestDTO) {
+    return this.http.put<string>(`${this.apiUrl}/admin/finish/${requestId}`, finishedRequest);
   }
 }

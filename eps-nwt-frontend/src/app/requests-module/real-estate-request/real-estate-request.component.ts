@@ -42,6 +42,7 @@ export class RealEstateRequestComponent implements OnInit{
   cities: string[] = [];
   selectedCity: string = '';
   selectedMunicipality: string = '';
+  loggedInId : number = 0;
 
   constructor(private fb: FormBuilder,
               private service: RealEstateRequestService,
@@ -70,6 +71,7 @@ export class RealEstateRequestComponent implements OnInit{
       this.citiesAndMunicipalities = data;
       this.cities = Object.keys(this.citiesAndMunicipalities);
     });
+    this.loggedInId = Number(localStorage.getItem("userId"));
   }
 
   onCityChange(event: Event) {
@@ -141,7 +143,7 @@ export class RealEstateRequestComponent implements OnInit{
         if (this.documentationFiles.length >= 1) {
 
           const realEstateRequest: RealEstateRequestDTO = {
-            owner: 1,
+            owner: this.loggedInId,
             address: this.realEstateForm.get('address')?.value,
             municipality: this.realEstateForm.get('municipality')?.value,
             town: this.realEstateForm.get('city')?.value,

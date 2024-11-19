@@ -8,6 +8,8 @@ import {ViewHouseholdComponent} from "./simulators/view-household/view-household
 import {ActivateComponent} from "./activate/activate.component";
 import {MainComponent} from "./main/main.component";
 import {OwnerRequestListingComponent} from "./requests-module/owner-request-listing/owner-request-listing.component";
+import {AdminRequestListingComponent} from "./requests-module/admin-request-listing/admin-request-listing.component";
+import {RequestViewAdminComponent} from "./requests-module/request-view-admin/request-view-admin.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -15,6 +17,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'real-estate-registration', component: RealEstateRequestComponent },
   { path: 'real-estate-requests/:ownerId/all', component: OwnerRequestListingComponent },
+  { path: 'real-estate-requests/admin/requests', component: AdminRequestListingComponent },
+  { path: 'real-estate-requests/admin/:requestId', component: RequestViewAdminComponent },
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
   { path: 'main', component: MainComponent },

@@ -1,35 +1,33 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MatCard, MatCardContent} from "@angular/material/card";
+import {DatePipe, NgIf} from "@angular/common";
 import {AllRealEstateRequestsDto} from "../../model/all-real-estate-requests-dto";
 import {Router, RouterLink} from "@angular/router";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
-import {DatePipe, NgIf} from "@angular/common";
 import {format} from "date-fns";
 
 @Component({
-  selector: 'app-owner-request-card',
+  selector: 'app-admin-request-card',
   standalone: true,
-  imports: [
-    MatCard,
-    MatCardContent,
-    DatePipe,
-    NgIf
-  ],
-  templateUrl: './owner-request-card.component.html',
-  styleUrl: './owner-request-card.component.css'
+    imports: [
+      MatCard,
+      MatCardContent,
+      RouterLink,
+      DatePipe,
+      NgIf
+    ],
+  templateUrl: './admin-request-card.component.html',
+  styleUrl: './admin-request-card.component.css'
 })
-export class OwnerRequestCardComponent implements OnInit{
+export class AdminRequestCardComponent implements OnInit{
   @Input()
   request: AllRealEstateRequestsDto | undefined;
-
-  //@Output()
-  //clicked: EventEmitter<AccommodationListingDto> = new EventEmitter<AccommodationListingDto>();
 
   status: string = "";
   createdAt: string = "";
   finishedAt: string = "";
 
-  constructor() {
+  constructor(private router: Router, private service: RealEstateRequestService) {
     this.request = {
       id: undefined,
       owner: 0,

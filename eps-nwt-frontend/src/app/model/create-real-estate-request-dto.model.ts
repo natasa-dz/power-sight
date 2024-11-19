@@ -7,7 +7,7 @@ export interface RealEstateRequestDTO {
   address: string;
   municipality: string;
   town: string;
-  floors: string;
+  floors: number;
   images: File[] | null;
   documentation: File[] | null;
   status: RealEstateRequestStatus;

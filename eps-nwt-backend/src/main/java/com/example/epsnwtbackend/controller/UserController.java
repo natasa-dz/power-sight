@@ -4,6 +4,7 @@ import com.example.epsnwtbackend.dto.ChangePasswordDto;
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
+import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
 import com.example.epsnwtbackend.service.EmailService;
@@ -190,5 +191,10 @@ public class UserController {
             //
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @GetMapping(value = "/byId/{userId}")
+    public User getUserById(@PathVariable("userId")Long userId){
+        return userService.getUserById(userId);
     }
 }

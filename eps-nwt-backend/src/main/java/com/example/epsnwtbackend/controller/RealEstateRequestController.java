@@ -2,12 +2,12 @@ package com.example.epsnwtbackend.controller;
 
 import com.example.epsnwtbackend.dto.AllRealEstateRequestsDTO;
 import com.example.epsnwtbackend.dto.CreateRealEstateRequestDTO;
+import com.example.epsnwtbackend.dto.FinishRealEstateRequestDTO;
 import com.example.epsnwtbackend.dto.HouseholdRequestDTO;
 import com.example.epsnwtbackend.model.HouseholdRequest;
 import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.service.HouseholdRequestService;
 import com.example.epsnwtbackend.service.RealEstateRequestService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
@@ -73,5 +76,92 @@ public class RealEstateRequestController {
     public List<AllRealEstateRequestsDTO> getAllForOwner(@PathVariable("ownerId")Long ownerId){
         System.out.println(ownerId + " hhhhhhhhhhhhhhhhhhhhhhhhhh");
         return service.getAllForOwner(ownerId);
+    }
+
+    @GetMapping(value = "/admin/requests")
+    public List<AllRealEstateRequestsDTO> getAllForAdmin(){
+        return service.getAllForAdmin();
+    }
+
+    @GetMapping(value = "/admin/request/{requestId}")
+    public RealEstateRequest getRequestForAdmin(@PathVariable("requestId")Long requestId){
+        return service.getRequestForAdmin(requestId);
+    }
+
+    @GetMapping("/images/{realEstateId}")
+    public ResponseEntity<List<String>> getImagesByRealEstateId(@PathVariable("realEstateId") String realEstateId) {
+        Path imageDirectory = Paths.get("src/main/resources/data/requests/realEstate" + realEstateId + "/images");
+        List<String> base64Images = new ArrayList<>();
+
+        try {
+            if (!Files.exists(imageDirectory) || !Files.isDirectory(imageDirectory)) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            Files.list(imageDirectory)
+                    .filter(Files::isRegularFile)
+                    .forEach(imagePath -> {
+                        try {
+                            byte[] imageBytes = Files.readAllBytes(imagePath);
+                            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                            base64Images.add(base64Image);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+            return ResponseEntity.ok(base64Images);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping(value = "/docs")
+    public ResponseEntity<byte[]> getDocsByRealEstateId(@RequestBody String filePath) {
+
+        System.out.println("usaoooo");
+        try {
+            Path path = Paths.get(filePath).normalize();
+            if (!Files.exists(path) || !Files.isRegularFile(path)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            byte[] fileBytes = Files.readAllBytes(path);
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                contentType = "application/pdf";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(fileBytes);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping(value = "admin/finish/{requestId}")
+    public ResponseEntity<String> finishRequest(@PathVariable("requestId")Long requestId,
+                                                @RequestBody FinishRealEstateRequestDTO finishedRequest){
+        System.out.println("gadja finish!!!!!!!!!!");
+        if(!finishedRequest.getApproved()){
+            if (finishedRequest.getNote() == null || finishedRequest.getNote().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Admin note is required for denied requests.");
+            }
+        } else {
+            if (finishedRequest.getNote().equals("\"\"") || finishedRequest.getNote().isEmpty()){
+                finishedRequest.setNote(null);
+            }
+        }
+
+        int updated = service.finishRequest(requestId, finishedRequest.getApproved(), finishedRequest.getNote(), finishedRequest.getOwner());
+        if (updated == 1) {
+            return ResponseEntity.ok("Real estate request finished successfully!");
+        } else if (updated == 0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Real estate request not found or not updated.");
+        } else if (updated == 2) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Real estate request finished.\nEmail not sent");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Admin note is required for denied requests.");
+        }
     }
 }
