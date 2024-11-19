@@ -58,7 +58,7 @@ public class InfluxService {
                 "from(bucket:\"%s\") |> range(start: -%s, stop: now()) " +
                         "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
                         "|> filter(fn: (r) => r[\"_field\"] == \"value\")" +
-                        "|> yield(name: \"mean\")",
+                        "|> yield(name: \"all\")",
                 this.heartbeatBucket, duration.toString(), measurementName);
         return this.queryAvailability(fluxQuery);
     }
@@ -67,13 +67,13 @@ public class InfluxService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
                 .withZone(ZoneOffset.UTC);
 
-        String start = startDate.atStartOfDay().format(formatter);       // Start of startDate
-        String end = endDate.plusDays(1).atStartOfDay().format(formatter); // End of endDate (exclusive)
+        String start = startDate.atStartOfDay().format(formatter);
+        String end = endDate.plusDays(1).atStartOfDay().format(formatter);
         String fluxQuery = String.format(
                 "from(bucket:\"%s\") |> range(start: %s, stop: %s) " +
                         "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
                         "|> filter(fn: (r) => r[\"_field\"] == \"value\")" +
-                        "|> yield(name: \"mean\")",
+                        "|> yield(name: \"all\")",
                 this.heartbeatBucket, start, end, measurementName);
         return this.queryAvailability(fluxQuery);
     }
