@@ -120,6 +120,16 @@ public class UserService implements UserDetailsService {
         return Optional.empty();
     }
 
+    public Optional<UserDto> findUserByToken(String token){
+        User toFind = userRepository.findByActivationToken(token);
+        if(toFind!=null){
+            return Optional.of(new UserDto(toFind));
+        }
+        return Optional.empty();
+    }
+
+
+
     public boolean changePassword(String username, String confirmPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -176,6 +186,8 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
     }
+
+
 
 
 }

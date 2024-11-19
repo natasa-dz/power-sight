@@ -171,6 +171,18 @@ public class UserController {
     }
 
     @PreAuthorize("permitAll()")
+    @GetMapping(path = "/activate/{token}")
+    public ResponseEntity<UserDto> getUserByToken(@PathVariable String token, HttpServletResponse response) {
+        Optional<UserDto> retVal = userDetailsService.findUserByToken(token);
+        if (retVal.isPresent()) {
+            return ResponseEntity.ok().body(retVal.get());
+        }
+        response.setHeader("Cache-Control", "no-store");
+        return ResponseEntity.notFound().build();
+    }
+
+
+    @PreAuthorize("permitAll()")
     @GetMapping(path = "/logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -191,4 +203,5 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+
 }
