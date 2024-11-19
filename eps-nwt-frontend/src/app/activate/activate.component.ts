@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {UserService} from "../service/user.service";
-import {HttpResponse} from "@angular/common/http";
+import {HttpErrorResponse, HttpResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-activate',

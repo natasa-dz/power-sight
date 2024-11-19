@@ -20,13 +20,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 @Configuration
 // Injektovanje bean-a za bezbednost
 @EnableWebSecurity
 // Ukljucivanje podrske za anotacije "@Pre*" i "@Post*" koje ce aktivirati autorizacione provere za svaki pristup metodi
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class WebSecurityConfig{
+public class WebSecurityConfig implements WebMvcConfigurer{
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+    }
     // Servis koji se koristi za citanje podataka o korisnicima aplikacije
     @Bean
     public UserDetailsService userDetailsService() {
@@ -96,7 +106,8 @@ public class WebSecurityConfig{
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
-                .requestMatchers("/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
+                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
+                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
                 // koji tip korisnika moze da pristupi odgovarajucoj ruti. Npr. ukoliko zelimo da definisemo da ruti 'admin' moze da pristupi
                 // samo korisnik koji ima rolu 'ADMIN', navodimo na sledeci nacin:
