@@ -370,7 +370,7 @@ public class HouseholdService {
 
     public List<String> getAllSimulatorIds() {
         return householdRepository.findAll().stream()
-                .map(Household::getSimulatorId)
+                .map(household -> household.getId().toString())
                 .collect(Collectors.toList());
     }
 }
