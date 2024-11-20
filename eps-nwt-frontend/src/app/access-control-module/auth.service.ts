@@ -52,6 +52,7 @@ export class AuthService {
   logout(): Observable<void|null> {
 
     localStorage.removeItem('user');
+    localStorage.removeItem('userId');
     this.user$.next('');
     this.userAccount$.next(null);
     console.log("You have logged out successfully!");
@@ -84,6 +85,7 @@ export class AuthService {
         const helper = new JwtHelperService();
         const decodedToken = helper.decodeToken(accessToken);
         console.log(decodedToken)
+        localStorage.setItem("userId", decodedToken.id);
 
         return decodedToken ? decodedToken.role : null;
       }

@@ -20,13 +20,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 @Configuration
 // Injektovanje bean-a za bezbednost
 @EnableWebSecurity
 // Ukljucivanje podrske za anotacije "@Pre*" i "@Post*" koje ce aktivirati autorizacione provere za svaki pristup metodi
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class WebSecurityConfig{
+public class WebSecurityConfig implements WebMvcConfigurer{
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:4200")
+                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+    }
     // Servis koji se koristi za citanje podataka o korisnicima aplikacije
     @Bean
     public UserDetailsService userDetailsService() {
@@ -73,8 +83,31 @@ public class WebSecurityConfig{
                 .requestMatchers("/users/register").permitAll()
                 .requestMatchers("/users/login").permitAll()
                 .requestMatchers("/users/{email}").permitAll()
+                .requestMatchers("/users/byId/{userId}").permitAll()
                 .requestMatchers("/users").permitAll()
-                .requestMatchers("/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
+                .requestMatchers("/household/find-by-id/{id}").permitAll()
+                .requestMatchers("/household/search/{address}/{apartmentNumber}").permitAll()
+                .requestMatchers("/real-estate-request/registration").permitAll()
+                .requestMatchers("/real-estate-request").permitAll()
+                .requestMatchers("/real-estate-request/{ownerId}/all").permitAll()
+                .requestMatchers("/real-estate-request/admin/requests").permitAll()
+                .requestMatchers("/real-estate-request/admin/request/{requestId}").permitAll()
+                .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
+                .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
+                .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/search-no-owner/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}?apartmentNumber").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/availability/{name}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/graph/{name}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
+                .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
+                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
+                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
                 // koji tip korisnika moze da pristupi odgovarajucoj ruti. Npr. ukoliko zelimo da definisemo da ruti 'admin' moze da pristupi
                 // samo korisnik koji ima rolu 'ADMIN', navodimo na sledeci nacin:
@@ -105,8 +138,16 @@ public class WebSecurityConfig{
         // Zahtevi koji se mecuju za web.ignoring().antMatchers() nemaju pristup SecurityContext-u
         // Dozvoljena POST metoda na ruti /auth/login, za svaki drugi tip HTTP metode greska je 401 Unauthorized
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
+                .requestMatchers(HttpMethod.POST, "/real-estate-request/registration")
+                .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
+                .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
-                        "/**.html", "/**.css", "/**.js");
+                        "/**.html", "/**.css", "/**.js",
+                        "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
+                        "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
+                        "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
+                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 
+                        "/socket/info/", "/socket/");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
@@ -115,4 +156,3 @@ public class WebSecurityConfig{
     }
 
 }
-

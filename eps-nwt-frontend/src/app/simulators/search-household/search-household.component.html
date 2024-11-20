@@ -1,0 +1,33 @@
+<app-navbar-admin></app-navbar-admin>
+<div class="whole-page">
+<div class="search-form">
+  <label>Municipality:</label>
+  <input [(ngModel)]="municipality" type="text" required />
+
+  <label>Address:</label>
+  <input [(ngModel)]="address" type="text" required />
+
+  <label>Apartment Number:</label>
+  <input [(ngModel)]="apartmentNumber" type="number" min="0" />
+
+  <button (click)="search()">Search</button>
+</div>
+
+<div *ngIf="page.content.length > 0" class="result-part">
+  <h3>Results:</h3>
+  <ul>
+    <li *ngFor="let household of page?.content">
+      <a [routerLink]="['/household', household.id]">
+        {{ municipality }} - {{ address }}, {{ household.apartmentNumber }}
+      </a>
+    </li>
+  </ul>
+
+  <div class="pagination">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+    <span>Page {{ currentPage + 1 }} of {{ page?.totalPages }}</span>
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= (page?.totalPages || 0)">Next</button>
+  </div>
+</div>
+<div class="space"></div>
+</div>

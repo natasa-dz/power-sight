@@ -4,6 +4,7 @@ import com.example.epsnwtbackend.dto.ChangePasswordDto;
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
+import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
 import com.example.epsnwtbackend.service.EmailService;
@@ -89,7 +90,7 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Optional<UserDto> dto = userDetailsService.findUser(credentials.getEmail());
 
-        String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole());
+        String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole(), dto.get().getId());
         int expiresIn = tokenService.getExpiredIn();
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
     }
@@ -101,7 +102,7 @@ public class UserController {
         if (credentials.isPresent()){
             System.out.println("Usao u credentialsPresent!!!");
 
-            tokenService.generateToken(dto.getUsername(), dto.getRole());
+            tokenService.generateToken(dto.getUsername(), dto.getRole(), dto.getId());
 
             String activationToken = UUID.randomUUID().toString();
             userService.saveActivationToken(dto.getUsername(), activationToken); // Save token and set user as inactive
@@ -190,5 +191,10 @@ public class UserController {
             //
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    @GetMapping(value = "/byId/{userId}")
+    public User getUserById(@PathVariable("userId")Long userId){
+        return userService.getUserById(userId);
     }
 }

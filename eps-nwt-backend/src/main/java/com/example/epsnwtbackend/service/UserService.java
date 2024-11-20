@@ -2,6 +2,7 @@ package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
+import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
 import jakarta.annotation.PostConstruct;
@@ -120,6 +121,16 @@ public class UserService implements UserDetailsService {
         return Optional.empty();
     }
 
+    public Optional<UserDto> findUserByToken(String token){
+        User toFind = userRepository.findByActivationToken(token);
+        if(toFind!=null){
+            return Optional.of(new UserDto(toFind));
+        }
+        return Optional.empty();
+    }
+
+
+
     public boolean changePassword(String username, String confirmPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -176,6 +187,12 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
     }
+
+    public User getUserById(Long userId){
+        return userRepository.findById(userId).get();
+    }
+
+
 
 
 }

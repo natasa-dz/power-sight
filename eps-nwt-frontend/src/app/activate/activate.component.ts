@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {UserService} from "../service/user.service";
+import {HttpErrorResponse, HttpResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-activate',
@@ -28,13 +29,22 @@ export class ActivateComponent implements OnInit {
   activateAccount(token:string){
     console.log("Usao u acitvate Account!")
     this.userService.activateAccount(token).subscribe({
-      next:(response)=>{
-        alert(response);
-        alert('Activation successful. You can now login into your account! ')
-        //this.router.navigate(['login']);
+      next: (response: HttpResponse<string>) => {
+        if (response.status === 200) {
+          alert('Account activated successfully. You can now log in!');
+          this.router.navigate(['login']);
+
+        } else {
+          alert('Unexpected response status: ' + response.status);
+        }
       },
-      error:()=>{
-        alert('Activation failed. Please check your token and try again! ')
+      error:(error:any)=>{
+        console.error(error);
+        if (error.status === 400) {
+          alert('Activation failed: ' + error.error);
+        } else {
+          alert('An unexpected error occurred. Please try again later.');
+        }
       }
     });
   }
