@@ -177,6 +177,12 @@ public class UserService implements UserDetailsService {
         return Optional.empty();
     }
 
+    public User findWholeUser(String email) {
+        Optional<User> u = userRepository.findByUsername(email);
+        if(u.isPresent()){return u.get();}
+        throw new RuntimeException("User not found with email");
+    }
+
     public void saveActivationToken(String username, String activationToken) {
 
         User user = userRepository.findByUsername(username)

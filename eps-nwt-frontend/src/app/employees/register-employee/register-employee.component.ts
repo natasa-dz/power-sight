@@ -35,6 +35,8 @@ export class RegisterEmployeeComponent {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       jmbg: ['', [Validators.required, Validators.minLength(13), Validators.maxLength(13)]],
+      name: ['', Validators.required],
+      surname: ['', Validators.required],
       profilePic: [null]
     });
   }
@@ -78,6 +80,7 @@ export class RegisterEmployeeComponent {
       formData.append('username', this.registerForm.get('username')?.value);
       formData.append('password', this.registerForm.get('jmbg')?.value);
       formData.append('userPhoto', this.selectedFile);
+      formData.append('userData', `{"name": "${this.registerForm.get('name')?.value}","surname": "${this.registerForm.get('surname')?.value}"}`);
       console.log(formData)
       this.userService.registerUser(formData).subscribe({
         next: (response) => {

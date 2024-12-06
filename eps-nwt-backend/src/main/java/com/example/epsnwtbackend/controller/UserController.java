@@ -4,12 +4,12 @@ import com.example.epsnwtbackend.dto.ChangePasswordDto;
 import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
-import com.example.epsnwtbackend.model.RealEstateRequest;
-import com.example.epsnwtbackend.model.Role;
-import com.example.epsnwtbackend.model.User;
+import com.example.epsnwtbackend.model.*;
 import com.example.epsnwtbackend.service.EmailService;
+import com.example.epsnwtbackend.service.EmployeeService;
 import com.example.epsnwtbackend.service.UserService;
 import com.example.epsnwtbackend.utils.TokenUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +48,9 @@ public class UserController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    EmployeeService employeeService;
 
     private static final String PHOTO_PATH = "/var/www/photos/profiles/";
     @Autowired
@@ -107,6 +110,15 @@ public class UserController {
             String activationToken = UUID.randomUUID().toString();
             userService.saveActivationToken(dto.getUsername(), activationToken); // Save token and set user as inactive
 
+            if (dto.getRole() == Role.EMPLOYEE) {
+                User user = userService.findWholeUser(dto.getUsername());
+                Employee employee = new Employee();
+                employee.setUser(user);
+                employee.setName(dto.getName());
+                employee.setSurname(dto.getSurname());
+                employeeService.saveEmployee(employee);
+            }
+
             // generate unique activation token and send activation email as well
             String activationLink = "http://localhost:8080/users/api/auth/activate?token=" + activationToken;
             emailService.sendActivationEmail(dto.getUsername(), activationLink);
@@ -122,7 +134,8 @@ public class UserController {
             @RequestParam("username") String username,
             @RequestParam("password") String password,
             @RequestParam("role") String role,
-            @RequestParam("userPhoto") MultipartFile userPhoto) {
+            @RequestParam("userPhoto") MultipartFile userPhoto,
+            @RequestParam(value = "userData", required = false) String userDataJson) {
 
         try {
             String uploadDir = "uploads/";  // Directory to store user photos
@@ -146,6 +159,22 @@ public class UserController {
                 // Generate and save activation token
                 String activationToken = UUID.randomUUID().toString();
                 userService.saveActivationToken(dto.getUsername(), activationToken);  // Save token and set user as inactive
+
+                if (dto.getRole() == Role.EMPLOYEE) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    System.out.println("userDataJson is " + userDataJson);
+                    System.out.println("userDataJson is " + dto.getId());
+                    if(userDataJson == null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                    }
+                    AdditionalDataUser userData = objectMapper.readValue(userDataJson, AdditionalDataUser.class);
+                    User user = userService.findWholeUser(dto.getUsername());
+                    Employee employee = new Employee();
+                    employee.setUser(user);
+                    employee.setName(userData.getName());
+                    employee.setSurname(userData.getSurname());
+                    employeeService.saveEmployee(employee);
+                }
 
                 String activationLink = "http://localhost:4200/activate?token=" + activationToken;
                 emailService.sendActivationEmail(dto.getUsername(), activationLink);
