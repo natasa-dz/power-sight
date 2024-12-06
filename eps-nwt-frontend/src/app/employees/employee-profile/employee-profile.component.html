@@ -5,6 +5,7 @@
     <p><strong>Username:</strong> {{ employee?.username }}</p>
     <p><strong>Name:</strong> {{ employee?.name }}</p>
     <p><strong>Surname:</strong> {{ employee?.surname }}</p>
+    <button (click)="suspend()">Suspend</button>
     <br><br><br>
     <div class="photo-box" *ngIf="employee?.userPhoto; else noImages">
       <img [src]="'data:image/jpeg;base64,' + image" alt="Employee Profile Image" />

@@ -8,6 +8,8 @@ import {ActivatedRoute} from "@angular/router";
 import {HouseholdService} from "../../simulators/household.service";
 import {WebSocketService} from "../../service/websocket.service";
 import {EmployeeService} from "../employee.service";
+import {Page} from "../../model/page.model";
+import {EmployeeSearchDto} from "../../model/employee-search-dto.model";
 
 @Component({
   selector: 'app-employee-profile',
@@ -57,5 +59,23 @@ export class EmployeeProfileComponent implements OnInit {
         }
       );
     }
+  }
+
+
+  suspend() {
+    if(this.employee != undefined && this.employee.id) {}
+    // @ts-ignore
+    this.employeeService.suspend(this.employee.id)
+      .subscribe(
+        (result: Boolean) => {
+          if(result) {
+            alert("Employee suspended successfuly!")
+          }
+        },
+        (error: any) => {
+          alert("Error suspending employee.");
+          console.error(error);
+        }
+      );
   }
 }

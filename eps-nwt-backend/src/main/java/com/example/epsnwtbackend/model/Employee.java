@@ -24,4 +24,7 @@ public class Employee {
 
     @Column(nullable = false)
     private String surname;
+
+    @Column(nullable = false)
+    private Boolean suspended;
 }

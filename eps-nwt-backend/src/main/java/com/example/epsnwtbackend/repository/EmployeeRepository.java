@@ -16,4 +16,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
             "FROM Employee e " +
             "WHERE e.user.username LIKE %:username%")
     Page<EmployeeSearchDTO> findAllWithUsername(@Param("username") String username, Pageable pageable);
+
+    @Query("SELECT e FROM Employee e WHERE e.user.id = :userId")
+    Employee findByUserId(@Param("userId") Long userId);
 }

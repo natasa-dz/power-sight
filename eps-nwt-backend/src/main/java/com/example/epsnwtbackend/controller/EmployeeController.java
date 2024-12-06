@@ -50,4 +50,16 @@ public class EmployeeController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping(path = "/suspend/{employeeId}")
+    public ResponseEntity<Boolean> suspendEmployee(@PathVariable Long employeeId) {
+        Optional<Employee> employeeOptional = employeeService.getEmployeeById(employeeId);
+        if(employeeOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Employee employee = employeeOptional.get();
+        employee.setSuspended(true);
+        employeeService.saveEmployee(employee);
+        return ResponseEntity.ok(true);
+    }
 }

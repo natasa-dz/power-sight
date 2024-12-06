@@ -32,4 +32,8 @@ export class EmployeeService {
   getProfileImage(path: string) {
     return this.http.post<string>(`${this.apiUrl}/image`, path, { responseType: 'text' as 'json' });
   }
+
+  suspend(id: number): Observable<Boolean> {
+    return this.http.put<Boolean>(`${this.apiUrl}/suspend/${id}`, null);
+  }
 }

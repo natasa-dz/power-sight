@@ -93,6 +93,11 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Optional<UserDto> dto = userDetailsService.findUser(credentials.getEmail());
 
+        if (dto.get().getRole() == Role.EMPLOYEE) {
+            Employee employee = employeeService.getEmployeeByUserId(dto.get().getId());
+            if(employee.getSuspended()) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
         String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole(), dto.get().getId());
         int expiresIn = tokenService.getExpiredIn();
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
@@ -116,6 +121,7 @@ public class UserController {
                 employee.setUser(user);
                 employee.setName(dto.getName());
                 employee.setSurname(dto.getSurname());
+                employee.setSuspended(false);
                 employeeService.saveEmployee(employee);
             }
 
@@ -173,6 +179,7 @@ public class UserController {
                     employee.setUser(user);
                     employee.setName(userData.getName());
                     employee.setSurname(userData.getSurname());
+                    employee.setSuspended(false);
                     employeeService.saveEmployee(employee);
                 }
 

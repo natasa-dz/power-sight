@@ -21,6 +21,23 @@
   padding: 1rem 2rem;
 }
 
+.employee-left button {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #0288d1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.employee-left button:hover {
+  background-color: #01579b;
+}
+
+
 .employee-left h2 {
   font-size: 2.5rem;
   color: #37474f;
@@ -81,49 +98,4 @@
 
 .employee-right button:hover {
   background-color: #0a3680;
-}
-
-.employee-right canvas {
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #bbdefb;
-  border-radius: 8px;
-  background-color: #ffffff;
-}
-
-.time-range-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.time-range-container select,
-.time-range-container input[type="date"] {
-  flex: 1;
-  padding: 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #0d47a1;
-  background-color: #ffffff;
-  color: #37474f;
-}
-
-.time-range-container input[type="date"] {
-  max-width: 10rem;
-}
-
-.graph-container {
-  margin-top: 20px;
-  height: 40%;
-  width: 100%;
-}
-
-.chart-type-selector {
-  margin-bottom: 10px;
-}
-.chart-type-selector label {
-  margin-right: 5px;
 }

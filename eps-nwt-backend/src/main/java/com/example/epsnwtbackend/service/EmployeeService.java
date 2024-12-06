@@ -31,4 +31,8 @@ public class EmployeeService {
     public Page<EmployeeSearchDTO> search(String username, Pageable pageable) {
         return employeeRepository.findAllWithUsername(username, pageable);
     }
+
+    public Employee getEmployeeByUserId(Long id) {
+        return employeeRepository.findByUserId(id);
+    }
 }
