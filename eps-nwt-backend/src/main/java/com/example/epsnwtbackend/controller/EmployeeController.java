@@ -1,9 +1,7 @@
 package com.example.epsnwtbackend.controller;
 
 import com.example.epsnwtbackend.dto.EmployeeSearchDTO;
-import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
 import com.example.epsnwtbackend.dto.ViewEmployeeDTO;
-import com.example.epsnwtbackend.dto.ViewHouseholdDTO;
 import com.example.epsnwtbackend.model.Employee;
 import com.example.epsnwtbackend.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Optional;
 
 @RestController
@@ -36,5 +37,17 @@ public class EmployeeController {
     public ResponseEntity<Page<EmployeeSearchDTO>> search(@PathVariable String username, Pageable pageable) {
         Page<EmployeeSearchDTO> users = employeeService.search(username, pageable);
         return ResponseEntity.ok(users);
+    }
+
+    @PostMapping(path = "/image")
+    public ResponseEntity<String> getProfileImage(@RequestBody String path) {
+        try {
+            byte[] imageBytes = Files.readAllBytes(Path.of(path));
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+            return ResponseEntity.ok(base64Image);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.notFound().build();
+        }
     }
 }

@@ -3,6 +3,9 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {Page} from "../model/page.model";
 import {HouseholdSearchDTO} from "../model/household-search-dto.model";
 import {EmployeeSearchDto} from "../model/employee-search-dto.model";
+import {Observable} from "rxjs";
+import {ViewHouseholdDto} from "../model/view-household-dto.model";
+import {EmployeeViewDto} from "../model/view-employee-dto.model";
 
 @Injectable({
   providedIn: 'root'
@@ -20,5 +23,13 @@ export class EmployeeService {
 
     const url = `${this.apiUrl}/search/${username}`;
     return this.http.get<Page<EmployeeSearchDto>>(url, { params });
+  }
+
+  findById(id: number): Observable<EmployeeViewDto> {
+    return this.http.get<EmployeeViewDto>(`${this.apiUrl}/find-by-id/${id}`);
+  }
+
+  getProfileImage(path: string) {
+    return this.http.post<string>(`${this.apiUrl}/image`, path, { responseType: 'text' as 'json' });
   }
 }

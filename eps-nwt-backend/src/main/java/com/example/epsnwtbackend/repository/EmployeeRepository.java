@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    @Query("SELECT new com.example.epsnwtbackend.dto.EmployeeSearchDTO(e.id, e.user.username, e.name, e.surname, e.user.userPhoto) " +
+    @Query("SELECT new com.example.epsnwtbackend.dto.EmployeeSearchDTO(e.id, e.user.username, e.name, e.surname) " +
             "FROM Employee e " +
             "WHERE e.user.username LIKE %:username%")
     Page<EmployeeSearchDTO> findAllWithUsername(@Param("username") String username, Pageable pageable);
