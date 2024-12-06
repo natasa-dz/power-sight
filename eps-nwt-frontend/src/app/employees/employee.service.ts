@@ -13,16 +13,12 @@ export class EmployeeService {
 
   constructor(private http: HttpClient) { }
 
-  search(name: string, jmbg?: string, page: number = 0, size: number = 10) {
+  search(username: string, page: number = 0, size: number = 10) {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
 
-    if (jmbg !== undefined && jmbg !== null) {
-      params = params.set('jmbg', jmbg.toString());
-    }
-
-    const url = `${this.apiUrl}/search/${name}`;
+    const url = `${this.apiUrl}/search/${username}`;
     return this.http.get<Page<EmployeeSearchDto>>(url, { params });
   }
 }

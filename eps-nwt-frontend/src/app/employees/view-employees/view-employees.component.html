@@ -1,15 +1,17 @@
 <app-navbar-admin></app-navbar-admin>
 <div class="whole-page">
   <div class="search-form">
-    <label>Name:</label>
-    <input [(ngModel)]="name" type="text" required />
+    <label>Username:</label>
+    <input [(ngModel)]="username" type="text" required />
 
-    <label>Jmbg:</label>
-    <input [(ngModel)]="jmbg" type="number" min="0" />
+    <div class="center-btn">
+      <button (click)="search()">Search</button>
+    </div>
 
-    <button (click)="search()">Search</button>
-
-    <button [routerLink]="['/register-employee']">Add Employee</button>
+    <div class="add-emp">
+      <p>Don't have an employee? Add them! </p>
+      <button [routerLink]="['/register-employee']" class="add-employee">Add Employee</button>
+    </div>
 
   </div>
 
@@ -18,7 +20,7 @@
     <ul>
       <li *ngFor="let employee of page?.content">
         <a [routerLink]="['/employee', employee.id]">
-          {{ name }} - {{ jmbg }}, {{ employee.username }}
+          {{ username }} - {{ employee.name }} {{ employee.surname }}
         </a>
       </li>
     </ul>

@@ -23,8 +23,7 @@ import {EmployeeService} from "../employee.service";
   styleUrl: './view-employees.component.css'
 })
 export class ViewEmployeesComponent {
-  name: string = '';
-  jmbg?: string = '';
+  username: string = '';
 
   page: Page<EmployeeSearchDto> = { content: [], totalPages: 0, totalElements: 0, size: 0, number: 0 };
   currentPage: number = 0;
@@ -32,11 +31,11 @@ export class ViewEmployeesComponent {
   constructor(private employeeService: EmployeeService) {}
 
   search(): void {
-    if (!this.name && !this.jmbg) {
-      alert("Please enter name or jmbg.");
+    if (!this.username) {
+      alert("Please enter username!");
       return;
     }
-    this.employeeService.search(this.name, this.jmbg, this.currentPage)
+    this.employeeService.search(this.username, this.currentPage)
       .subscribe(
         (result: Page<EmployeeSearchDto>) => {
           this.page = result;

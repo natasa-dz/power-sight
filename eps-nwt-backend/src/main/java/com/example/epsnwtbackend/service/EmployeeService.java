@@ -1,8 +1,11 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.dto.EmployeeSearchDTO;
 import com.example.epsnwtbackend.model.Employee;
 import com.example.epsnwtbackend.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,5 +26,9 @@ public class EmployeeService {
 
     public Optional<Employee> getEmployeeById(Long id) {
         return employeeRepository.findById(id);
+    }
+
+    public Page<EmployeeSearchDTO> search(String username, Pageable pageable) {
+        return employeeRepository.findAllWithUsername(username, pageable);
     }
 }

@@ -4,5 +4,4 @@ export interface EmployeeSearchDto {
   username: string;
   name: string;
   surname: string;
-  jmbg: number;
 }

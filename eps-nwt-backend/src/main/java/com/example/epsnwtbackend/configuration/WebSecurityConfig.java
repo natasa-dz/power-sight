@@ -95,6 +95,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers("/employee/search/{username}").permitAll()
+                .requestMatchers("/employee/find-by-id/{id}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -147,7 +149,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
                         "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 
-                        "/socket/info/", "/socket/");
+                        "/socket/info/", "/socket/", "/employee/search/", "employee/find-by-id/");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
