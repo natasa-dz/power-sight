@@ -5,6 +5,7 @@ import {AuthService} from "../../access-control-module/auth.service";
 import {UserService} from "../../service/user.service";
 import {NgxImageCompressService} from "ngx-image-compress";
 import {Role} from "../../model/user.model";
+import {BaseModule} from "../../base/base.module";
 
 @Component({
   selector: 'app-register-employee',
@@ -12,7 +13,8 @@ import {Role} from "../../model/user.model";
     imports: [
         FormsModule,
         ReactiveFormsModule,
-        RouterLink
+        RouterLink,
+        BaseModule
     ],
   templateUrl: './register-employee.component.html',
   styleUrl: './register-employee.component.css'

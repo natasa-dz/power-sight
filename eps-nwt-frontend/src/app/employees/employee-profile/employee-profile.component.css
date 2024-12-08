@@ -99,3 +99,16 @@
 .employee-right button:hover {
   background-color: #0a3680;
 }
+
+.photo-box img {
+  width: 320px;
+  height: fit-content;
+  border-radius: 6px;
+  margin: 0 20px;
+  transition: width 0.5s;
+}
+
+.photo-box img:hover {
+  box-shadow: 0 0 10px #3c3c3c;
+  width: 360px;
+}

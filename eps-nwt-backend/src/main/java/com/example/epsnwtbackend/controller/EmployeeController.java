@@ -3,7 +3,9 @@ package com.example.epsnwtbackend.controller;
 import com.example.epsnwtbackend.dto.EmployeeSearchDTO;
 import com.example.epsnwtbackend.dto.ViewEmployeeDTO;
 import com.example.epsnwtbackend.model.Employee;
+import com.example.epsnwtbackend.service.AppointmentService;
 import com.example.epsnwtbackend.service.EmployeeService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,9 @@ public class EmployeeController {
 
     @Autowired
     EmployeeService employeeService;
+
+    @Autowired
+    AppointmentService appointmentService;
 
     @GetMapping(path = "/find-by-id/{id}")
     public ResponseEntity<ViewEmployeeDTO> findById(@PathVariable Long id) {
@@ -51,6 +56,7 @@ public class EmployeeController {
         }
     }
 
+    @Transactional
     @PutMapping(path = "/suspend/{employeeId}")
     public ResponseEntity<Boolean> suspendEmployee(@PathVariable Long employeeId) {
         Optional<Employee> employeeOptional = employeeService.getEmployeeById(employeeId);
@@ -60,6 +66,7 @@ public class EmployeeController {
         Employee employee = employeeOptional.get();
         employee.setSuspended(true);
         employeeService.saveEmployee(employee);
+        appointmentService.cancelAppointments(employee.getId());
         return ResponseEntity.ok(true);
     }
 }
