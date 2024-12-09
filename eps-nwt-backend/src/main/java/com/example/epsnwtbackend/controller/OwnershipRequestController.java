@@ -5,6 +5,7 @@ import com.example.epsnwtbackend.model.OwnershipRequest;
 import com.example.epsnwtbackend.model.Status;
 import com.example.epsnwtbackend.repository.OwnershipRequestRepository;
 import com.example.epsnwtbackend.service.OwnershipRequestService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class OwnershipRequestController {
     @PostMapping("/process/{id}")
     public ResponseEntity<?> processRequest(
             @PathVariable Long id,
-            @RequestBody ProcessRequestDto dto) {
+            @RequestBody ProcessRequestDto dto) throws MessagingException {
 
         ownershipRequestService.processRequest(id, dto.isApproved(), dto.getReason());
         return ResponseEntity.ok("Request processed successfully");

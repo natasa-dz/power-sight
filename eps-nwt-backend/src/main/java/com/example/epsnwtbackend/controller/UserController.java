@@ -10,6 +10,7 @@ import com.example.epsnwtbackend.model.User;
 import com.example.epsnwtbackend.service.EmailService;
 import com.example.epsnwtbackend.service.UserService;
 import com.example.epsnwtbackend.utils.TokenUtils;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto){
+    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto) throws MessagingException {
         Optional<UserCredentials> credentials = userDetailsService.register(dto);
 
         if (credentials.isPresent()){
@@ -155,6 +156,8 @@ public class UserController {
 
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Handle errors like file storage issues
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // In case registration fails

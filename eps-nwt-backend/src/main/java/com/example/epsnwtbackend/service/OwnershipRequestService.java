@@ -3,6 +3,7 @@ package com.example.epsnwtbackend.service;
 import com.example.epsnwtbackend.model.OwnershipRequest;
 import com.example.epsnwtbackend.model.Status;
 import com.example.epsnwtbackend.repository.OwnershipRequestRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class OwnershipRequestService {
 
 
     // TODO: assign an owner to a household
-    public void processRequest(Long requestId, boolean approved, String reason) {
+    public void processRequest(Long requestId, boolean approved, String reason) throws MessagingException {
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));
 

@@ -1,11 +1,9 @@
 package com.example.epsnwtbackend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class OwnershipRequest {
@@ -16,7 +14,29 @@ public class OwnershipRequest {
     String householdId;
     String userId;
     private Status status;
+    @ElementCollection
+    private List<String> images;
 
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public List<String> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<String> documents) {
+        this.documents = documents;
+    }
+
+    @ElementCollection
+    private List<String> documents;
+
+    // note: reason nullable, ukoliko status REJECTED!
     private String reason;
 
     private LocalDateTime submittedAt;
@@ -57,7 +77,11 @@ public class OwnershipRequest {
                 ", householdId='" + householdId + '\'' +
                 ", userId='" + userId + '\'' +
                 ", status=" + status +
+                ", images=" + images +
+                ", documents=" + documents +
                 ", reason='" + reason + '\'' +
+                ", submittedAt=" + submittedAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 
