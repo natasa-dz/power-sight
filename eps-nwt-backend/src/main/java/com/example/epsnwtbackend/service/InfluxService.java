@@ -21,6 +21,9 @@ public class InfluxService {
     @Value("${influxdb.bucket.heartbeat}")
     private String heartbeatBucket;
 
+    @Value("${influxdb.bucket.consumption}")
+    private String consumptionBucket;
+
     private final InfluxDBClient influxDbClientHeartbeat;
     private final InfluxDBClient influxDbClientConsumption;
 
@@ -95,5 +98,26 @@ public class InfluxService {
             }
         }
         return result;
+    }
+
+    public /*List<MeterConsumptionData>*/ void getConsumptionForCityByDateRange(String city, String measurementName, LocalDate startDate, LocalDate endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneOffset.UTC);
+
+        String start = startDate.atStartOfDay().format(formatter);
+        String end = endDate.plusDays(1).atStartOfDay().format(formatter);
+
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: %s, stop: %s) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"value\") " +
+                        "|> filter(fn: (r) => r[\"city\"] == \"%s\") " +
+                        "|> group(columns: [\"meter_id\"]) " +
+                        "|> sum(column: \"_value\") " +
+                        "|> yield(name: \"total_consumption\")",
+                this.consumptionBucket, start, end, measurementName, city);
+
+        //return this.queryMeterConsumption(fluxQuery);
     }
 }

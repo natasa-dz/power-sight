@@ -17,6 +17,8 @@ import {SearchHouseholdComponent} from "./simulators/search-household/search-hou
 import {ActivateComponent} from "./activate/activate.component";
 import {MainComponent} from "./main/main.component";
 import {BaseModule} from "./base/base.module";  // Import routes from app.routes.ts
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 @NgModule({
   declarations: [AppComponent,
@@ -32,8 +34,8 @@ import {BaseModule} from "./base/base.module";  // Import routes from app.routes
     HttpClientModule,
     ReactiveFormsModule,
     RouterModule.forRoot(routes),
-    BrowserModule,
-    AccessControlModule,
+    BrowserAnimationsModule,
+    MatSnackBarModule,
     SearchHouseholdComponent,
     BaseModule],
   bootstrap: [AppComponent],

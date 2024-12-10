@@ -9,6 +9,7 @@ import {format} from "date-fns";
 import {UserService} from "../../service/user.service";
 import {FinishRealEstateRequestDTO} from "../../model/finish-real-estate-request-dto";
 import {BaseModule} from "../../base/base.module";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-request-view-admin',
@@ -34,7 +35,8 @@ export class RequestViewAdminComponent implements OnInit{
 
   constructor(private service: RealEstateRequestService,
               private route: ActivatedRoute,
-              private userService: UserService) {
+              private userService: UserService,
+              private snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -105,7 +107,7 @@ export class RequestViewAdminComponent implements OnInit{
       if(!approved) {
         // ako nema note
         if (this.adminNote === '') {
-          alert("Admin note is required for denied requests!\nAdd reason for denying the request.");
+          this.showSnackbar("Admin note is required for denied requests!\nAdd reason for denying the request.");
         } else {
           note = true;
         }
@@ -122,20 +124,28 @@ export class RequestViewAdminComponent implements OnInit{
       }
       this.service.finishRequest(this.request.id, finishedRequest).subscribe({
         next: (message: string) => {
-          alert(message)
+          this.showSnackbar(message)
           location.reload();
         },
         error: (mess:any) => {
           //console.log(mess)
           if(mess.status === 200){
-            alert(mess.error.text);
+            this.showSnackbar(mess.error.text);
             location.reload();
           } else{
-            alert(mess.error.text);
+            this.showSnackbar(mess.error.text);
             console.log("Error with finishing request!")
           }
         }
       });
     }
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

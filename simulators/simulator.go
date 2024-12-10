@@ -35,13 +35,14 @@ func GetHourlyConsumption(hour int) float64 {
 }
 
 var lastSuccessfulMessageTime string
+var municipality string
 
 func main() {
 	id := flag.String("id", "simulator", "Unique ID for the simulator instance")
 	municipalityInput := flag.String("municipality", "novisad", "Municipality name")
 	flag.Parse()
 
-	municipality := strings.ToLower(strings.ReplaceAll(*municipalityInput, " ", ""))
+	municipality = strings.ToLower(strings.ReplaceAll(*municipalityInput, " ", ""))
 
 	conn, err := amqp.Dial(amqpURL)
 	if err != nil {
@@ -122,9 +123,10 @@ func sendConsumptionData(ch *amqp.Channel, id string, queue string) {
 		simulationTime := time.Date(date.Year(), date.Month(), date.Day(), hour, 0, 0, 0, time.UTC)
 		consumption := GetHourlyConsumption(hour) + (rand.Float64() * 0.1)
 		message := map[string]interface{}{
-			"id":          "simulator-" + id,
-			"consumption": consumption,
-			"timestamp":   simulationTime.Format(time.RFC3339),
+			"id":           "simulator-" + id,
+			"consumption":  consumption,
+			"municipality": municipality,
+			"timestamp":    simulationTime.Format(time.RFC3339),
 		}
 		sendAMQPMessage(ch, "consumptionExchange", queue, message)
 	}

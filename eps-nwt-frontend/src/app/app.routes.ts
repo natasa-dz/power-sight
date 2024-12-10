@@ -10,6 +10,7 @@ import {MainComponent} from "./main/main.component";
 import {OwnerRequestListingComponent} from "./requests-module/owner-request-listing/owner-request-listing.component";
 import {AdminRequestListingComponent} from "./requests-module/admin-request-listing/admin-request-listing.component";
 import {RequestViewAdminComponent} from "./requests-module/request-view-admin/request-view-admin.component";
+import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -22,6 +23,7 @@ export const routes: Routes = [
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
   { path: 'main', component: MainComponent },
+  { path: 'admin/city-consumption', component: CityConsumptionComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
 
