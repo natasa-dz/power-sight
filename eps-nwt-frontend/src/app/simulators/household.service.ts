@@ -5,6 +5,7 @@ import {Page} from "../model/page.model";
 import {Observable} from "rxjs";
 import {Household} from "../model/household.model";
 import {ViewHouseholdDto} from "../model/view-household-dto.model";
+import {HouseholdDto} from "../model/householdDTO";
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,14 @@ export class HouseholdService {
   private apiUrl = 'http://localhost:8080/household';  // Adjust to your backend URL
 
   constructor(private http: HttpClient) {}
+
+  getHouseholdsWithoutOwner(page: number, size: number): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    const url =`${this.apiUrl}/no-owner`;
+    return this.http.get<Page<HouseholdDto>>(url, {params});
+  }
 
   search(municipality: string, address: string, apartmentNumber?: number, page: number = 0, size: number = 10): Observable<Page<HouseholdSearchDTO>> {
     let params = new HttpParams()
@@ -40,4 +49,13 @@ export class HouseholdService {
     return this.http.get<any[]>(`${this.apiUrl}/graph/${name}/${timeRange}`);
   }
 
+  // Submit ownership request (upload files and description)
+  submitOwnershipRequest(formData: FormData): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/submit-ownership-request`, formData);
+  }
+
+  getHouseholdById(householdId: number) {
+    return this.http.get<HouseholdDto>(`${this.apiUrl}/get-household/${householdId}`);
+
+  }
 }
