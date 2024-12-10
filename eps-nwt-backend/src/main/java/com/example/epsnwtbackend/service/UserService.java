@@ -154,8 +154,6 @@ public class UserService implements UserDetailsService {
 
     public Optional<UserCredentials> register(UserDto dto) {
 
-        System.out.println(dto.getPassword());
-        //TODO: Add missing fields!!!!
 
         if(userRepository.findByUsername(dto.getUsername()).isPresent()){
             return Optional.empty();
@@ -164,6 +162,11 @@ public class UserService implements UserDetailsService {
         dto.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
 
         User user=new User(dto);
+
+        if(user.getRole() == Role.ADMIN){
+            user.setActive(true);
+            user.setActivationToken(null);
+        }
 
         User saved = userRepository.save(user);
         return Optional.of(new UserCredentials(saved));

@@ -1,0 +1,157 @@
+.whole-page {
+  background-color: #f0f4f8;
+  height: fit-content;
+  min-height: 86%;
+  padding-top: 30px;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #f0f4f8;
+  border-color: #37474f;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.search-form label {
+  font-size: 1rem;
+  color: #37474f;
+  margin-top: 1rem;
+}
+
+.search-form input[type="text"],
+.search-form input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.search-form button {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #0288d1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-form button:hover {
+  background-color: #01579b;
+}
+
+
+.result-part {
+  margin: 0 30px 100px;
+}
+
+h2 {
+  color: #0d47a1;
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1.5rem;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+ul li {
+  padding: 0.75rem;
+  background-color: #e0f7fa;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #0288d1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: padding, font-size 0.3s;
+}
+
+ul li:hover {
+  padding: 1rem;
+  font-size: large;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.5rem;
+  margin-bottom: 30px;
+}
+
+.pagination button {
+  background-color: #0288d1;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pagination button[disabled] {
+  background-color: #90a4ae;
+  cursor: not-allowed;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.clickable-row:hover {
+  background-color: #e2f0fb;
+}
+
+
+.pagination button:hover:not([disabled]) {
+  background-color: #01579b;
+}
+
+.pagination span {
+  font-size: 1rem;
+  color: #37474f;
+}
+
+.space {
+  min-height: 15px;
+}
+
+.households-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.households-table th, .households-table td {
+  padding: 10px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+.households-table th {
+  background-color: #b5d9de;
+  color: white;
+}
+
+.households-table tr:nth-child(even) {
+  background-color: #f0f4f8;
+}
+
+

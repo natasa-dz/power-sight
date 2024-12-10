@@ -1,0 +1,30 @@
+<app-navbar-citizen></app-navbar-citizen>
+<div class="body">
+  <div class="details-container">
+    <h2>Household Ownership Request</h2>
+    <div class="details-content">
+      <div class="info">
+        <p><strong>Household ID:</strong> {{ household?.id }}</p>
+        <p><strong>Floor:</strong> {{ household?.floor }}</p>
+        <p><strong>Apartment Number:</strong> {{ household?.apartmentNumber }}</p>
+        <p><strong>Square Footage:</strong> {{ household?.squareFootage }} sq.ft.</p>
+      </div>
+
+      <div class="upload-section">
+        <h3>Upload Supporting Documents</h3>
+        <input type="file" multiple (change)="onFileSelected($event)" />
+        <ul *ngIf="uploadedFiles.length">
+          <li *ngFor="let file of uploadedFiles">{{ file.name }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <h3>Request Submission</h3>
+    <textarea [(ngModel)]="requestNote" placeholder="Add request note"></textarea>
+    <div class="buttons">
+      <button class="btn" (click)="submitRequest()">Submit Request</button>
+    </div>
+  </div>
+</div>
