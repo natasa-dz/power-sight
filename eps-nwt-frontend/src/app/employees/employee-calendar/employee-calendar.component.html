@@ -57,8 +57,8 @@
   </div>
 
   <div class="employee-right">
-    <h3>Your Calendar</h3>
     <div class="simple-calendar">
+      <h3>Your Calendar</h3>
       <div class="calendar-header">
         <button (click)="prevMonth()">&lt;</button>
         <span>{{ months[currentMonthIndex] }} {{ currentYear }}</span>
@@ -78,6 +78,25 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="appointments-section" *ngIf="selectedDate != null">
+      <h4>Appointments for {{ selectedDate.day }} {{ months[selectedDate.month] }} {{ selectedDate.year }}</h4>
+      <div class="appointment-item-header">
+        <div class="time">Time</div>
+        <div class="user">Username</div>
+        <div class="status">Status</div>
+      </div>
+      <ul *ngIf="appointments.length > 0; else noAppointments" class="appointments-list">
+        <li *ngFor="let appointment of appointments" class="appointment-item">
+          <div class="time">{{ appointment.startTime | date: 'hh:mm' }} - {{ appointment.endTime | date: 'hh:mm' }}</div>
+          <div class="user" *ngIf="appointment.userId == this.loggedInId">Private appointment</div>
+          <div class="user" *ngIf="appointment.userId != this.loggedInId">{{ appointment.usersUsername }}</div>
+          <div class="status" [class]="appointment.status">{{ getStatusFormatted(appointment.status) }}</div>
+        </li>
+      </ul>
+      <ng-template #noAppointments>
+        <p class="no-appointments">No appointments for the selected day.</p>
+      </ng-template>
     </div>
   </div>
 </div>

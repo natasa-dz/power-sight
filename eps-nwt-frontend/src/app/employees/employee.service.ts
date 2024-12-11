@@ -6,6 +6,7 @@ import {EmployeeSearchDto} from "../model/employee-search-dto.model";
 import {Observable} from "rxjs";
 import {ViewHouseholdDto} from "../model/view-household-dto.model";
 import {EmployeeViewDto} from "../model/view-employee-dto.model";
+import {Appointment} from "../model/appointment.model";
 
 @Injectable({
   providedIn: 'root'
@@ -58,5 +59,10 @@ export class EmployeeService {
       params,
       responseType: 'text' as 'json', // Ensures the response is treated as text
     });
+  }
+
+  getAppointmentsForDate(employeeId: number, date: string) {
+    const params = new HttpParams().set('date', date);
+    return this.http.get<Appointment[]>(`${this.appointmentUrl}/get-employees-appointments-for-date/${employeeId}`, { params });
   }
 }

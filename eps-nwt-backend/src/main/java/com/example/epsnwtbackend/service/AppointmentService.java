@@ -1,5 +1,6 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.dto.AppointmentDTO;
 import com.example.epsnwtbackend.enums.AppointmentStatus;
 import com.example.epsnwtbackend.model.Appointment;
 import com.example.epsnwtbackend.model.Employee;
@@ -10,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -38,13 +40,18 @@ public class AppointmentService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
+        List<LocalDateTime> availableSlots = new ArrayList<>();
+        LocalDateTime slotStart = LocalDateTime.of(date, START_OF_DAY);
+
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            return availableSlots;
+        }
+
         List<Appointment> existingAppointments = appointmentRepository
                 .findByEmployeeAndStartTimeBetween(employee,
                         LocalDateTime.of(date, START_OF_DAY),
                         LocalDateTime.of(date, END_OF_DAY));
-
-        List<LocalDateTime> availableSlots = new ArrayList<>();
-        LocalDateTime slotStart = LocalDateTime.of(date, START_OF_DAY);
 
         while (slotStart.isBefore(LocalDateTime.of(date, END_OF_DAY))) {
             LocalDateTime slotEnd = slotStart.plusMinutes(30);
@@ -63,6 +70,37 @@ public class AppointmentService {
         }
 
         return availableSlots;
+    }
+
+    public List<AppointmentDTO> getAppointments(Long employeeId, LocalDate date) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            return new ArrayList<>();
+        }
+
+        List<Appointment> appointments = appointmentRepository
+                .findByEmployeeAndStartTimeBetween(employee,
+                        LocalDateTime.of(date, START_OF_DAY),
+                        LocalDateTime.of(date, END_OF_DAY));
+
+        List<AppointmentDTO> appointmentDTOs = new ArrayList<>();
+        for(Appointment appointment : appointments) {
+            AppointmentDTO appointmentDTO = new AppointmentDTO();
+            appointmentDTO.setId(appointment.getId());
+            appointmentDTO.setEmployeeId(appointment.getEmployee().getId());
+            appointmentDTO.setEmployeeUsername(appointment.getEmployee().getUser().getUsername());
+            appointmentDTO.setUserId(appointment.getUser().getId());
+            appointmentDTO.setUsersUsername(appointment.getUser().getUsername());
+            appointmentDTO.setStartTime(appointment.getStartTime());
+            appointmentDTO.setEndTime(appointment.getEndTime());
+            appointmentDTO.setStatus(appointment.getStatus());
+            appointmentDTOs.add(appointmentDTO);
+        }
+
+        return appointmentDTOs;
     }
 
     @Transactional

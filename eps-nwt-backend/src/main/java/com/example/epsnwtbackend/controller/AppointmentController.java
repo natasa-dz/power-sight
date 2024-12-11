@@ -1,5 +1,7 @@
 package com.example.epsnwtbackend.controller;
 
+import com.example.epsnwtbackend.dto.AppointmentDTO;
+import com.example.epsnwtbackend.model.Appointment;
 import com.example.epsnwtbackend.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,6 +25,18 @@ public class AppointmentController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         try {
             List<LocalDateTime> slots = appointmentService.getAvailableSlots(employeeId, date);
+            return ResponseEntity.ok(slots);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/get-employees-appointments-for-date/{employeeId}")
+    public ResponseEntity<List<AppointmentDTO>> getEmployeesAppointmentsForDate(
+            @PathVariable Long employeeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            List<AppointmentDTO> slots = appointmentService.getAppointments(employeeId, date);
             return ResponseEntity.ok(slots);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(null);

@@ -1,10 +1,11 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {EmployeeService} from "../employee.service";
 import {BaseModule} from "../../base/base.module";
 import {DatePipe, NgFor, NgForOf, NgIf} from "@angular/common";
 import {EmployeeViewDto} from "../../model/view-employee-dto.model";
-import {ActivatedRoute} from "@angular/router";
+import {Appointment} from "../../model/appointment.model";
+import {AppointmentStatus} from "../../enum/appointment-status";
 
 @Component({
   selector: 'app-employee-calendar',
@@ -22,7 +23,7 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class EmployeeCalendarComponent implements OnInit {
   employee?: EmployeeViewDto;
-  private loggedInId: number;
+  protected loggedInId: number;
   appointmentForm: FormGroup;
   availableSlots: string[] = [];
   isLoading: boolean = false;
@@ -34,6 +35,7 @@ export class EmployeeCalendarComponent implements OnInit {
                       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   calendarDates: { day: number }[] = [];
   selectedDate: { day: number; month: number; year: number } | null = null;
+  appointments: Appointment[] = [];
 
   constructor(private fb: FormBuilder,
               private employeeService: EmployeeService,
@@ -54,6 +56,7 @@ export class EmployeeCalendarComponent implements OnInit {
         (employee) => {
           this.employee = employee;
           this.initializeCalendar();
+          this.fetchAppointmentsForDate();
         },
         (error) => {
           console.error("Error fetching employee details", error);
@@ -117,6 +120,22 @@ export class EmployeeCalendarComponent implements OnInit {
         year: this.currentYear,
       };
       console.log("selected " + this.selectedDate.day + this.selectedDate.month + this.selectedDate.year);
+      this.fetchAppointmentsForDate();
+    }
+  }
+
+  fetchAppointmentsForDate(): void {
+    if (this.selectedDate && this.employee) {
+      const dateString = `${this.selectedDate.year}-${String(this.selectedDate.month + 1).padStart(2, '0')}-${String(this.selectedDate.day).padStart(2, '0')}`;
+      this.employeeService.getAppointmentsForDate(this.employee.id, dateString).subscribe(
+        (appointments) => {
+          this.appointments = appointments;
+        },
+        (error) => {
+          console.error('Error fetching appointments:', error);
+          this.appointments = [];
+        }
+      );
     }
   }
 
@@ -175,4 +194,10 @@ export class EmployeeCalendarComponent implements OnInit {
     }
   }
 
+  getStatusFormatted(status: AppointmentStatus) {
+    if(status.valueOf() == AppointmentStatus.CREATED.valueOf()) return "created";
+    if(status.valueOf() == AppointmentStatus.CANCELLED.valueOf()) return "cancelled";
+    if(status.valueOf() == AppointmentStatus.FINISHED.valueOf()) return "finished";
+    return "";
+  }
 }

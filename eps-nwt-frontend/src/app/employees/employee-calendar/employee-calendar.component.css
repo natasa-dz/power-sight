@@ -39,9 +39,10 @@
 
 
 .employee-left h2 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   color: #37474f;
   margin-bottom: 2rem;
+  margin-top: 2rem;
 }
 
 .employee-left p {
@@ -55,14 +56,15 @@
 }
 
 .employee-right {
-  flex: 2;
+  flex-direction: row;
+  flex: 3;
   background-color: #e3f2fd;
   padding: 1rem 2rem;
 }
 
 .employee-right h3 {
   font-size: 2rem;
-  color: #0d47a1;
+  color: #37474f;
   margin-bottom: 1rem;
 }
 
@@ -80,24 +82,24 @@
 
 .employee-right select:hover, .employee-right input[type="date"]:hover, .employee-right button:hover {
   background-color: #bbdefb;
-  color: #0d47a1;
+  color: #0288d1;
   border-color: #0d47a1;
 }
 
 .employee-right select:focus, .employee-right input[type="date"]:focus, .employee-right button:focus {
   outline: none;
   box-shadow: 0 0 5px rgba(13, 71, 161, 0.4);
-  border-color: #0d47a1;
+  border-color: #0288d1;
 }
 
 .employee-right button {
   cursor: pointer;
-  background-color: #0d47a1;
+  background-color: #0288d1;
   color: #ffffff;
 }
 
 .employee-right button:hover {
-  background-color: #0a3680;
+  background-color: #0288d1;
 }
 
 .photo-box img {
@@ -128,7 +130,7 @@
   flex: 1;
   padding: 0.6rem;
   border-radius: 6px;
-  border: 1px solid #0d47a1;
+  border: 1px solid #0288d1;
   background-color: #ffffff;
   color: #37474f;
 }
@@ -175,4 +177,80 @@
   text-align: center;
   padding: 0;
 }
+
+.appointments-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f9f9ff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: 4rem;
+  width: 50%;
+}
+
+.appointments-section h4 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.appointments-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.appointment-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  background-color: #f9f9ff;
+}
+
+.appointment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  background-color: #f9f9ff;
+}
+
+.appointment-item .time {
+  font-size: 1rem;
+  color: #37474f;
+}
+
+.appointment-item .user {
+  font-size: 0.9rem;
+  color: #37474f;
+}
+
+.appointment-item .status {
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.appointment-item .CREATED {
+  color: #0288d1;
+}
+
+.appointment-item .FINISHED {
+  color: #37474f;
+}
+
+.appointment-item .CANCELLED {
+  color: #dc3545;
+}
+
+.no-appointments {
+  color: #6c757d;
+  margin-top: 2.5rem;
+  text-align: center;
+  font-size: 1rem;
+}
+
 
