@@ -78,8 +78,12 @@ export class LoginComponent implements OnInit {
             });
           }
         },
-        error: () => {
-          alert('Bad credentials or account not verified yet');
+        error: (err) => {
+          if (err.status === 403) {
+            alert('Your account is suspended!');
+          } else {
+            alert('Bad credentials or account not verified yet');
+          }
         }
       });
     } else {
