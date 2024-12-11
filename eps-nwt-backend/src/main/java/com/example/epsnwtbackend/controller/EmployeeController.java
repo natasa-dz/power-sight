@@ -55,8 +55,10 @@ public class EmployeeController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping(path = "/search/{username}")
-    public ResponseEntity<Page<EmployeeSearchDTO>> search(@PathVariable String username, Pageable pageable) {
+    @GetMapping(path = "/search")
+    public ResponseEntity<Page<EmployeeSearchDTO>> search(
+            @RequestParam(value = "username", required = false, defaultValue = "") String username,
+            Pageable pageable) {
         Page<EmployeeSearchDTO> users = employeeService.search(username, pageable);
         return ResponseEntity.ok(users);
     }

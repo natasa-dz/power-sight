@@ -68,8 +68,10 @@
 
 .center-btn {
   display: flex;
+  flex-direction: column;
   min-width: 100%;
   justify-content: center;
+  align-items: center;
 }
 
 .search-form button:hover {
