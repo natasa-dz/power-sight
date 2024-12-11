@@ -18,7 +18,7 @@
   <ul>
     <li *ngFor="let household of page?.content">
       <a [routerLink]="['/household', household.id]">
-        {{ municipality }} - {{ address }}, {{ household.apartmentNumber }}
+        {{ household.municipality }} - {{ household.address }}, {{ household.apartmentNumber }}
       </a>
     </li>
   </ul>
@@ -28,6 +28,9 @@
     <span>Page {{ currentPage + 1 }} of {{ page?.totalPages }}</span>
     <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= (page?.totalPages || 0)">Next</button>
   </div>
+</div>
+<div *ngIf="page.content.length == 0" class="result-part" style="width: 92%; margin-top: 5rem; text-align: center">
+  <p class="no-households" style="color: #3c3c3c">No households found.</p>
 </div>
 <div class="space"></div>
 </div>

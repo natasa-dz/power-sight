@@ -20,8 +20,9 @@ public class EmployeeService {
         return employeeRepository.save(employee);
     }
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public Page<EmployeeSearchDTO> getAllEmployees(Pageable pageable) {
+        return employeeRepository.findAll(pageable)
+                .map(employee -> EmployeeSearchDTO.toDto(employee));
     }
 
     public Optional<Employee> getEmployeeById(Long id) {

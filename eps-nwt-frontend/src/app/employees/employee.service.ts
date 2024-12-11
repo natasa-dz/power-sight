@@ -65,4 +65,13 @@ export class EmployeeService {
     const params = new HttpParams().set('date', date);
     return this.http.get<Appointment[]>(`${this.appointmentUrl}/get-employees-appointments-for-date/${employeeId}`, { params });
   }
+
+  getAll(page: number = 0, size: number = 10) {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    const url = `${this.apiUrl}/all-employees`;
+    return this.http.get<Page<EmployeeSearchDto>>(url, { params });
+  }
 }
