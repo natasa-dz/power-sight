@@ -57,6 +57,27 @@
   </div>
 
   <div class="employee-right">
-
+    <h3>Your Calendar</h3>
+    <div class="simple-calendar">
+      <div class="calendar-header">
+        <button (click)="prevMonth()">&lt;</button>
+        <span>{{ months[currentMonthIndex] }} {{ currentYear }}</span>
+        <button (click)="nextMonth()">&gt;</button>
+      </div>
+      <div class="calendar-grid">
+        <div class="day" *ngFor="let day of days">{{ day }}</div>
+        <div class="date" *ngFor="let date of calendarDates">
+          <div [class.clicked]="
+                  selectedDate &&
+                  selectedDate.day === date.day &&
+                  selectedDate.month === currentMonthIndex &&
+                  selectedDate.year === currentYear"
+               *ngIf="date.day != 0"
+               (click)="onDateClick(date.day)">
+            {{ date.day }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
