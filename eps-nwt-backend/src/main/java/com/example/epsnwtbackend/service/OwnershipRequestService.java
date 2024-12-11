@@ -6,7 +6,12 @@ import com.example.epsnwtbackend.repository.OwnershipRequestRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,12 +23,29 @@ public class OwnershipRequestService {
     @Autowired
     private EmailService emailService;
 
+    private final String baseDirectory = "data/requests/ownership";
+
+    public String storeFiles(Long requestId, List<MultipartFile> files) {
+        String folderPath = baseDirectory + requestId;
+        Path folder = Paths.get(folderPath);
+
+        try {
+            Files.createDirectories(folder);
+            for (MultipartFile file : files) {
+                String fileName = file.getOriginalFilename();
+                Path filePath = folder.resolve(fileName);
+                Files.write(filePath, file.getBytes());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("File upload failed for request ID: " + requestId, e);
+        }
+        return folder.toString();
+    }
+
     public List<OwnershipRequest> getPendingRequests() {
         return ownershipRequestRepository.findByStatus(Status.PENDING);
     }
 
-
-    // TODO: assign an owner to a household
     public void processRequest(Long requestId, boolean approved, String reason) throws MessagingException {
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));
@@ -44,6 +66,10 @@ public class OwnershipRequestService {
         request.setUpdatedAt(LocalDateTime.now());
 
         ownershipRequestRepository.save(request);
+    }
+
+    public List<OwnershipRequest> getUserOwnershipRequests(String username){
+        return ownershipRequestRepository.findByUserId(username);
     }
 
 }

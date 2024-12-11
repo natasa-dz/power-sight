@@ -95,6 +95,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers("/ownership-requests/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -144,6 +145,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
+                        "/ownership-requests/**",
                         "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",

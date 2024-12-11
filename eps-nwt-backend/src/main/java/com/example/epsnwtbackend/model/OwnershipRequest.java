@@ -6,37 +6,25 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Table(indexes = @Index(name = "idx_userId", columnList = "userId"))
 public class OwnershipRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    String householdId;
+    Long householdId;
     String userId;
     private Status status;
-    @ElementCollection
-    private List<String> images;
 
-    public List<String> getImages() {
-        return images;
+    public String getDocumentationPath() {
+        return documentationPath;
     }
 
-    public void setImages(List<String> images) {
-        this.images = images;
+    public void setDocumentationPath(String documentationPath) {
+        this.documentationPath = documentationPath;
     }
 
-    public List<String> getDocuments() {
-        return documents;
-    }
+    private String documentationPath;
 
-    public void setDocuments(List<String> documents) {
-        this.documents = documents;
-    }
-
-    @ElementCollection
-    private List<String> documents;
-
-    // note: reason nullable, ukoliko status REJECTED!
     private String reason;
 
     private LocalDateTime submittedAt;
@@ -60,7 +48,7 @@ public class OwnershipRequest {
 
     public OwnershipRequest(){}
 
-    public OwnershipRequest(Long id, String householdId, String userId, Status status, String reason, LocalDateTime submittedAt, LocalDateTime updatedAt) {
+    public OwnershipRequest(Long id, Long householdId, String userId, Status status, String reason, LocalDateTime submittedAt, LocalDateTime updatedAt) {
         this.id = id;
         this.householdId = householdId;
         this.userId = userId;
@@ -77,8 +65,6 @@ public class OwnershipRequest {
                 ", householdId='" + householdId + '\'' +
                 ", userId='" + userId + '\'' +
                 ", status=" + status +
-                ", images=" + images +
-                ", documents=" + documents +
                 ", reason='" + reason + '\'' +
                 ", submittedAt=" + submittedAt +
                 ", updatedAt=" + updatedAt +
@@ -93,11 +79,11 @@ public class OwnershipRequest {
         this.id = id;
     }
 
-    public String getHouseholdId() {
+    public Long getHouseholdId() {
         return householdId;
     }
 
-    public void setHouseholdId(String householdId) {
+    public void setHouseholdId(Long householdId) {
         this.householdId = householdId;
     }
 
