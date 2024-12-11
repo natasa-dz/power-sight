@@ -16,26 +16,27 @@ import {ChangePasswordComponent} from "./change-password/change-password.compone
 import {SearchHouseholdComponent} from "./simulators/search-household/search-household.component";  // Import routes from app.routes.ts
 import {ActivateComponent} from "./activate/activate.component";
 import {MainComponent} from "./main/main.component";
-import {BaseModule} from "./base/base.module";  // Import routes from app.routes.ts
+import {BaseModule} from "./base/base.module";
+import {NavbarEmployeeComponent} from "./base/navbar-employee/navbar-employee.component";  // Import routes from app.routes.ts
 
 @NgModule({
   declarations: [AppComponent,
     ChangePasswordComponent,
     MainComponent,
     ActivateComponent], // Add all components here
-  imports: [RouterModule.forRoot(routes),
-    BrowserModule,
-    AccessControlModule,
-    RequestsModuleModule,
-    CommonModule,
-    FormsModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    RouterModule.forRoot(routes),
-    BrowserModule,
-    AccessControlModule,
-    SearchHouseholdComponent,
-    BaseModule],
+    imports: [RouterModule.forRoot(routes),
+        BrowserModule,
+        AccessControlModule,
+        RequestsModuleModule,
+        CommonModule,
+        FormsModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        RouterModule.forRoot(routes),
+        BrowserModule,
+        AccessControlModule,
+        SearchHouseholdComponent,
+        BaseModule, NavbarEmployeeComponent],
   bootstrap: [AppComponent],
   providers: [provideAnimationsAsync()] // Bootstraps the application with AppComponent
 })

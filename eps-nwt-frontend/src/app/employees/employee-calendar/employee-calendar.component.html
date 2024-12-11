@@ -1,0 +1,62 @@
+<app-navbar-admin></app-navbar-admin>
+<div class="employee-container">
+  <div class="employee-left">
+    <h2>Add an Appointment</h2>
+    <form [formGroup]="appointmentForm" (ngSubmit)="bookAppointment()">
+      <div class="form-group">
+        <label for="date">Select Date</label>
+        <input
+          id="date"
+          type="date"
+          class="employee-input"
+          formControlName="date"
+          required
+          (change)="fetchAvailableSlots()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="startTime">Available Slots</label>
+        <select
+          id="startTime"
+          class="employee-select"
+          formControlName="startTime"
+          required
+        >
+          <option *ngFor="let slot of availableSlots" [value]="slot">
+            {{ slot }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="timeSlotCount">How many slots?</label>
+        <input
+          id="timeSlotCount"
+          type="number"
+          class="employee-input"
+          formControlName="timeSlotCount"
+          min="1"
+          max="16"
+        />
+      </div>
+
+      <button type="submit" class="employee-btn" [disabled]="isLoading">
+        Book Appointment
+      </button>
+    </form>
+
+    <br><br>
+    <div *ngIf="message" class="employee-message">
+      {{ message }}
+    </div>
+
+    <div *ngIf="isLoading" class="employee-loading">
+      <p>Loading available slots...</p>
+    </div>
+  </div>
+
+  <div class="employee-right">
+
+  </div>
+</div>

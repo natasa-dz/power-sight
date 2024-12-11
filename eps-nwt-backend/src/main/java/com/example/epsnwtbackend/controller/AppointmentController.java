@@ -35,11 +35,15 @@ public class AppointmentController {
             @RequestParam Long userId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam(defaultValue = "1") int timeSlotCount) {
-        boolean success = appointmentService.tryBookAppointment(employeeId, userId, startTime, timeSlotCount);
-        if (success) {
-            return ResponseEntity.ok("Appointment booked successfully!");
-        } else {
-            return ResponseEntity.status(409).body("Failed to book appointment, please try again.");
+        try {
+            boolean success = appointmentService.tryBookAppointment(employeeId, userId, startTime, timeSlotCount);
+            if (success) {
+                return ResponseEntity.ok("Appointment booked successfully!");
+            } else {
+                return ResponseEntity.status(409).body("Failed to book appointment, please try again.");
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(409).body(e.getMessage());
         }
     }
 }

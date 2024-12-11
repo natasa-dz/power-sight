@@ -73,6 +73,12 @@ public class AppointmentService {
 
         LocalDateTime endTime = startTime.plusMinutes(30 * slotCount);
 
+        // end time cant be after 16:00
+        LocalDateTime latestAllowedEndTime = startTime.toLocalDate().atTime(16, 0);
+        if (endTime.isAfter(latestAllowedEndTime)) {
+            throw new RuntimeException("Appointment can not end after 16:00");
+        }
+
         boolean isSlotAvailable = appointmentRepository
                 .existsByEmployeeIdAndStartTimeLessThanAndEndTimeGreaterThan(employeeId, endTime, startTime);
         if (isSlotAvailable) {

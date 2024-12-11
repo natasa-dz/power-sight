@@ -38,6 +38,13 @@ public class EmployeeController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping(path = "/find-by-user-id/{id}")
+    public ResponseEntity<ViewEmployeeDTO> findByUserId(@PathVariable Long id) {
+        Employee employee = employeeService.getEmployeeByUserId(id);
+        ViewEmployeeDTO viewEmployeeDTO = ViewEmployeeDTO.toDto(employee);
+        return ResponseEntity.ok(viewEmployeeDTO);
+    }
+
     @GetMapping(path = "/search/{username}")
     public ResponseEntity<Page<EmployeeSearchDTO>> search(@PathVariable String username, Pageable pageable) {
         Page<EmployeeSearchDTO> users = employeeService.search(username, pageable);

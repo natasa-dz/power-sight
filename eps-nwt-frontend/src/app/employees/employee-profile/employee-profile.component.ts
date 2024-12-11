@@ -37,9 +37,6 @@ export class EmployeeProfileComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (typeof id === "string") {
-      localStorage.setItem("simulator-id", id);
-    }
     if (id) {
       this.employeeService.findById(+id).subscribe(
         (employee) => {
@@ -47,7 +44,7 @@ export class EmployeeProfileComponent implements OnInit {
           this.employeeService.getProfileImage(employee.userPhoto).subscribe({
             next: (base64Image: string) => {
               this.image = base64Image;
-              this.cdr.markForCheck();
+              this.cdr.detectChanges();
             },
             error: (err: any) => {
               console.error('Error loading images', err);

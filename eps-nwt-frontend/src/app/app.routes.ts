@@ -13,6 +13,7 @@ import {RequestViewAdminComponent} from "./requests-module/request-view-admin/re
 import {ViewEmployeesComponent} from "./employees/view-employees/view-employees.component";
 import {EmployeeProfileComponent} from "./employees/employee-profile/employee-profile.component";
 import {RegisterEmployeeComponent} from "./employees/register-employee/register-employee.component";
+import {EmployeeCalendarComponent} from "./employees/employee-calendar/employee-calendar.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -27,6 +28,7 @@ export const routes: Routes = [
   { path: 'view-employees', component: ViewEmployeesComponent },
   { path: 'employee/:id', component: EmployeeProfileComponent },
   { path: 'register-employee', component: RegisterEmployeeComponent },
+  { path: 'employee-calendar', component: EmployeeCalendarComponent },
   { path: 'main', component: MainComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
