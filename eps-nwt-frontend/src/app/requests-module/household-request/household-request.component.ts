@@ -7,6 +7,7 @@ import {HouseholdService} from "../../simulators/household.service";
 import {HttpClient} from "@angular/common/http";
 import {formatDate} from "date-fns";
 import {HouseholdDto} from "../../model/householdDTO";
+import {AuthService} from "../../access-control-module/auth.service";
 
 @Component({
   selector: 'app-household-request',
@@ -30,7 +31,9 @@ export class HouseholdRequestComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private authService:AuthService,
+    private householdService: HouseholdService
   ) {}
 
   ngOnInit(): void {
@@ -41,7 +44,6 @@ export class HouseholdRequestComponent implements OnInit {
       console.log('Retrieved household from local storage:', this.household);
 
     } else {
-      // Handle missing household case
       alert('No household data found. Returning to the dashboard.');
       this.router.navigate(['/household-no-owner']);
     }
@@ -61,28 +63,26 @@ export class HouseholdRequestComponent implements OnInit {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('householdId', this.household.id.toString());
-    formData.append('floor', this.household.floor.toString());
-    formData.append('apartmentNumber', this.household.apartmentNumber.toString());
-    formData.append('squareFootage', this.household.squareFootage.toString());
-    formData.append('requestNote', this.requestNote);
-    formData.append('createdAt', formatDate(new Date(), 'yyyy-MM-dd HH:mm:ss'));
+    let username: string | undefined = "";
 
-    this.uploadedFiles.forEach((file, index) => {
-      formData.append(`file${index}`, file, file.name);
-    });
+    this.authService.getCurrentUser().subscribe((user)=>{
+      const userId = user?.username;
+      username =userId;
 
-    this.http.post('/api/household-requests', formData).subscribe(
-      () => {
-        alert('Request submitted successfully!');
-        this.router.navigate(['/admin-dashboard']);
-      },
-      (error) => {
-        console.error(error);
-        alert('Error submitting request. Please try again.');
-      }
-    );
+      this.householdService
+        .submitOwnershipRequest(userId!, this.household.id, this.uploadedFiles)
+        .subscribe(
+          () => {
+            alert('Request submitted successfully!');
+            this.router.navigate(['/main']);
+          },
+          (error: any) => {
+            console.error(error);
+            alert('Error submitting request. Please try again.');
+          }
+        );
+
+    })
   }
 }
 

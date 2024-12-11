@@ -24,6 +24,11 @@ export class HouseholdService {
     return this.http.get<Page<HouseholdDto>>(url, {params});
   }
 
+  createOwnershipRequest(formData: FormData): Observable<any> {
+    const url =`${this.apiUrl}/no-owner`;
+    return this.http.post(url, formData);
+  }
+
   search(municipality: string, address: string, apartmentNumber?: number, page: number = 0, size: number = 10): Observable<Page<HouseholdSearchDTO>> {
     let params = new HttpParams()
       .set('page', page.toString())
@@ -49,13 +54,20 @@ export class HouseholdService {
     return this.http.get<any[]>(`${this.apiUrl}/graph/${name}/${timeRange}`);
   }
 
-  // Submit ownership request (upload files and description)
-  submitOwnershipRequest(formData: FormData): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/submit-ownership-request`, formData);
-  }
 
-  getHouseholdById(householdId: number) {
-    return this.http.get<HouseholdDto>(`${this.apiUrl}/get-household/${householdId}`);
+  submitOwnershipRequest(
+    userId: string,
+    householdId: number,
+    files: File[]
+  ): Observable<any> {
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('householdId', householdId.toString());
 
+    files.forEach(file => {
+      formData.append('documentation', file, file.name);
+    });
+
+    return this.http.post(`${this.apiUrl}/requestOwnership`, formData);
   }
 }
