@@ -1,0 +1,38 @@
+<app-navbar-admin></app-navbar-admin>
+<div class="whole-page">
+  <div class="search-form">
+    <label>Username:</label>
+    <input [(ngModel)]="username" type="text" required />
+
+    <div class="center-btn">
+      <button (click)="search()">Search</button>
+    </div>
+
+    <div class="add-emp">
+      <p>Don't have an employee? Add them! </p>
+      <button [routerLink]="['/register-employee']" class="add-employee">Add Employee</button>
+    </div>
+
+  </div>
+
+  <div *ngIf="page.content.length > 0" class="result-part">
+    <h3>Results:</h3>
+    <ul>
+      <li *ngFor="let employee of page?.content">
+        <a [routerLink]="['/employee', employee.id]">
+          {{ employee.username }} - {{ employee.name }} {{ employee.surname }}
+        </a>
+      </li>
+    </ul>
+
+    <div class="pagination">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+      <span>Page {{ currentPage + 1 }} of {{ page?.totalPages }}</span>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= (page?.totalPages || 0)">Next</button>
+    </div>
+  </div>
+  <div *ngIf="page.content.length == 0" class="result-part" style="width: 92%; margin-top: 5rem; text-align: center">
+    <p class="no-households" style="color: #3c3c3c">No households found.</p>
+  </div>
+  <div class="space"></div>
+</div>

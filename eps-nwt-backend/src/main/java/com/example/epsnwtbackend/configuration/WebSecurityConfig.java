@@ -103,6 +103,15 @@ public class WebSecurityConfig implements WebMvcConfigurer{
 
 
 
+                .requestMatchers("/employee/search/{username}").permitAll()
+                .requestMatchers("/employee/all-employees").permitAll()
+                .requestMatchers("/employee/find-by-id/{id}").permitAll()
+                .requestMatchers("/employee/find-by-user-id/{id}").permitAll()
+                .requestMatchers("/employee/image").permitAll()
+                .requestMatchers("employee/suspend/{employeeId}").permitAll()
+                .requestMatchers("/appointments/create").permitAll()
+                .requestMatchers("/appointments/available-slots/{employeeId}").permitAll()
+                .requestMatchers("/appointments/get-employees-appointments-for-date/{employeeId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -149,7 +158,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/registration")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
+                .requestMatchers(HttpMethod.POST, "/employee/image")
+                .requestMatchers(HttpMethod.POST, "/appointments/create")
                 .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
+                .requestMatchers(HttpMethod.PUT, "/employee/suspend/")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/ownership-requests/**","/ownership-requests/requestOwnership", "/ownership-requests/pending",
@@ -159,7 +171,9 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
                         "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 
-                        "/socket/info/", "/socket/");
+                        "/socket/info/", "/socket/", "/employee/search/", "employee/find-by-id/",
+                        "appointments/available-slots/", "employee/find-by-user-id/",
+                        "appointments/get-employees-appointments-for-date/", "employee/all-employees");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

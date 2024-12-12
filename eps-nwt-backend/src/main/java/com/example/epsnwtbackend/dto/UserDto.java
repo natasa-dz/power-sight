@@ -2,9 +2,11 @@ package com.example.epsnwtbackend.dto;
 
 import com.example.epsnwtbackend.model.Role;
 import com.example.epsnwtbackend.model.User;
+import lombok.Data;
 
 import java.io.File;
 
+@Data
 public class UserDto {
 
     private Long id;
@@ -17,6 +19,10 @@ public class UserDto {
     private String activationToken;
 
     private boolean passwordChanged;
+
+    private String name;
+
+    private String surname;
 
     // Constructors
     public UserDto() {}
@@ -74,71 +80,5 @@ public class UserDto {
         this.userPhoto = userPhoto;
         this.isActive = isActive;
         this.passwordChanged = passwordChanged;
-    }
-
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public String getUserPhoto() {
-        return userPhoto;
-    }
-
-    public void setUserPhoto(String userPhoto) {
-        this.userPhoto = userPhoto;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public boolean isPasswordChanged() {
-        return passwordChanged;
-    }
-
-    public void setPasswordChanged(boolean passwordChanged) {
-        this.passwordChanged=passwordChanged;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getActivationToken() {
-        return activationToken;
-    }
-
-    public void setActivationToken(String activationToken) {
-        this.activationToken = activationToken;
     }
 }

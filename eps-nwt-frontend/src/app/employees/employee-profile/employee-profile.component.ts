@@ -1,0 +1,78 @@
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {BaseChartDirective} from "ng2-charts";
+import {BaseModule} from "../../base/base.module";
+import {DatePipe, DecimalPipe, NgForOf, NgIf} from "@angular/common";
+import {FormsModule} from "@angular/forms";
+import {EmployeeViewDto} from "../../model/view-employee-dto.model";
+import {ActivatedRoute} from "@angular/router";
+import {HouseholdService} from "../../simulators/household.service";
+import {WebSocketService} from "../../service/websocket.service";
+import {EmployeeService} from "../employee.service";
+import {Page} from "../../model/page.model";
+import {EmployeeSearchDto} from "../../model/employee-search-dto.model";
+
+@Component({
+  selector: 'app-employee-profile',
+  standalone: true,
+  imports: [
+    BaseChartDirective,
+    BaseModule,
+    DecimalPipe,
+    FormsModule,
+    NgIf,
+    NgForOf
+  ],
+  templateUrl: './employee-profile.component.html',
+  styleUrl: './employee-profile.component.css'
+})
+export class EmployeeProfileComponent implements OnInit {
+  employee?: EmployeeViewDto;
+  image: string = "";
+
+  constructor(
+    private route: ActivatedRoute,
+    private employeeService: EmployeeService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.employeeService.findById(+id).subscribe(
+        (employee) => {
+          this.employee = employee;
+          this.employeeService.getProfileImage(employee.userPhoto).subscribe({
+            next: (base64Image: string) => {
+              this.image = base64Image;
+              this.cdr.detectChanges();
+            },
+            error: (err: any) => {
+              console.error('Error loading images', err);
+            }
+          });
+        },
+        (error) => {
+          console.error("Error fetching household details", error);
+        }
+      );
+    }
+  }
+
+
+  suspend() {
+    if(this.employee != undefined && this.employee.id) {}
+    // @ts-ignore
+    this.employeeService.suspend(this.employee.id)
+      .subscribe(
+        (result: Boolean) => {
+          if(result) {
+            alert("Employee suspended successfuly!")
+          }
+        },
+        (error: any) => {
+          alert("Error suspending employee.");
+          console.error(error);
+        }
+      );
+  }
+}
