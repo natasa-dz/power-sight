@@ -158,6 +158,14 @@ export class EmployeeCalendarComponent implements OnInit {
     const date = new Date(dateValue);
     const formattedDate = date.toISOString().split('T')[0];
 
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    if (date < currentDate) {
+      this.showSnackbar("Selected date is in the past. Please choose a future date.");
+      this.appointmentForm.reset();
+      return;
+    }
+
     if (employeeId && date) {
       this.isLoading = true;
       this.employeeService.getAvailableSlots(employeeId, formattedDate).subscribe(
@@ -181,6 +189,14 @@ export class EmployeeCalendarComponent implements OnInit {
       const date = new Date(dateValue);
       const formattedDate = date.toISOString().split('T')[0];
       const startTime = `${formattedDate}T${formValues.startTime}`;
+
+      const appointmentDate = new Date(startTime);
+      const currentDate = new Date();
+      if (appointmentDate < currentDate) {
+        this.showSnackbar("Appointment cannot be booked in the past.");
+        return;
+      }
+
       if(this.employee != undefined) {
         const payload = {
           employeeId: this.employee.id,

@@ -6,7 +6,9 @@ import com.example.epsnwtbackend.model.Appointment;
 import com.example.epsnwtbackend.model.Employee;
 import com.example.epsnwtbackend.model.User;
 import com.example.epsnwtbackend.repository.AppointmentRepository;
+import com.example.epsnwtbackend.repository.AppointmentRepositoryCustom;
 import com.example.epsnwtbackend.repository.EmployeeRepository;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class AppointmentService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private AppointmentRepositoryCustom appointmentRepositoryCustom;
 
     @Autowired
     private UserService userService;
@@ -111,15 +116,12 @@ public class AppointmentService {
 
         LocalDateTime endTime = startTime.plusMinutes(30 * slotCount);
 
-        // end time cant be after 16:00
-        LocalDateTime latestAllowedEndTime = startTime.toLocalDate().atTime(16, 0);
-        if (endTime.isAfter(latestAllowedEndTime)) {
-            throw new RuntimeException("Appointment can not end after 16:00");
-        }
+        validateWorkingHours(startTime, endTime);
 
-        boolean isSlotAvailable = appointmentRepository
-                .existsByEmployeeIdAndStartTimeLessThanAndEndTimeGreaterThan(employeeId, endTime, startTime);
-        if (isSlotAvailable) {
+        List<Appointment> conflictingAppointments = appointmentRepositoryCustom
+                .findByEmployeeIdAndTimeSlotOverlapWithLock(employeeId, startTime, endTime);
+
+        if (!conflictingAppointments.isEmpty()) {
             throw new RuntimeException("One or more slots in the requested range are already booked");
         }
 
@@ -137,8 +139,25 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+
+    private void validateWorkingHours(LocalDateTime startTime, LocalDateTime endTime) {
+        LocalDateTime latestAllowedEndTime = startTime.toLocalDate().atTime(16, 0);
+        LocalDateTime pauseStartTime = startTime.toLocalDate().atTime(12, 0);
+        LocalDateTime pauseEndTime = startTime.toLocalDate().atTime(12, 30);
+
+        // end time before 16:00
+        if (endTime.isAfter(latestAllowedEndTime)) {
+            throw new RuntimeException("Appointment cannot end after 16:00");
+        }
+
+        // pause overlap
+        if ((startTime.isBefore(pauseEndTime) && endTime.isAfter(pauseStartTime))) {
+            throw new RuntimeException("Appointment cannot overlap the break (12:00-12:30)");
+        }
+    }
+
     @Transactional
-    public synchronized boolean tryBookAppointment(Long employeeId, Long userId, LocalDateTime startTime, int slotCount) {
+    public boolean tryBookAppointment(Long employeeId, Long userId, LocalDateTime startTime, int slotCount) {
         try {
             bookAppointment(employeeId, userId, startTime, slotCount);
             return true;
