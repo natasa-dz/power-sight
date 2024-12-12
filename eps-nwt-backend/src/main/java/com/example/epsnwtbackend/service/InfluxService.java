@@ -56,6 +56,20 @@ public class InfluxService {
         writeApi.writePoint(point);
     }
 
+    public boolean getLatestAvailability(String name) {
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: -1y) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"value\") " +
+                        "|> last()",
+                this.heartbeatBucket, name);
+        List<AvailabilityData> data = this.queryAvailability(fluxQuery);
+        if(data.isEmpty()) return false;
+        AvailabilityData availabilityData = data.getFirst();
+        return availabilityData.isOnline();
+    }
+
     public List<AvailabilityData> getAvailabilityByTimeRange(String measurementName, String duration) {
         String fluxQuery = String.format(
                 "from(bucket:\"%s\") |> range(start: -%s, stop: now()) " +
