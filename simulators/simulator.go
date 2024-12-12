@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -94,6 +95,29 @@ func initializeAMQP() {
 	if err != nil {
 		fmt.Printf("Failed to declare consumption exchange: %v", err)
 	}
+
+	// Declare queues
+	heartbeatQueueName := "heartbeat_queue_" + municipality
+	consumptionQueueName := "consumption_queue_" + municipality
+
+	_, err = ch.QueueDeclare(heartbeatQueueName, true, false, false, false, nil)
+	if err != nil {
+		log.Fatalf("Failed to declare heartbeat queue: %v", err)
+	}
+	err = ch.QueueBind(heartbeatQueueName, heartbeatQueueName, "heartbeatExchange", false, nil)
+	if err != nil {
+		log.Fatalf("Failed to bind heartbeat queue: %v", err)
+	}
+
+	_, err = ch.QueueDeclare(consumptionQueueName, true, false, false, false, nil)
+	if err != nil {
+		log.Fatalf("Failed to declare consumption queue: %v", err)
+	}
+	err = ch.QueueBind(consumptionQueueName, consumptionQueueName, "consumptionExchange", false, nil)
+	if err != nil {
+		log.Fatalf("Failed to bind consumption queue: %v", err)
+	}
+
 }
 
 func getChannel() *amqp.Channel {
@@ -139,13 +163,15 @@ func sendConsumptionData() {
 	}
 }
 
-func sendAMQPMessage(exchange, routingKey string, data map[string]interface{}, isConsumption bool) {
+func sendAMQPMessage(exchange, routingKey string, data map[string]interface{}, isConsumption bool) bool {
 	ch := getChannel()
+
+	sent := false
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		log.Printf("Error encoding JSON: %v", err)
-		return
+		return sent
 	}
 
 	err = ch.Publish(
@@ -174,12 +200,82 @@ func sendAMQPMessage(exchange, routingKey string, data map[string]interface{}, i
 
 			initializeAMQP()
 			fmt.Println("Successful connection.")
+
+			if !isFileEmpty(simulatorId + ".txt") {
+				baseDate := time.Date(2024, time.November, 1, 0, 0, 0, 0, time.UTC)
+				now := time.Now().UTC()
+				timePassed := now.Sub(baseDate)
+				simulationHoursPassed := int(math.Round(timePassed.Minutes())) + 60
+				daysPassed := simulationHoursPassed / 24
+				hour := simulationHoursPassed % 24
+				date := baseDate.AddDate(0, 0, daysPassed)
+				currentTime := time.Date(date.Year(), date.Month(), date.Day(), hour, 0, 0, 0, time.UTC)
+
+				file, err := os.Open(simulatorId + ".txt")
+				if err != nil {
+					fmt.Printf("Error opening file: %v\n", err)
+					return
+				}
+				defer file.Close()
+
+				var lines []string
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					lines = append(lines, scanner.Text())
+				}
+
+				if err := scanner.Err(); err != nil {
+					fmt.Printf("Error reading file: %v\n", err)
+				}
+
+				var newLines []string
+				for _, line := range lines {
+					parts := strings.Split(line, ",")
+					message := map[string]interface{}{
+						"id":          "simulator-" + simulatorId,
+						"consumption": parts[1],
+						"timestamp":   parts[0],
+					}
+					parsedTime, err := time.Parse(time.RFC3339, parts[0])
+					if err != nil {
+						fmt.Printf("Error parsing time: %v\n", err)
+					}
+					limitDate := currentTime.AddDate(0, 0, -90)
+					if !parsedTime.Before(limitDate) {
+						success := sendAMQPMessage("consumptionExchange", "consumption_queue_"+municipality, message, true)
+						if !success {
+							sent = false
+							newLines = append(newLines, line)
+						}
+					} else {
+						fmt.Printf("Older than 90 days: " + line + "\n")
+					}
+				}
+
+				outputFile, err := os.Create(simulatorId + ".txt")
+				if err != nil {
+					fmt.Printf("Error creating file: %v\n", err)
+					return
+				}
+				defer outputFile.Close()
+
+				for _, newLine := range newLines {
+					_, err := outputFile.WriteString(newLine + "\n")
+					if err != nil {
+						fmt.Printf("Error writing to file: %v\n", err)
+						return
+					}
+				}
+
+			}
 		}()
+		return sent
 	} else {
 		if strings.HasPrefix(routingKey, "consumption") {
 			lastSuccessfulMessageTime = data["timestamp"].(string)
 		}
 		log.Printf("Message sent to %s via exchange %s", routingKey, exchange)
+		return true
 	}
 }
 
@@ -198,4 +294,12 @@ func saveFailedData(consumption string, timestamp string) {
 	if err != nil {
 		fmt.Printf("Error appending to file: %v\n", err)
 	}
+}
+
+func isFileEmpty(filePath string) bool {
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		return false
+	}
+	return fileInfo.Size() == 0
 }
