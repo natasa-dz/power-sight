@@ -145,21 +145,19 @@ public class UserController {
             @RequestParam(value = "userData", required = false) String userDataJson) {
 
         try {
-            String uploadDir = "resources/pictures";  // Directory to store user photos
+            String uploadDir = "src/main/resources/pictures/";  // Directory to store user photos
             File uploadDirectory = new File(uploadDir);
             if (!uploadDirectory.exists()) {
                 uploadDirectory.mkdir();
             }
 
-            // Create a new UserDto (or User entity if you have one) with the path to the saved image
-            UserDto dto = new UserDto(username, password, Role.valueOf(role), false,true, ""); // Assume 'false' for isActive
-
-
             // Generate unique file name based on the username
-            String fileName = dto.getId().toString() + "_profile.jpg";
+            String fileName = username + "_profile.jpg";
             Path filePath = Paths.get(uploadDir + fileName);
             Files.write(filePath, userPhoto.getBytes());  // Save the photo to the file system
-            dto.setUserPhoto(filePath.toString());
+
+            // Create a new UserDto (or User entity if you have one) with the path to the saved image
+            UserDto dto = new UserDto(username, password, Role.valueOf(role), filePath.toString(), false,true, ""); // Assume 'false' for isActive
 
             // Register user credentials
             Optional<UserCredentials> credentials = userDetailsService.register(dto);
