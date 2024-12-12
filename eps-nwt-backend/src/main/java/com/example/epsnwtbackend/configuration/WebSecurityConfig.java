@@ -103,6 +103,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/availability/{name}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/graph/{name}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/{city}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
@@ -146,7 +147,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
-                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 
+                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
+                        "/consumption/{city}/{timeRange}",
                         "/socket/info/", "/socket/");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije

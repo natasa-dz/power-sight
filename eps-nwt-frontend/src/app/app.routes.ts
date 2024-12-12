@@ -22,8 +22,8 @@ export const routes: Routes = [
   { path: 'real-estate-requests/admin/:requestId', component: RequestViewAdminComponent },
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
-  { path: 'main', component: MainComponent },
   { path: 'admin/city-consumption', component: CityConsumptionComponent },
+  { path: 'main', component: MainComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
 

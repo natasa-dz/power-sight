@@ -6,7 +6,6 @@ import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
 import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute} from "@angular/router";
-import {HouseholdService} from "../household.service";
 import {WebSocketService} from "../../service/websocket.service";
 import {
   Chart,
@@ -21,6 +20,7 @@ import {
   ChartData, LineElement, PointElement, LineController
 } from 'chart.js';
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {ConsumptionService} from "../consumption.service";
 
 @Component({
   selector: 'app-city-consumption',
@@ -34,6 +34,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     NgForOf,
     ReactiveFormsModule
   ],
+  providers: [DatePipe],
   templateUrl: './city-consumption.component.html',
   styleUrl: './city-consumption.component.css'
 })
@@ -42,8 +43,8 @@ export class CityConsumptionComponent implements OnInit{
   citiesAndMunicipalities: any = {};
   cities: string[] = [];
   selectedCity: string = '';
-  custom: boolean = false;
   timeRange = '3';
+  custom: boolean = false;
   startDate: string | undefined;
   endDate: string | undefined;
   chartData: ChartData<'bar'> = {
@@ -61,10 +62,11 @@ export class CityConsumptionComponent implements OnInit{
   chartType: ChartType = 'bar';
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
-  constructor(private realEstateService: RealEstateRequestService,
+  constructor(private consumptionService: ConsumptionService,
+              private realEstateService: RealEstateRequestService,
               private http: HttpClient,
+              private datePipe: DatePipe,
               private route: ActivatedRoute,
-              private householdService: HouseholdService,
               private webSocketService: WebSocketService,
               private snackBar: MatSnackBar) {}
 
@@ -93,16 +95,53 @@ export class CityConsumptionComponent implements OnInit{
   }
 
   updateChart(): void {
+    let validDates = false;
     this.custom = this.timeRange === 'custom';
+    const timeRangeValue = this.timeRange;
+
+    const formattedStartDate = this.startDate
+      ? this.datePipe.transform(this.startDate, 'dd.MM.yyyy.')
+      : '';
+    const formattedEndDate = this.endDate
+      ? this.datePipe.transform(this.endDate, 'dd.MM.yyyy.')
+      : '';
+
+    const queryParam =
+      timeRangeValue === 'custom' && formattedStartDate && formattedEndDate
+        ? `${formattedStartDate}-${formattedEndDate}`
+        : timeRangeValue;
+
     if (this.startDate != undefined && this.endDate != undefined){
       if (this.validateDateRange(new Date(this.startDate), new Date(this.endDate))){
-        // dalje
+        validDates = true;
       }
       else {
+        validDates = false;
         this.showSnackbar("The selected dates are invalid. The range must not exceed 1 year.");
         this.startDate = "";
         this.endDate = "";
       }
+    }
+
+    // ako je custom i validni datumi ili ako nije custom
+    if ((this.custom && validDates) || !this.custom){
+      this.consumptionService.getConsumption(this.selectedCity, queryParam).subscribe({
+        next: (data : number) => {
+          if (data === null){
+            this.showSnackbar("No data available");
+          }
+          else{
+            this.showSnackbar(data.toString());
+          }
+        },
+        error: (mess:any) => {
+          if(mess.status === 200){
+            this.showSnackbar(mess.error.text);
+          } else{
+            this.showSnackbar("Error with consumption");
+          }
+        }
+      });
     }
 
     /*const name = "simulator-" + this.household?.id.toString();
