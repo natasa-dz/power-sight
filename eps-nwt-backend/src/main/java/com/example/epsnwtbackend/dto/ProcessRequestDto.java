@@ -1,8 +1,20 @@
 package com.example.epsnwtbackend.dto;
 
+import org.springframework.web.bind.annotation.PathVariable;
+
 public class ProcessRequestDto {
+
+    private Long requestId;
     private boolean approved;
     private String reason;
+
+    public Long getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(Long requestId) {
+        this.requestId = requestId;
+    }
 
     public boolean isApproved() {
         return approved;
