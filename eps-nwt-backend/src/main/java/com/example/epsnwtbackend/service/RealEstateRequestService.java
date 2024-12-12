@@ -160,13 +160,14 @@ public class RealEstateRequestService {
         realEstateRepository.save(realEstate);
     }
 
+    //TODO: Izmenila sam setOwner da ne setuje owner-a, DISCLAIMER!
     private Household createHousehold(HouseholdRequest request, RealEstate realEstate, User owner){
         Household household = new Household();
         household.setFloor(request.getFloor());
         household.setSquareFootage(request.getSquareFootage());
         household.setApartmentNumber(request.getApartmentNumber());
         household.setRealEstate(realEstate);
-        household.setOwner(owner);
+        //household.setOwner(owner);
         return household;
     }
 }

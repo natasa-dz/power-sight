@@ -1,0 +1,112 @@
+/* Base styles for the requests section */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;  /* Makes the body take the full height of the viewport */
+  flex-direction: column;
+}
+
+.request-card {
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.request-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.request-header h3 {
+  color: #0e47a0;
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.status-badge.pending {
+  background-color: #ff9800;
+  color: white;
+}
+
+.request-details p {
+  margin: 8px 0;
+  font-size: 1rem;
+}
+
+.reason-label {
+  display: block;
+  margin-top: 20px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 1rem;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.action-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.approve-button,
+.reject-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 48%;
+}
+
+.approve-button {
+  background-color: #1247a1;
+  color: white;
+  border: none;
+}
+
+.approve-button:hover {
+  background-color: #45a049;
+}
+
+.reject-button {
+  background-color: #0d47a0;
+  color: white;
+  border: none;
+}
+
+.reject-button:hover {
+  background-color: #e53935;
+}

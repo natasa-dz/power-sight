@@ -10,6 +10,7 @@ import com.example.epsnwtbackend.service.EmployeeService;
 import com.example.epsnwtbackend.service.UserService;
 import com.example.epsnwtbackend.utils.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,7 @@ public class UserController {
     }
 
     @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto){
+    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto) throws MessagingException {
         Optional<UserCredentials> credentials = userDetailsService.register(dto);
 
         if (credentials.isPresent()){
@@ -144,7 +145,7 @@ public class UserController {
             @RequestParam(value = "userData", required = false) String userDataJson) {
 
         try {
-            String uploadDir = "uploads/";  // Directory to store user photos
+            String uploadDir = "src/main/resources/pictures/";  // Directory to store user photos
             File uploadDirectory = new File(uploadDir);
             if (!uploadDirectory.exists()) {
                 uploadDirectory.mkdir();
@@ -191,6 +192,8 @@ public class UserController {
 
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Handle errors like file storage issues
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // In case registration fails

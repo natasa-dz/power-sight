@@ -14,6 +14,16 @@ import {ViewEmployeesComponent} from "./employees/view-employees/view-employees.
 import {EmployeeProfileComponent} from "./employees/employee-profile/employee-profile.component";
 import {RegisterEmployeeComponent} from "./employees/register-employee/register-employee.component";
 import {EmployeeCalendarComponent} from "./employees/employee-calendar/employee-calendar.component";
+import {
+  AdminHouseholdRequestsComponent
+} from "./requests-module/admin-household-requests/admin-household-requests.component";
+import {
+  OwnerHouseholdsListingComponent
+} from "./requests-module/no-owner-households-listing/owner-households-listing.component";
+import {HouseholdRequestComponent} from "./requests-module/household-request/household-request.component";
+import {
+  OwnerHouseholdRequestsComponent
+} from "./requests-module/owner-household-requests/owner-household-requests.component";
 import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
 
 export const routes: Routes = [
@@ -26,6 +36,10 @@ export const routes: Routes = [
   { path: 'real-estate-requests/admin/:requestId', component: RequestViewAdminComponent },
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
+  { path: 'manage-household-requests', component: AdminHouseholdRequestsComponent},
+  { path: 'household-no-owner', component: OwnerHouseholdsListingComponent},
+  { path: 'household-ownership-request/:householdId', component: HouseholdRequestComponent},
+  { path: 'my-household-ownership-requests', component: OwnerHouseholdRequestsComponent},
   { path: 'view-employees', component: ViewEmployeesComponent },
   { path: 'employee/:id', component: EmployeeProfileComponent },
   { path: 'register-employee', component: RegisterEmployeeComponent },

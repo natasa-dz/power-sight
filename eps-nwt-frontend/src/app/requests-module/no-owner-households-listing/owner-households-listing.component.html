@@ -1,0 +1,55 @@
+<app-navbar-citizen></app-navbar-citizen>
+
+<div class="whole-page">
+  <h2>Households Without Owners</h2>
+<!--TODO: Dodaj search bar?-->
+<!--  <div class="search-form">-->
+<!--    <label>Municipality:</label>-->
+<!--    <input [(ngModel)]="municipality" type="text" required />-->
+<!--    <label>Address:</label>-->
+<!--    <input [(ngModel)]="address" type="text" required />-->
+<!--    <label>Apartment Number:</label>-->
+<!--    <input [(ngModel)]="apartmentNumber" type="number" min="0" />-->
+<!--    <button (click)="search()">Search</button>-->
+<!--  </div>-->
+
+  <div class="result-part">
+    <table class="households-table" *ngIf="page.content.length>0; else noData" >
+      <thead>
+      <tr>
+        <th>#</th>
+        <th>Household ID</th>
+        <th>Floor</th>
+        <th>Apartment Number</th>
+        <th>Square Footage</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let household of page?.content; let i = index"
+          (click)="onHouseholdClick(household)"
+          class="clickable-row"
+      >
+        <td>{{ i + 1 + (page.number) * page.size }}</td>
+        <td>{{ household.id }}</td>
+        <td>{{ household.floor }}</td>
+        <td>{{ household.apartmentNumber }}</td>
+        <td>{{ household.squareFootage }} m²</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noData>
+    <p class="no-data-message">No households without owners found.</p>
+  </ng-template>
+
+  <div class="pagination">
+    <button (click)="onPageChange(page.number - 1)" [disabled]="page.number <= 0">
+      Previous
+    </button>
+    <span>Page {{ page.number + 1 }} of {{ page.totalPages }}</span>
+    <button (click)="onPageChange(page.number + 1)" [disabled]="page.number >= page.totalPages - 1">
+      Next
+    </button>
+  </div>
+</div>

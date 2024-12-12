@@ -1,0 +1,28 @@
+<app-navbar-citizen></app-navbar-citizen>
+
+<div *ngIf="ownershipRequests.length === 0" class="empty-message">
+  <p>You have no ownership requests at the moment.</p>
+</div>
+
+<div *ngFor="let request of ownershipRequests" class="request-card">
+  <div class="request-header">
+    <h3>Request #{{ request.id }}</h3>
+    <span class="status-badge" [ngClass]="getStatusClass(request.status)">{{ request.status }}</span>
+  </div>
+
+  <div class="request-details">
+    <p><b>Household ID:</b> {{ request.householdId }}</p>
+    <p><b>Reason:</b> {{ request.reason || 'N/A' }}</p>
+    <p><b>Submitted At:</b> {{ request.submittedAt | date: 'medium' }}</p>
+    <p><b>Updated At:</b> {{ request.updatedAt | date: 'medium' }}</p>
+  </div>
+
+  <div *ngIf="request.documentationPath" class="attached-files">
+    <h4>Attached Files:</h4>
+    <ul>
+      <li>
+        <a [href]="'/api/files/' + request.documentationPath" target="_blank">View Files</a>
+      </li>
+    </ul>
+  </div>
+</div>

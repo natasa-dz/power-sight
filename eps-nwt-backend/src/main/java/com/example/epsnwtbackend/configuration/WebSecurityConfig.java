@@ -97,6 +97,12 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/docs").permitAll()
                 .requestMatchers("/employee/search").permitAll()
                 .requestMatchers("/employee/search?username").permitAll()
+                .requestMatchers("ownership-requests/**").permitAll()
+                .requestMatchers("ownership-requests/requestOwnership").permitAll()
+                .requestMatchers("ownership-requests/pending").permitAll()
+                .requestMatchers("ownership-requests/{userId}").permitAll()
+                .requestMatchers("ownership-requests/process/{id}").permitAll()
+                .requestMatchers("/employee/search/{username}").permitAll()
                 .requestMatchers("/employee/all-employees").permitAll()
                 .requestMatchers("/employee/find-by-id/{id}").permitAll()
                 .requestMatchers("/employee/find-by-user-id/{id}").permitAll()
@@ -108,6 +114,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
+                .requestMatchers("/household/no-owner").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}?apartmentNumber").permitAll()
@@ -157,7 +164,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.PUT, "/employee/suspend/")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
-                        "/household/find-by-id/", "/household/search/", "household/search-no-owner/",
+                        "/ownership-requests/**","/ownership-requests/requestOwnership", "/ownership-requests/pending",
+                        "/ownership-requests/process/{id}", "/ownership-requests/{userId}",
+
+                        "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
                         "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 

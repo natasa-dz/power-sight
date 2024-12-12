@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "households")
+@Table(name = "households", indexes = {
+        @Index(name = "idx_household_owner", columnList = "user_id")
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +36,6 @@ public class Household {
     private RealEstate realEstate;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User owner;
 }
