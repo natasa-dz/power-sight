@@ -6,6 +6,7 @@ import {DatePipe, NgFor, NgForOf, NgIf} from "@angular/common";
 import {EmployeeViewDto} from "../../model/view-employee-dto.model";
 import {Appointment} from "../../model/appointment.model";
 import {AppointmentStatus} from "../../enum/appointment-status";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-employee-calendar',
@@ -39,6 +40,7 @@ export class EmployeeCalendarComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
               private employeeService: EmployeeService,
+              private snackBar: MatSnackBar
   ) {
     this.appointmentForm = this.fb.group({
       employeeId: [''],
@@ -201,7 +203,7 @@ export class EmployeeCalendarComponent implements OnInit {
         );
       }
     } else {
-      alert("please fill out all fields");
+      this.showSnackbar("please fill out all fields");
     }
   }
 
@@ -210,5 +212,13 @@ export class EmployeeCalendarComponent implements OnInit {
     if(status.valueOf() == AppointmentStatus.CANCELLED.valueOf()) return "cancelled";
     if(status.valueOf() == AppointmentStatus.FINISHED.valueOf()) return "finished";
     return "";
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

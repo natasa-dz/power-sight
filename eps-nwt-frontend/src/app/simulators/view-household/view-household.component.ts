@@ -20,6 +20,7 @@ import {
 import { ViewChild } from '@angular/core';
 import {WebSocketService} from "../../service/websocket.service";
 import {BaseModule} from "../../base/base.module";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 
 @Component({
@@ -64,7 +65,8 @@ export class ViewHouseholdComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private householdService: HouseholdService,
     private datePipe: DatePipe,
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -227,6 +229,14 @@ export class ViewHouseholdComponent implements OnInit, OnDestroy {
     if (this.chart) {
       this.chart.update();
     }
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 
 }

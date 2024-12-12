@@ -7,6 +7,7 @@ import {RouterLink} from "@angular/router";
 import {EmployeeSearchDto} from "../../model/employee-search-dto.model";
 import {EmployeeService} from "../employee.service";
 import * as console from "node:console";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-view-employees',
@@ -28,7 +29,8 @@ export class ViewEmployeesComponent implements OnInit {
   currentPage: number = 0;
   private debounceTimer: any;
 
-  constructor(private employeeService: EmployeeService) {}
+  constructor(private employeeService: EmployeeService,
+              private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.loadPage();
@@ -46,7 +48,7 @@ export class ViewEmployeesComponent implements OnInit {
           this.page = result;
         },
         (error: any) => {
-          alert("Error fetching employees.");
+          this.showSnackbar("Error fetching employees.");
           console.error(error);
         }
       );
@@ -60,5 +62,13 @@ export class ViewEmployeesComponent implements OnInit {
   debounceSearch(): void {
     clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => this.search(), 400); // 400ms delay
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }
