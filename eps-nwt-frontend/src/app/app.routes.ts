@@ -24,6 +24,7 @@ import {HouseholdRequestComponent} from "./requests-module/household-request/hou
 import {
   OwnerHouseholdRequestsComponent
 } from "./requests-module/owner-household-requests/owner-household-requests.component";
+import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -35,19 +36,16 @@ export const routes: Routes = [
   { path: 'real-estate-requests/admin/:requestId', component: RequestViewAdminComponent },
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
-
   { path: 'manage-household-requests', component: AdminHouseholdRequestsComponent},
   { path: 'household-no-owner', component: OwnerHouseholdsListingComponent},
   { path: 'household-ownership-request/:householdId', component: HouseholdRequestComponent},
-
   { path: 'my-household-ownership-requests', component: OwnerHouseholdRequestsComponent},
-
-
   { path: 'view-employees', component: ViewEmployeesComponent },
   { path: 'employee/:id', component: EmployeeProfileComponent },
   { path: 'register-employee', component: RegisterEmployeeComponent },
   { path: 'employee-calendar', component: EmployeeCalendarComponent },
   { path: 'main', component: MainComponent },
+  { path: 'admin/city-consumption', component: CityConsumptionComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
 

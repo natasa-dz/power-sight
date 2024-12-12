@@ -18,13 +18,13 @@ export class EmployeeService {
 
   constructor(private http: HttpClient) { }
 
-  search(username: string, page: number = 0, size: number = 10) {
+  search(username: string = '', page: number = 0, size: number = 10): Observable<Page<EmployeeSearchDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('username', username);
 
-    const url = `${this.apiUrl}/search/${username}`;
-    return this.http.get<Page<EmployeeSearchDto>>(url, { params });
+    return this.http.get<Page<EmployeeSearchDto>>(`${this.apiUrl}/search`, { params });
   }
 
   findById(id: number): Observable<EmployeeViewDto> {

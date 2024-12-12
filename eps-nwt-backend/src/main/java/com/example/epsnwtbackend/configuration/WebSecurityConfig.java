@@ -95,14 +95,13 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers("/employee/search").permitAll()
+                .requestMatchers("/employee/search?username").permitAll()
                 .requestMatchers("ownership-requests/**").permitAll()
                 .requestMatchers("ownership-requests/requestOwnership").permitAll()
                 .requestMatchers("ownership-requests/pending").permitAll()
                 .requestMatchers("ownership-requests/{userId}").permitAll()
                 .requestMatchers("ownership-requests/process/{id}").permitAll()
-
-
-
                 .requestMatchers("/employee/search/{username}").permitAll()
                 .requestMatchers("/employee/all-employees").permitAll()
                 .requestMatchers("/employee/find-by-id/{id}").permitAll()
@@ -121,6 +120,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/availability/{name}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/graph/{name}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/current/{name}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
@@ -171,9 +171,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
                         "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 
-                        "/socket/info/", "/socket/", "/employee/search/", "employee/find-by-id/",
+                        "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
                         "appointments/available-slots/", "employee/find-by-user-id/",
-                        "appointments/get-employees-appointments-for-date/", "employee/all-employees");
+                        "appointments/get-employees-appointments-for-date/", "employee/all-employees",
+                        "household/current/");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

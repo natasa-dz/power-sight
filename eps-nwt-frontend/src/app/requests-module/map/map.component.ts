@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, EventEmitter, Output} from '@angular/core';
 import * as L from "leaflet";
 import {HttpClient} from "@angular/common/http";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-map',
@@ -14,7 +15,8 @@ export class MapComponent implements AfterViewInit{
 
   @Output() addressChange = new EventEmitter<string>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+              private snackBar: MatSnackBar) {}
 
   private initMap(): void {
     // Novi Sad
@@ -39,7 +41,7 @@ export class MapComponent implements AfterViewInit{
         .subscribe((data: any) => {
           const road = data?.address?.road || 'Unknown road';
           if (road === 'Unknown road') {
-            alert("Unknown address")
+            this.showSnackbar("Unknown address")
             return
           }
           const number = data?.address?.house_number || 'Unknown number';
@@ -55,5 +57,13 @@ export class MapComponent implements AfterViewInit{
 
   ngAfterViewInit(): void {
     this.initMap();
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

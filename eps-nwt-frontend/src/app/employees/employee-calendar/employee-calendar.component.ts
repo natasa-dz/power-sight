@@ -6,6 +6,7 @@ import {DatePipe, NgFor, NgForOf, NgIf} from "@angular/common";
 import {EmployeeViewDto} from "../../model/view-employee-dto.model";
 import {Appointment} from "../../model/appointment.model";
 import {AppointmentStatus} from "../../enum/appointment-status";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-employee-calendar',
@@ -39,6 +40,7 @@ export class EmployeeCalendarComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
               private employeeService: EmployeeService,
+              private snackBar: MatSnackBar
   ) {
     this.appointmentForm = this.fb.group({
       employeeId: [''],
@@ -156,6 +158,14 @@ export class EmployeeCalendarComponent implements OnInit {
     const date = new Date(dateValue);
     const formattedDate = date.toISOString().split('T')[0];
 
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    if (date < currentDate) {
+      this.showSnackbar("Selected date is in the past. Please choose a future date.");
+      this.appointmentForm.reset();
+      return;
+    }
+
     if (employeeId && date) {
       this.isLoading = true;
       this.employeeService.getAvailableSlots(employeeId, formattedDate).subscribe(
@@ -179,6 +189,14 @@ export class EmployeeCalendarComponent implements OnInit {
       const date = new Date(dateValue);
       const formattedDate = date.toISOString().split('T')[0];
       const startTime = `${formattedDate}T${formValues.startTime}`;
+
+      const appointmentDate = new Date(startTime);
+      const currentDate = new Date();
+      if (appointmentDate < currentDate) {
+        this.showSnackbar("Appointment cannot be booked in the past.");
+        return;
+      }
+
       if(this.employee != undefined) {
         const payload = {
           employeeId: this.employee.id,
@@ -201,7 +219,7 @@ export class EmployeeCalendarComponent implements OnInit {
         );
       }
     } else {
-      alert("please fill out all fields");
+      this.showSnackbar("please fill out all fields");
     }
   }
 
@@ -210,5 +228,13 @@ export class EmployeeCalendarComponent implements OnInit {
     if(status.valueOf() == AppointmentStatus.CANCELLED.valueOf()) return "cancelled";
     if(status.valueOf() == AppointmentStatus.FINISHED.valueOf()) return "finished";
     return "";
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

@@ -97,6 +97,13 @@ public class HouseholdController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping(value = "/current/{name}")
+    public ResponseEntity<Boolean> getCurrentStatus(
+            @PathVariable String name) {
+        boolean isOnline = householdService.getCurrentStatus(name);
+        return ResponseEntity.ok(isOnline);
+    }
+
     @GetMapping(value = "/availability/{name}/{timeRange}")
     public ResponseEntity<?> getAvailability(
             @PathVariable String name, @PathVariable String timeRange) {

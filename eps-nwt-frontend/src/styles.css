@@ -35,3 +35,6 @@ button.mat-button.mat-accent:hover {
   border-bottom: 1px rgba(8, 0, 103, 1); /* Changes text color to blue */
 
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -55,7 +55,9 @@ export class HouseholdService {
     return this.http.get<any[]>(`${this.apiUrl}/graph/${name}/${timeRange}`);
   }
 
-
+  getLatestValue(name: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/current/${name}`);
+  }
 
   submitOwnershipRequest(
     userId: string,

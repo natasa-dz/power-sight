@@ -7,6 +7,7 @@ import {RouterLink} from "@angular/router";
 import {EmployeeSearchDto} from "../../model/employee-search-dto.model";
 import {EmployeeService} from "../employee.service";
 import * as console from "node:console";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-view-employees',
@@ -24,49 +25,30 @@ import * as console from "node:console";
 })
 export class ViewEmployeesComponent implements OnInit {
   username: string = '';
-
   page: Page<EmployeeSearchDto> = { content: [], totalPages: 0, totalElements: 0, size: 0, number: 0 };
   currentPage: number = 0;
+  private debounceTimer: any;
 
-  constructor(private employeeService: EmployeeService) {}
+  constructor(private employeeService: EmployeeService,
+              private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
-    this.employeeService.getAll(this.currentPage)
-      .subscribe(
-        (result: Page<EmployeeSearchDto>) => {
-          this.page = result;
-          console.log(result)
-        },
-        (error: any) => {
-          alert("Error fetching employes.");
-          console.error(error);
-        }
-      );
+    this.loadPage();
   }
 
   search(): void {
-    if (!this.username) {
-      this.employeeService.getAll(this.currentPage)
-        .subscribe(
-          (result: Page<EmployeeSearchDto>) => {
-            this.page = result;
-            console.log(result)
-          },
-          (error: any) => {
-            alert("Error fetching employes.");
-            console.error(error);
-          }
-        );
-      return;
-    }
+    this.currentPage = 0;
+    this.loadPage();
+  }
+
+  loadPage(): void {
     this.employeeService.search(this.username, this.currentPage)
       .subscribe(
         (result: Page<EmployeeSearchDto>) => {
           this.page = result;
-          console.log(result)
         },
         (error: any) => {
-          alert("Error fetching employes.");
+          this.showSnackbar("Error fetching employees.");
           console.error(error);
         }
       );
@@ -74,6 +56,19 @@ export class ViewEmployeesComponent implements OnInit {
 
   goToPage(pageNumber: number): void {
     this.currentPage = pageNumber;
-    this.search();
+    this.loadPage();
+  }
+
+  debounceSearch(): void {
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => this.search(), 400); // 400ms delay
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }
