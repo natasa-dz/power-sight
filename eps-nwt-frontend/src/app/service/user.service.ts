@@ -115,8 +115,10 @@ export class UserService {
       }
 
       const userId = decodedToken.sub;
-      console.log("User ID: ", userId);
-      return this.getUser(userId);
+      console.log("User ID from getCurrentUser: ", userId);
+      localStorage.setItem('username', userId);
+
+    return this.getUser(userId);
   }
 
   isLoggedIn(): boolean {

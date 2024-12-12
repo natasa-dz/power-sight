@@ -8,6 +8,8 @@ import {HttpClient} from "@angular/common/http";
 import {formatDate} from "date-fns";
 import {HouseholdDto} from "../../model/householdDTO";
 import {AuthService} from "../../access-control-module/auth.service";
+import {UserService} from "../../service/user.service";
+import {User} from "../../model/user.model";
 
 @Component({
   selector: 'app-household-request',
@@ -32,7 +34,7 @@ export class HouseholdRequestComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
-    private authService:AuthService,
+    private userService:UserService,
     private householdService: HouseholdService
   ) {}
 
@@ -63,26 +65,20 @@ export class HouseholdRequestComponent implements OnInit {
       return;
     }
 
-    let username: string | undefined = "";
-
-    this.authService.getCurrentUser().subscribe((user)=>{
-      const userId = user?.username;
-      username =userId;
-
-      this.householdService
-        .submitOwnershipRequest(userId!, this.household.id, this.uploadedFiles)
-        .subscribe(
-          () => {
-            alert('Request submitted successfully!');
-            this.router.navigate(['/main']);
-          },
-          (error: any) => {
-            console.error(error);
-            alert('Error submitting request. Please try again.');
-          }
-        );
-
-    })
+    const username = localStorage.getItem('username');
+    if(username){
+      this.householdService.submitOwnershipRequest(username, this.household.id, this.uploadedFiles)
+      .subscribe(
+        () => {
+          alert('Request submitted successfully!');
+          this.router.navigate(['/main']);
+        },
+        (error: any) => {
+          console.error(error);
+          alert('Error submitting request. Please try again.');
+        }
+      );
+    }
   }
 }
 

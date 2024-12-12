@@ -15,8 +15,11 @@ import {
 } from "./requests-module/admin-household-requests/admin-household-requests.component";
 import {
   OwnerHouseholdsListingComponent
-} from "./requests-module/owner-households-listing/owner-households-listing.component";
+} from "./requests-module/no-owner-households-listing/owner-households-listing.component";
 import {HouseholdRequestComponent} from "./requests-module/household-request/household-request.component";
+import {
+  OwnerHouseholdRequestsComponent
+} from "./requests-module/owner-household-requests/owner-household-requests.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -34,6 +37,9 @@ export const routes: Routes = [
   { path: 'manage-household-requests', component: AdminHouseholdRequestsComponent},
   { path: 'household-no-owner', component: OwnerHouseholdsListingComponent},
   { path: 'household-ownership-request/:householdId', component: HouseholdRequestComponent},
+
+  { path: 'my-household-ownership-requests', component: OwnerHouseholdRequestsComponent},
+
 
   { path: 'main', component: MainComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default

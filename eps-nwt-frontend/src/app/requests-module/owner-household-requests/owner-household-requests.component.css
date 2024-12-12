@@ -1,4 +1,4 @@
-/* Base styles for the requests section */
+/* Base styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f4f7fa;
@@ -12,6 +12,12 @@ body {
   flex-direction: column;
 }
 
+.empty-message {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+}
+
 .request-card {
   border-radius: 12px;
   padding: 20px;
@@ -19,7 +25,7 @@ body {
   background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  max-width: 700px;
+  max-width: 700px; /* Controls the maximum width of the card */
   margin-left: auto;
   margin-right: auto;
 }
@@ -36,14 +42,26 @@ body {
 }
 
 .request-header h3 {
-  color: #0e47a0;
+  color: #0d47a0;
   font-size: 1.2rem;
 }
 
 .status-badge {
   padding: 5px 10px;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 1.3rem;
+}
+
+.request-container {
+  width: 100%;
+  max-width: 800px;  /* Limits the width of the container */
+  margin: 0 auto;  /* Centers the container */
+  padding: 20px;
+}
+
+.status-badge.approved {
+  background-color: #4caf50;
+  color: white;
 }
 
 .status-badge.pending {
@@ -51,62 +69,34 @@ body {
   color: white;
 }
 
+.status-badge.rejected {
+  background-color: #f44336;
+  color: white;
+}
+
 .request-details p {
   margin: 8px 0;
   font-size: 1rem;
+
 }
 
-.reason-label {
-  display: block;
+.attached-files h4 {
   margin-top: 20px;
+  font-size: 1.1rem;
+  color: #0a3680;
 }
 
-textarea {
-  width: 100%;
-  height: 100px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  resize: vertical;
-  font-size: 1rem;
+.attached-files ul {
+  list-style-type: none;
+  padding: 0;
 }
 
-textarea:focus {
-  outline: none;
-  border-color: #007bff;
+.attached-files ul li a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
 }
 
-.action-buttons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.approve-button,
-.reject-button {
-  padding: 10px 20px;
-  font-size: 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 48%;
-}
-
-.approve-button {
-  background-color: #1247a1;
-  color: white;
-  border: none;
-}
-
-.approve-button:hover {
-  background-color: #45a049;
-}
-
-.reject-button {
-  background-color: #0d47a0;
-  color: white;
-  border: none;
-}
-
-.reject-button:hover {
-  background-color: #e53935;
+.attached-files ul li a:hover {
+  text-decoration: underline;
 }

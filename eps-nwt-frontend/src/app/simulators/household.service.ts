@@ -13,6 +13,7 @@ import {HouseholdDto} from "../model/householdDTO";
 export class HouseholdService {
 
   private apiUrl = 'http://localhost:8080/household';  // Adjust to your backend URL
+  private ownershipUrl = 'http://localhost:8080/ownership-requests';  // Adjust to your backend URL
 
   constructor(private http: HttpClient) {}
 
@@ -55,6 +56,7 @@ export class HouseholdService {
   }
 
 
+
   submitOwnershipRequest(
     userId: string,
     householdId: number,
@@ -65,9 +67,29 @@ export class HouseholdService {
     formData.append('householdId', householdId.toString());
 
     files.forEach(file => {
-      formData.append('documentation', file, file.name);
+      formData.append('files', file);  // Remove file.name
     });
 
-    return this.http.post(`${this.apiUrl}/requestOwnership`, formData);
+    // Log formData keys and values using a manual loop
+    formData.forEach((value, key) => {
+      console.log(`FormData - ${key}:`, value);
+    });
+
+    return this.http.post(`${this.ownershipUrl}/requestOwnership`, formData, { responseType: 'text' });
   }
+
+  getUserOwnershipRequests(userId: string): Observable<any> {
+    return this.http.get(`${this.ownershipUrl}/${userId}`);
+  }
+
+  getPendingRequests(): Observable<any> {
+    return this.http.get(`${this.ownershipUrl}/pending`);
+  }
+
+  processRequest(requestId: number, approved: boolean, reason?: string ): Observable<any> {
+    const payload = { requestId, approved, reason };
+    return this.http.post(`${this.ownershipUrl}/process`, payload, { responseType: 'text' });
+  }
+
+
 }

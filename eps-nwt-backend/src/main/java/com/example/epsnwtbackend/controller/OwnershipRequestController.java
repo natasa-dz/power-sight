@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import retrofit2.http.Path;
 
 import javax.swing.text.Document;
@@ -25,12 +26,10 @@ public class OwnershipRequestController {
     @Autowired
     private OwnershipRequestRepository ownershipRequestRepository;
 
-    @PostMapping("/process/{id}")
+    @PostMapping("/process")
     public ResponseEntity<?> processRequest(
-            @PathVariable Long id,
-            @RequestBody ProcessRequestDto dto) throws MessagingException {
-
-        ownershipRequestService.processRequest(id, dto.isApproved(), dto.getReason());
+            @RequestBody ProcessRequestDto dto) throws MessagingException, NoResourceFoundException {
+        ownershipRequestService.processRequest(dto.getRequestId(), dto.isApproved(), dto.getReason());
         return ResponseEntity.ok("Request processed successfully");
     }
 
@@ -53,6 +52,7 @@ public class OwnershipRequestController {
 
         return ResponseEntity.ok("Ownership request submitted.");
     }
+
 
     @GetMapping("/{userId}")
     public List<OwnershipRequest> getUserOwnershipRequests(@PathVariable String userId){

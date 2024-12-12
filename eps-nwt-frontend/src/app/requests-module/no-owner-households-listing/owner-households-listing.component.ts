@@ -10,15 +10,13 @@ import {ReactiveFormsModule} from "@angular/forms";
 import {Route, Router} from "@angular/router";
 
 @Component({
-  selector: 'app-owner-households-listing',
+  selector: 'app-no-owner-households-listing',
   standalone: true,
   imports: [
     BaseModule,
     JsonPipe,
     CommonModule,
     ReactiveFormsModule,
-    // Add this to fix ngIf and ngFor issues
-
   ],
   templateUrl: './owner-households-listing.component.html',
   styleUrls: ['./owner-households-listing.component.css']

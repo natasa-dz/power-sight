@@ -1,1 +1,24 @@
-<p>admin-household-requests works!</p>
+<app-navbar-admin></app-navbar-admin>
+
+<div *ngFor="let request of pendingRequests" class="request-card">
+  <div class="request-header">
+    <h3>Request #{{ request.id }}</h3>
+    <span class="status-badge pending">{{ request.status }}</span>
+  </div>
+
+  <div class="request-details">
+    <p><b>User ID:</b> {{ request.userId }}</p>
+    <p><b>Household ID:</b> {{ request.householdId }}</p>
+  </div>
+
+  <label *ngIf="!request.approved" class="reason-label">
+    Rejection Reason:
+    <textarea [(ngModel)]="request.reason" placeholder="Provide reason for rejection"></textarea>
+  </label>
+
+  <div class="action-buttons">
+    <button (click)="submitRequestDecision(request.id, true)" class="approve-button">Approve</button>
+    <button (click)="submitRequestDecision(request.id, false, request.reason)" class="reject-button">Reject</button>
+  </div>
+</div>
+

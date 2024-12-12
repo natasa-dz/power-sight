@@ -11,24 +11,32 @@
 
   <button mat-button type="button" class="text1" [matMenuTriggerFor]="accountMenu">My Account</button>
   <mat-menu class="mat-menu-panel" #accountMenu="matMenu">
-    <button routerLink="/main" type="button" mat-menu-item class="text"><span class="material-icons">home</span>
-      Home</button>
-    <button routerLink="/real-estate-registration" type="button" mat-menu-item class="text"><span class="material-icons">add</span>
-      Register Real Estate</button>
-    <button routerLink="/household-no-owner" type="button" mat-menu-item class="text">
-      <span class="material-icons">manage_accounts</span>
-      Household Ownership Request
+
+    <button routerLink="/main" type="button" mat-menu-item class="text">
+      <span class="material-icons">home</span> Home
     </button>
 
-    <button routerLink="/real-estate-requests/{{this.userId}}/all" type="button" mat-menu-item class="text"><span class="material-icons">list</span>
-      My requests</button>
-    <button mat-menu-item type="button" class="text"  (click)="menuItemClicked('logout')"><span class="material-icons">logout</span>Logout</button>
+    <button routerLink="/real-estate-registration" type="button" mat-menu-item class="text">
+      <span class="material-icons">assignment</span> Register Real Estate
+    </button>
 
+    <button routerLink="/household-no-owner" type="button" mat-menu-item class="text">
+      <span class="material-icons">fact_check</span> Household Ownership Request
+    </button>
 
+    <button routerLink="/my-household-ownership-requests" type="button" mat-menu-item class="text">
+      <span class="material-icons">receipt_long</span> My Household Requests
+    </button>
+
+    <button routerLink="/real-estate-requests/{{this.userId}}/all" type="button" mat-menu-item class="text">
+      <span class="material-icons">list_alt</span> My Real Estate Requests
+    </button>
+
+    <button mat-menu-item type="button" class="text" (click)="menuItemClicked('logout')">
+      <span class="material-icons">logout</span> Logout
+    </button>
 
   </mat-menu>
 
-
   <div class="rectangle37"></div>
-
 </mat-toolbar>
