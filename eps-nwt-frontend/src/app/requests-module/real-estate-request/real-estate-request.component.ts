@@ -18,6 +18,7 @@ import {RealEstateRequestService} from "../../service/real-estate-request.servic
 import {HttpClient} from "@angular/common/http";
 import {MapComponent} from "../map/map.component";
 import {BaseModule} from "../../base/base.module";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-real-estate-request',
@@ -48,7 +49,8 @@ export class RealEstateRequestComponent implements OnInit{
 
   constructor(private fb: FormBuilder,
               private service: RealEstateRequestService,
-              private http: HttpClient) {
+              private http: HttpClient,
+              private snackBar: MatSnackBar) {
     this.realEstateForm = this.fb.group({
       address: new FormControl('', [Validators.required]),
       municipality: new FormControl('', [Validators.required]),
@@ -119,7 +121,7 @@ export class RealEstateRequestComponent implements OnInit{
       this.households.push(household);
       this.householdForm.reset();
     } else {
-      alert("Bad input")
+      this.showSnackbar("Bad input")
     }
 
   }
@@ -164,7 +166,7 @@ export class RealEstateRequestComponent implements OnInit{
             },
             error: (mess:any) => {
               if(mess.status === 200){
-                alert(mess.error.text);
+                this.showSnackbar(mess.error.text);
                 location.reload();
               } else{
                 console.log("Error with creating real estate request");
@@ -174,13 +176,21 @@ export class RealEstateRequestComponent implements OnInit{
 
 
         } else {
-          alert("Nije u redu dokumentacija");
+          this.showSnackbar("Nije u redu dokumentacija");
         }
       } else {
-        alert("Nije u redu forma za household");
+        this.showSnackbar("Nije u redu forma za household");
       }
     } else {
-      alert("Nije u redu forma za nekretninu");
+      this.showSnackbar("Nije u redu forma za nekretninu");
     }
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

@@ -14,6 +14,7 @@ import {ViewEmployeesComponent} from "./employees/view-employees/view-employees.
 import {EmployeeProfileComponent} from "./employees/employee-profile/employee-profile.component";
 import {RegisterEmployeeComponent} from "./employees/register-employee/register-employee.component";
 import {EmployeeCalendarComponent} from "./employees/employee-calendar/employee-calendar.component";
+import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -30,6 +31,7 @@ export const routes: Routes = [
   { path: 'register-employee', component: RegisterEmployeeComponent },
   { path: 'employee-calendar', component: EmployeeCalendarComponent },
   { path: 'main', component: MainComponent },
+  { path: 'admin/city-consumption', component: CityConsumptionComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
 

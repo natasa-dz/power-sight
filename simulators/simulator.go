@@ -3,10 +3,13 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"math"
 	"math/rand"
+	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/streadway/amqp"
@@ -35,79 +38,85 @@ func GetHourlyConsumption(hour int) float64 {
 }
 
 var lastSuccessfulMessageTime string
+var simulatorId string
+var municipality string
+var ch *amqp.Channel
+var conn *amqp.Connection
+var chMutex sync.Mutex
 
 func main() {
 	id := flag.String("id", "simulator", "Unique ID for the simulator instance")
 	municipalityInput := flag.String("municipality", "novisad", "Municipality name")
 	flag.Parse()
 
-	municipality := strings.ToLower(strings.ReplaceAll(*municipalityInput, " ", ""))
+	municipality = strings.ToLower(strings.ReplaceAll(*municipalityInput, " ", ""))
+	simulatorId = *id
 
-	conn, err := amqp.Dial(amqpURL)
-	if err != nil {
-		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
-	}
-	defer conn.Close()
+	initializeAMQP()
 
-	ch, err := conn.Channel()
-	if err != nil {
-		log.Fatalf("Failed to open a channel: %v", err)
-	}
-	defer ch.Close()
-
-	// Declare exchanges for heartbeat and consumption
-	err = ch.ExchangeDeclare("heartbeatExchange", "direct", true, false, false, false, nil)
-	if err != nil {
-		log.Fatalf("Failed to declare heartbeat exchange: %v", err)
-	}
-	err = ch.ExchangeDeclare("consumptionExchange", "direct", true, false, false, false, nil)
-	if err != nil {
-		log.Fatalf("Failed to declare consumption exchange: %v", err)
-	}
-
-	// Declare and bind the queues to their respective exchanges
-	heartbeatQueueName := "heartbeat_queue_" + municipality
-	consumptionQueueName := "consumption_queue_" + municipality
-
-	_, err = ch.QueueDeclare(heartbeatQueueName, true, false, false, false, nil)
-	if err != nil {
-		log.Fatalf("Failed to declare heartbeat queue: %v", err)
-	}
-	err = ch.QueueBind(heartbeatQueueName, heartbeatQueueName, "heartbeatExchange", false, nil)
-	if err != nil {
-		log.Fatalf("Failed to bind heartbeat queue: %v", err)
-	}
-
-	_, err = ch.QueueDeclare(consumptionQueueName, true, false, false, false, nil)
-	if err != nil {
-		log.Fatalf("Failed to declare consumption queue: %v", err)
-	}
-	err = ch.QueueBind(consumptionQueueName, consumptionQueueName, "consumptionExchange", false, nil)
-	if err != nil {
-		log.Fatalf("Failed to bind consumption queue: %v", err)
-	}
-
-	go sendHeartbeat(ch, *id, heartbeatQueueName)
-	go sendConsumptionData(ch, *id, consumptionQueueName)
+	go sendHeartbeat()
+	go sendConsumptionData()
 
 	select {}
 }
 
-func sendHeartbeat(ch *amqp.Channel, id string, queue string) {
+func initializeAMQP() {
+	chMutex.Lock()
+	defer chMutex.Unlock()
+
+	// Close existing connection and channel if any
+	if ch != nil {
+		_ = ch.Close()
+	}
+	if conn != nil {
+		_ = conn.Close()
+	}
+
+	// Establish new connection
+	var err error
+	conn, err = amqp.Dial(amqpURL)
+	if err != nil {
+		fmt.Printf("Failed to connect to RabbitMQ: %v", err)
+	}
+
+	// Establish new channel
+	ch, err = conn.Channel()
+	if err != nil {
+		fmt.Printf("Failed to open a channel: %v", err)
+	}
+
+	// Declare exchanges
+	err = ch.ExchangeDeclare("heartbeatExchange", "direct", true, false, false, false, nil)
+	if err != nil {
+		fmt.Printf("Failed to declare heartbeat exchange: %v", err)
+	}
+	err = ch.ExchangeDeclare("consumptionExchange", "direct", true, false, false, false, nil)
+	if err != nil {
+		fmt.Printf("Failed to declare consumption exchange: %v", err)
+	}
+}
+
+func getChannel() *amqp.Channel {
+	chMutex.Lock()
+	defer chMutex.Unlock()
+	return ch
+}
+
+func sendHeartbeat() {
 	ticker := time.NewTicker(heartbeatInterval)
 	defer ticker.Stop()
 
 	for range ticker.C {
 		message := map[string]interface{}{
 			"status":    "online",
-			"id":        "simulator-" + id,
+			"id":        "simulator-" + simulatorId,
 			"timestamp": time.Now().Format(time.RFC3339),
 		}
-		sendAMQPMessage(ch, "heartbeatExchange", queue, message)
+		sendAMQPMessage("heartbeatExchange", "heartbeat_queue_"+municipality, message, false)
 	}
 }
 
-func sendConsumptionData(ch *amqp.Channel, id string, queue string) {
+func sendConsumptionData() {
 	ticker := time.NewTicker(consumptionInterval)
 	defer ticker.Stop()
 
@@ -122,15 +131,17 @@ func sendConsumptionData(ch *amqp.Channel, id string, queue string) {
 		simulationTime := time.Date(date.Year(), date.Month(), date.Day(), hour, 0, 0, 0, time.UTC)
 		consumption := GetHourlyConsumption(hour) + (rand.Float64() * 0.1)
 		message := map[string]interface{}{
-			"id":          "simulator-" + id,
+			"id":          "simulator-" + simulatorId,
 			"consumption": consumption,
 			"timestamp":   simulationTime.Format(time.RFC3339),
 		}
-		sendAMQPMessage(ch, "consumptionExchange", queue, message)
+		sendAMQPMessage("consumptionExchange", "consumption_queue_"+municipality, message, true)
 	}
 }
 
-func sendAMQPMessage(ch *amqp.Channel, exchange, routingKey string, data map[string]interface{}) {
+func sendAMQPMessage(exchange, routingKey string, data map[string]interface{}, isConsumption bool) {
+	ch := getChannel()
+
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		log.Printf("Error encoding JSON: %v", err)
@@ -149,10 +160,42 @@ func sendAMQPMessage(ch *amqp.Channel, exchange, routingKey string, data map[str
 	)
 	if err != nil {
 		log.Printf("Failed to publish message to %s: %v", routingKey, err)
+		if isConsumption {
+			consumptionStr := fmt.Sprintf("%.2f", data["consumption"].(float64))
+			timestampStr := data["timestamp"].(string)
+			saveFailedData(consumptionStr, timestampStr)
+		}
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Println("Not connected:", r)
+				}
+			}()
+
+			initializeAMQP()
+			fmt.Println("Successful connection.")
+		}()
 	} else {
 		if strings.HasPrefix(routingKey, "consumption") {
 			lastSuccessfulMessageTime = data["timestamp"].(string)
 		}
 		log.Printf("Message sent to %s via exchange %s", routingKey, exchange)
+	}
+}
+
+func saveFailedData(consumption string, timestamp string) {
+	filename := simulatorId + ".txt"
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		if !os.IsExist(err) {
+			fmt.Printf("Error creating file: %v\n", err)
+		}
+		return
+	}
+	defer file.Close()
+	line := fmt.Sprintf("%s,%s\n", timestamp, consumption)
+	_, err = file.WriteString(line)
+	if err != nil {
+		fmt.Printf("Error appending to file: %v\n", err)
 	}
 }
