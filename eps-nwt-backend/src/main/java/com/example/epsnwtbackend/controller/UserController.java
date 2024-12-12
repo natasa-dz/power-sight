@@ -63,9 +63,7 @@ public class UserController {
         File photo = new File(dir, "photo.jpg");
         file.transferTo(photo);
 
-        // Save the photo path in the database, e.g., "/photos/profiles/user_<userId>/photo.jpg"
         String photoPath = "/photos/profiles/user_" + userId + "/photo.jpg";
-        // Update user photo path in the database here...
 
         return ResponseEntity.ok(photoPath);
     }
@@ -101,7 +99,6 @@ public class UserController {
         Optional<UserCredentials> credentials = userDetailsService.register(dto);
 
         if (credentials.isPresent()){
-            System.out.println("Usao u credentialsPresent!!!");
 
             tokenService.generateToken(dto.getUsername(), dto.getRole(), dto.getId());
 
@@ -126,19 +123,22 @@ public class UserController {
             @RequestParam("userPhoto") MultipartFile userPhoto) {
 
         try {
-            String uploadDir = "uploads/";  // Directory to store user photos
+            String uploadDir = "resources/pictures";  // Directory to store user photos
             File uploadDirectory = new File(uploadDir);
             if (!uploadDirectory.exists()) {
                 uploadDirectory.mkdir();
             }
 
+            // Create a new UserDto (or User entity if you have one) with the path to the saved image
+            UserDto dto = new UserDto(username, password, Role.valueOf(role), false,true, ""); // Assume 'false' for isActive
+
+
             // Generate unique file name based on the username
-            String fileName = username + "_profile.jpg";
+            String fileName = dto.getId().toString() + "_profile.jpg";
             Path filePath = Paths.get(uploadDir + fileName);
             Files.write(filePath, userPhoto.getBytes());  // Save the photo to the file system
+            dto.setUserPhoto(filePath.toString());
 
-            // Create a new UserDto (or User entity if you have one) with the path to the saved image
-            UserDto dto = new UserDto(username, password, Role.valueOf(role), filePath.toString(), false,true, ""); // Assume 'false' for isActive
 
             // Register user credentials
             Optional<UserCredentials> credentials = userDetailsService.register(dto);

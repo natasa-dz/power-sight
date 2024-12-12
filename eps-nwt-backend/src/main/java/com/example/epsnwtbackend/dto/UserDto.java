@@ -31,6 +31,15 @@ public class UserDto {
         this.activationToken = activationToken;
     }
 
+    public UserDto(String username, String password, Role role, boolean isActive, boolean passwordChanged, String activationToken) {
+        this.username = username;
+        this.role = role;
+        this.password = password;
+        this.isActive = isActive;
+        this.passwordChanged = passwordChanged;
+        this.activationToken = activationToken;
+    }
+
     @Override
     public String toString() {
         return "UserDto{" +
