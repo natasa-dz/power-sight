@@ -3,7 +3,7 @@
   <div class="consumption-left">
     <select (change)="onCityChange($event)">
       <option value="" disabled selected>Select a city</option>
-      <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+      <option *ngFor="let city of existingCities" [value]="city">{{ city }}</option>
     </select>
   </div>
 
@@ -28,12 +28,9 @@
       <button (click)="updateChart()">Fetch Data</button>
     </div>
 
-    <!--<div class="availability-data" *ngIf="onlinePercentage !== undefined">
-      <p><strong>Online Duration:</strong> {{ onlineDuration }} seconds</p>
-      <p><strong>Offline Duration:</strong> {{ offlineDuration }} seconds</p>
-      <p><strong>Online Percentage:</strong> {{ onlinePercentage | number:'1.2-2' }}%</p>
-      <p><strong>Offline Percentage:</strong> {{ offlinePercentage | number:'1.2-2' }}%</p>
-    </div>-->
+    <div class="consumption-data" *ngIf="total !== undefined">
+      <p><strong>Total consumption:</strong> {{ total }} </p>
+    </div>
 
     <div class="graph-container" *ngIf="chartData.labels != undefined">
       <div class="time-range-container2">

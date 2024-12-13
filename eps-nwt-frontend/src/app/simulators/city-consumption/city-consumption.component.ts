@@ -21,6 +21,7 @@ import {
 } from 'chart.js';
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ConsumptionService} from "../consumption.service";
+import {CityMunicipality} from "../../model/city-municipality";
 
 @Component({
   selector: 'app-city-consumption',
@@ -42,16 +43,19 @@ export class CityConsumptionComponent implements OnInit{
   selected: boolean = false;
   citiesAndMunicipalities: any = {};
   cities: string[] = [];
+  existingMunicipalities: string[] = [];
+  existingCities: string[] = [];
   selectedCity: string = '';
   timeRange = '3';
   custom: boolean = false;
   startDate: string | undefined;
   endDate: string | undefined;
+  total: string | undefined;
   chartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
       {
-        label: 'Availability',
+        label: 'Energy Consumption',
         data: [],
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
@@ -71,10 +75,40 @@ export class CityConsumptionComponent implements OnInit{
               private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
-    this.realEstateService.getCitiesWithMunicipalities().subscribe(data => {
-      this.citiesAndMunicipalities = data;
-      this.cities = Object.keys(this.citiesAndMunicipalities);
+    this.consumptionService.getMunicipalitiesFromInflux().subscribe(data => {
+      this.existingMunicipalities = data; //novisad, novibeograd
+      this.realEstateService.getCitiesWithMunicipalities().subscribe({
+        next: (data2: CityMunicipality) => {
+          this.citiesAndMunicipalities = data2; // Beograd - Novi Beograd, Zemun , ...
+          this.cities = Object.keys(this.citiesAndMunicipalities);
+          for (let municipality of this.existingMunicipalities){
+            for (let city of this.cities){
+              let municipalitiesHelper: string[] = this.citiesAndMunicipalities[city].map((item: string) => {
+                return item.toLowerCase().replace(" ", '');
+              });
+              if (municipalitiesHelper.includes(municipality)){
+                this.existingCities.push(city);
+              }
+            }
+          }
+        },
+        error: (err: any): void => {
+        }
+      });
     });
+
+    Chart.register(
+      BarElement,
+      BarController,
+      CategoryScale,
+      LinearScale,
+      Title,
+      Tooltip,
+      Legend,
+      LineController,
+      PointElement,
+      LineElement
+    );
   }
 
   onCityChange(event: Event) {
@@ -108,7 +142,7 @@ export class CityConsumptionComponent implements OnInit{
 
     const queryParam =
       timeRangeValue === 'custom' && formattedStartDate && formattedEndDate
-        ? `${formattedStartDate}-${formattedEndDate}`
+        ? `${formattedStartDate} 00:00:00-${formattedEndDate} 00:00:00`
         : timeRangeValue;
 
     if (this.startDate != undefined && this.endDate != undefined){
@@ -120,6 +154,7 @@ export class CityConsumptionComponent implements OnInit{
         this.showSnackbar("The selected dates are invalid. The range must not exceed 1 year.");
         this.startDate = "";
         this.endDate = "";
+        this.total = undefined;
       }
     }
 
@@ -128,11 +163,12 @@ export class CityConsumptionComponent implements OnInit{
       this.consumptionService.getConsumption(this.selectedCity, queryParam).subscribe({
         next: (data : number) => {
           if (data === null){
-            this.showSnackbar("No data available");
+            this.total = "No data available";
           }
           else{
-            this.showSnackbar(data.toString());
+            this.total = Number(data.toFixed(4)).toString() + " kWh";
           }
+          this.fetchGraphData(this.selectedCity, queryParam);
         },
         error: (mess:any) => {
           if(mess.status === 200){
@@ -143,22 +179,7 @@ export class CityConsumptionComponent implements OnInit{
         }
       });
     }
-
-    /*const name = "simulator-" + this.household?.id.toString();
-    const timeRangeValue = this.timeRange;
-
-    const formattedStartDate = this.startDate
-      ? this.datePipe.transform(this.startDate, 'dd.MM.yyyy.')
-      : '';
-    const formattedEndDate = this.endDate
-      ? this.datePipe.transform(this.endDate, 'dd.MM.yyyy.')
-      : '';
-
-    const queryParam =
-      timeRangeValue === 'custom' && formattedStartDate && formattedEndDate
-        ? `${formattedStartDate}-${formattedEndDate}`
-        : timeRangeValue;
-
+    /*
     if (this.timeRange !== '1' && this.webSocketService.isConnected) {
       this.webSocketService.disconnect();
     }
@@ -166,8 +187,57 @@ export class CityConsumptionComponent implements OnInit{
       const simulatorName = `${this.household?.id}`;
       this.initWebSocket(simulatorName);
     }
+*/
 
-    this.fetchAvailabilityData(name, queryParam);*/
+  }
+
+  fetchGraphData(name: string, timeRange: string) {
+    this.consumptionService.getGraphData(name, timeRange).subscribe(
+      (graphData: any[]) => {
+        const graphDataArray = Object.entries(graphData).map(([key, value]) => ({
+          key,
+          value,
+        }));
+        graphDataArray.sort((a, b) => {
+          const isHour = /^\d{2}h$/.test(a.key); // Matches "08h", "21h"
+          const isDate = /^\d{2}\.\d{2}\.\d{4}\.$/.test(a.key); // Matches "12.12.2023."
+          const isWeek = /^\d{1,2}(st|nd|rd|th)$/.test(a.key); // Matches "1st", "2nd", "5th"
+
+          if (isHour) {
+            const hourA = parseInt(a.key.slice(0, 2), 10);
+            const hourB = parseInt(b.key.slice(0, 2), 10);
+            return hourA - hourB;
+          } else if (isDate) {
+            const dateA = new Date(a.key.split('.').reverse().join('-'));
+            const dateB = new Date(b.key.split('.').reverse().join('-'));
+            return dateA.getTime() - dateB.getTime();
+          } else if (isWeek) {
+            const weekA = parseInt(a.key.replace(/\D/g, ''), 10);
+            const weekB = parseInt(b.key.replace(/\D/g, ''), 10);
+            return weekA - weekB;
+          } else {
+            const monthMap = { JANUARY: 1, FEBRUARY: 2,
+              MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9,
+              OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
+            // @ts-ignore
+            const monthA = monthMap[a.key];
+            // @ts-ignore
+            const monthB = monthMap[b.key];
+            return monthA - monthB;
+          }
+
+        });
+
+        this.chartData.labels = graphDataArray.map(item => item.key);
+        this.chartData.datasets[0].data = graphDataArray.map(item => item.value);
+        if (this.chart) {
+          this.chart.update();
+        }
+      },
+      (error) => {
+        console.error("Error fetching graph data", error);
+      }
+    );
   }
 
   updateChartType(): void {

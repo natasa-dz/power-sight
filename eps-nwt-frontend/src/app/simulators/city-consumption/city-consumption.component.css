@@ -95,6 +95,10 @@
   background-color: #01579b;
 }
 
+.consumption-data{
+  color: #37474f;
+}
+
 .consumption-right canvas {
   margin-top: 2rem;
   width: 100%;

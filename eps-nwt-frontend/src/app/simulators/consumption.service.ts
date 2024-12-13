@@ -11,7 +11,15 @@ export class ConsumptionService {
 
   constructor(private http: HttpClient) { }
 
+  getMunicipalitiesFromInflux(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/municipalities`);
+  }
+
   getConsumption(city: string, timeRange: string): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/${city}/${timeRange}`);
+  }
+
+  getGraphData(name: string, timeRange: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/graph/${name}/${timeRange}`);
   }
 }
