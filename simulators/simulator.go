@@ -145,7 +145,7 @@ func sendConsumptionData() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		baseDate := time.Date(2024, time.November, 1, 0, 0, 0, 0, time.UTC)
+		baseDate := time.Date(2024, time.December, 14, 15, 56, 0, 0, time.UTC)
 		now := time.Now().UTC()
 		timePassed := now.Sub(baseDate)
 		simulationHoursPassed := int(math.Round(timePassed.Minutes())) + 60
@@ -153,6 +153,7 @@ func sendConsumptionData() {
 		hour := simulationHoursPassed % 24
 		date := baseDate.AddDate(0, 0, daysPassed)
 		simulationTime := time.Date(date.Year(), date.Month(), date.Day(), hour, 0, 0, 0, time.UTC)
+		fmt.Printf(simulationTime.String() + "\n")
 		consumption := GetHourlyConsumption(hour) + (rand.Float64() * 0.1)
 		message := map[string]interface{}{
 			"id":          "simulator-" + simulatorId,
@@ -202,7 +203,7 @@ func sendAMQPMessage(exchange, routingKey string, data map[string]interface{}, i
 			fmt.Println("Successful connection.")
 
 			if !isFileEmpty(simulatorId + ".txt") {
-				baseDate := time.Date(2024, time.November, 1, 0, 0, 0, 0, time.UTC)
+				baseDate := time.Date(2024, time.December, 14, 15, 56, 0, 0, time.UTC)
 				now := time.Now().UTC()
 				timePassed := now.Sub(baseDate)
 				simulationHoursPassed := int(math.Round(timePassed.Minutes())) + 60

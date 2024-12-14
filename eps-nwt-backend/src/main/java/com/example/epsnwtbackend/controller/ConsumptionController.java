@@ -58,8 +58,13 @@ public class ConsumptionController {
     }
 
         @GetMapping(value = "/municipalities")
-    public ResponseEntity<?> getMunicipalities() {
+    public ResponseEntity<?> getExistingMunicipalities() {
         return new ResponseEntity<>(influxService.getMunicipalitiesFromInflux(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/cities")
+    public ResponseEntity<?> getExistingCities() {
+        return new ResponseEntity<>(influxService.getExistingCities(), HttpStatus.OK);
     }
 
 }

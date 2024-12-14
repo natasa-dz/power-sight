@@ -41,9 +41,6 @@ import {CityMunicipality} from "../../model/city-municipality";
 })
 export class CityConsumptionComponent implements OnInit{
   selected: boolean = false;
-  citiesAndMunicipalities: any = {};
-  cities: string[] = [];
-  existingMunicipalities: string[] = [];
   existingCities: string[] = [];
   selectedCity: string = '';
   timeRange = '3';
@@ -75,26 +72,8 @@ export class CityConsumptionComponent implements OnInit{
               private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
-    this.consumptionService.getMunicipalitiesFromInflux().subscribe(data => {
-      this.existingMunicipalities = data; //novisad, novibeograd
-      this.realEstateService.getCitiesWithMunicipalities().subscribe({
-        next: (data2: CityMunicipality) => {
-          this.citiesAndMunicipalities = data2; // Beograd - Novi Beograd, Zemun , ...
-          this.cities = Object.keys(this.citiesAndMunicipalities);
-          for (let municipality of this.existingMunicipalities){
-            for (let city of this.cities){
-              let municipalitiesHelper: string[] = this.citiesAndMunicipalities[city].map((item: string) => {
-                return item.toLowerCase().replace(" ", '');
-              });
-              if (municipalitiesHelper.includes(municipality)){
-                this.existingCities.push(city);
-              }
-            }
-          }
-        },
-        error: (err: any): void => {
-        }
-      });
+    this.consumptionService.getCitiesFromInflux().subscribe(data => {
+      this.existingCities = data;
     });
 
     Chart.register(
@@ -111,11 +90,30 @@ export class CityConsumptionComponent implements OnInit{
     );
   }
 
+  disconnectWebSocket(city : string): void {
+    if (this.webSocketService.client && this.webSocketService.isConnectedCity.get(city)) {
+      this.webSocketService.disconnectCity(city);
+    }
+  }
+
+  initWebSocket(city: string): void {
+    console.log("Subscribing to WebSocket for city:", city);
+    this.webSocketService.connectCity(city);
+  }
+
   onCityChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     if (target && target.value) {
+      let old = this.selectedCity;
       this.selectedCity = target.value;
       this.selected = true;
+      this.startDate = "";
+      this.endDate = "";
+      this.total = undefined;
+      this.timeRange = '';
+      this.chartData.labels = []
+      this.chartData.datasets[0].data = []
+      if (old !== '') this.disconnectWebSocket(old);
     }
   }
 
@@ -126,6 +124,15 @@ export class CityConsumptionComponent implements OnInit{
     const oneYear = 365 * 24 * 60 * 60 * 1000;  // milliseconds
     const difference = end.getTime() - start.getTime();
     return difference <= oneYear;
+  }
+
+  updateChartSocket(data: Map<string,number>): void { //{k=v}
+    this.chartData.labels = Object.keys(data);
+    this.chartData.datasets[0].data = Object.values(data);
+    if (this.chart) {
+      this.chart.update();
+    }
+
   }
 
   updateChart(): void {
@@ -145,7 +152,7 @@ export class CityConsumptionComponent implements OnInit{
         ? `${formattedStartDate} 00:00:00-${formattedEndDate} 00:00:00`
         : timeRangeValue;
 
-    if (this.startDate != undefined && this.endDate != undefined){
+    if (this.custom && this.startDate != undefined && this.endDate != undefined){
       if (this.validateDateRange(new Date(this.startDate), new Date(this.endDate))){
         validDates = true;
       }
@@ -157,6 +164,17 @@ export class CityConsumptionComponent implements OnInit{
         this.total = undefined;
       }
     }
+
+    if (this.timeRange !== '1' && this.webSocketService.isConnectedCity.get(this.selectedCity)) {
+      this.webSocketService.disconnectCity(this.selectedCity);
+    }
+
+    if (this.timeRange === '1') {
+      this.initWebSocket(this.selectedCity);
+    }
+    this.webSocketService.cityData$.subscribe(data => {
+      this.updateChartSocket(data);
+    });
 
     // ako je custom i validni datumi ili ako nije custom
     if ((this.custom && validDates) || !this.custom){
@@ -179,15 +197,6 @@ export class CityConsumptionComponent implements OnInit{
         }
       });
     }
-    /*
-    if (this.timeRange !== '1' && this.webSocketService.isConnected) {
-      this.webSocketService.disconnect();
-    }
-    if (this.timeRange === '1') {
-      const simulatorName = `${this.household?.id}`;
-      this.initWebSocket(simulatorName);
-    }
-*/
 
   }
 

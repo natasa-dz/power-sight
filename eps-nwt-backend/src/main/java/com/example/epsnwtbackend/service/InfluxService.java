@@ -112,7 +112,7 @@ public class InfluxService {
         List<String> municipalities = citiesAndMunicipalities.get(city);
 
         String municipalityFilter = municipalities.stream()
-                .map(municipality -> String.format("r[\"Municipality\"] == \"%s\"", municipality))
+                .map(municipality -> String.format("r[\"Municipality\"] == \"%s\"", municipality.replace(" ", "").trim().toLowerCase()))
                 .collect(Collectors.joining(" or "));
         String fluxQuery = String.format(
                 "from(bucket:\"%s\") " +
@@ -132,7 +132,7 @@ public class InfluxService {
         List<String> municipalities = citiesAndMunicipalities.get(city);
 
         String municipalityFilter = municipalities.stream()
-                .map(municipality -> String.format("r[\"Municipality\"] == \"%s\"", municipality))
+                .map(municipality -> String.format("r[\"Municipality\"] == \"%s\"", municipality.replace(" ", "").trim().toLowerCase()))
                 .collect(Collectors.joining(" or "));
         String fluxQuery = String.format(
                 "from(bucket:\"%s\") " +
@@ -243,4 +243,27 @@ public class InfluxService {
         }
         return result;
     }
+
+    public List<String> getExistingCities() {
+        List<String> existingCities = new ArrayList<>();
+        List<String> existingMunicipalities = getMunicipalitiesFromInflux();
+        Map<String, List<String>> citiesAndMunicipalities = realEstateRequestService.getCitiesWithMunicipalities();
+
+        for (String municipality : existingMunicipalities) {
+            for (Map.Entry<String, List<String>> entry : citiesAndMunicipalities.entrySet()) {
+                String city = entry.getKey();
+                List<String> municipalities = entry.getValue()
+                        .stream()
+                        .map(item -> item.toLowerCase().replace(" ", ""))
+                        .toList();
+                if (municipalities.contains(municipality)) {
+                    if (!existingCities.contains(city)) {
+                        existingCities.add(city);
+                    }
+                }
+            }
+        }
+        return existingCities;
+    }
+
 }
