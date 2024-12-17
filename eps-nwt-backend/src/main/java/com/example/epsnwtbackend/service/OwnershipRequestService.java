@@ -57,7 +57,7 @@ public class OwnershipRequestService {
     public List<OwnershipRequest> getPendingRequests() {
         return ownershipRequestRepository.findByStatus(Status.PENDING);
     }
-
+    //TODO: modify register funkciju, setovanje i id usera, pronalazenje!
     public void processRequest(Long requestId, boolean approved, String reason) throws MessagingException, NoResourceFoundException {
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));
