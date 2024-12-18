@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -53,6 +54,12 @@ public class EmployeeController {
     public ResponseEntity<Page<EmployeeSearchDTO>> getAllEmployees(Pageable pageable) {
         Page<EmployeeSearchDTO> users = employeeService.getAllEmployees(pageable);
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping(path = "/all-employees-no-pagination")
+    public ResponseEntity<List<EmployeeSearchDTO>> getAllEmployeesNoPagination() {
+        List<EmployeeSearchDTO> employees = employeeService.getAllEmployeesNoPagination();
+        return ResponseEntity.ok(employees);
     }
 
     @GetMapping(path = "/search/{username}")
