@@ -1,0 +1,105 @@
+<app-navbar-admin></app-navbar-admin>
+<div class="employee-container">
+  <div class="employee-left">
+    <h2>Select an Employee</h2>
+    <div class="form-group">
+      <label for="employees">Employees</label>
+      <select id="employees"[(ngModel)]="selectedEmployeeId" (change)="fetchAppointmentsForDate()">
+      <option *ngFor="let employee of employees" [value]="employee.id">
+        {{ employee.name }}
+        {{ employee.surname }}
+      </option>
+
+    </select>
+    </div>
+    <h2>Add an Appointment</h2>
+    <form [formGroup]="appointmentForm" (ngSubmit)="bookAppointment()">
+      <div class="form-group">
+        <label for="date">Select Date</label>
+        <input
+          id="date"
+          type="date"
+          class="employee-input"
+          formControlName="date"
+          required
+          (change)="fetchAvailableSlots()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="startTime">Available Slots</label>
+        <select
+          id="startTime"
+          class="employee-select"
+          formControlName="startTime"
+          required
+        >
+          <option *ngFor="let slot of availableSlots" [value]="slot">
+            {{ slot }}
+          </option>
+        </select>
+      </div>
+
+      <button type="submit" class="employee-btn" [disabled]="isLoading">
+        Book Appointment
+      </button>
+    </form>
+
+    <br><br>
+    <div *ngIf="message" class="employee-message">
+      {{ message }}
+    </div>
+
+    <div *ngIf="isLoading" class="employee-loading">
+      <p>Loading available slots...</p>
+    </div>
+  </div>
+
+  <div class="employee-right">
+    <div class="simple-calendar">
+      <h3>Calendar</h3>
+      <div class="calendar-header">
+        <button (click)="prevMonth()">&lt;</button>
+        <span>{{ months[currentMonthIndex] }} {{ currentYear }}</span>
+        <button (click)="nextMonth()">&gt;</button>
+      </div>
+      <div class="calendar-grid">
+        <div class="day" *ngFor="let day of days">{{ day }}</div>
+        <div class="date" *ngFor="let date of calendarDates">
+          <div [class.clicked]="
+                  selectedDate &&
+                  selectedDate.day === date.day &&
+                  selectedDate.month === currentMonthIndex &&
+                  selectedDate.year === currentYear"
+               *ngIf="date.day != 0"
+               (click)="onDateClick(date.day)">
+            {{ date.day }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="appointments-section" *ngIf="selectedDate != null">
+      <h4>Appointments for {{ selectedDate.day }} {{ months[selectedDate.month] }} {{ selectedDate.year }}</h4>
+      <div class="appointment-item-header">
+        <div class="time">Time</div>
+        <div class="user">Username</div>
+        <div class="status">Status</div>
+      </div>
+
+      <ul *ngIf="appointments.length > 0; else noAppointments" class="appointments-list">
+        <li *ngFor="let appointment of appointments" class="appointment-item">
+          <div class="time">{{ appointment.startTime | date: 'hh:mm' }} - {{ appointment.endTime | date: 'hh:mm' }}</div>
+          <div class="user" *ngIf="appointment.userId == this.loggedInId">Private appointment</div>
+          <div class="user" *ngIf="appointment.userId != this.loggedInId">{{ appointment.usersUsername }}</div>
+          <div class="status" [class]="appointment.status">{{ getStatusFormatted(appointment.status) }}</div>
+        </li>
+      </ul>
+
+      <ng-template #noAppointments>
+        <p class="no-appointments">No appointments for the selected day.</p>
+      </ng-template>
+    </div>
+  </div>
+
+</div>
