@@ -6,7 +6,6 @@ import {FormBuilder, FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
 import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute} from "@angular/router";
-import {HouseholdService} from "../household.service";
 import {WebSocketService} from "../../service/websocket.service";
 import {
   Chart,
@@ -21,6 +20,8 @@ import {
   ChartData, LineElement, PointElement, LineController
 } from 'chart.js';
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {ConsumptionService} from "../consumption.service";
+import {CityMunicipality} from "../../model/city-municipality";
 
 @Component({
   selector: 'app-city-consumption',
@@ -34,23 +35,24 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     NgForOf,
     ReactiveFormsModule
   ],
+  providers: [DatePipe],
   templateUrl: './city-consumption.component.html',
   styleUrl: './city-consumption.component.css'
 })
 export class CityConsumptionComponent implements OnInit{
   selected: boolean = false;
-  citiesAndMunicipalities: any = {};
-  cities: string[] = [];
+  existingCities: string[] = [];
   selectedCity: string = '';
-  custom: boolean = false;
   timeRange = '3';
+  custom: boolean = false;
   startDate: string | undefined;
   endDate: string | undefined;
+  total: string | undefined;
   chartData: ChartData<'bar'> = {
     labels: [],
     datasets: [
       {
-        label: 'Availability',
+        label: 'Energy Consumption',
         data: [],
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
@@ -61,25 +63,57 @@ export class CityConsumptionComponent implements OnInit{
   chartType: ChartType = 'bar';
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
 
-  constructor(private realEstateService: RealEstateRequestService,
+  constructor(private consumptionService: ConsumptionService,
+              private realEstateService: RealEstateRequestService,
               private http: HttpClient,
+              private datePipe: DatePipe,
               private route: ActivatedRoute,
-              private householdService: HouseholdService,
               private webSocketService: WebSocketService,
               private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
-    this.realEstateService.getCitiesWithMunicipalities().subscribe(data => {
-      this.citiesAndMunicipalities = data;
-      this.cities = Object.keys(this.citiesAndMunicipalities);
+    this.consumptionService.getCitiesFromInflux().subscribe(data => {
+      this.existingCities = data;
     });
+
+    Chart.register(
+      BarElement,
+      BarController,
+      CategoryScale,
+      LinearScale,
+      Title,
+      Tooltip,
+      Legend,
+      LineController,
+      PointElement,
+      LineElement
+    );
+  }
+
+  disconnectWebSocket(city : string): void {
+    if (this.webSocketService.client && this.webSocketService.isConnectedCity.get(city)) {
+      this.webSocketService.disconnectCity(city);
+    }
+  }
+
+  initWebSocket(city: string): void {
+    console.log("Subscribing to WebSocket for city:", city);
+    this.webSocketService.connectCity(city);
   }
 
   onCityChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     if (target && target.value) {
+      let old = this.selectedCity;
       this.selectedCity = target.value;
       this.selected = true;
+      this.startDate = "";
+      this.endDate = "";
+      this.total = undefined;
+      this.timeRange = '';
+      this.chartData.labels = []
+      this.chartData.datasets[0].data = []
+      if (old !== '') this.disconnectWebSocket(old);
     }
   }
 
@@ -92,20 +126,18 @@ export class CityConsumptionComponent implements OnInit{
     return difference <= oneYear;
   }
 
-  updateChart(): void {
-    this.custom = this.timeRange === 'custom';
-    if (this.startDate != undefined && this.endDate != undefined){
-      if (this.validateDateRange(new Date(this.startDate), new Date(this.endDate))){
-        // dalje
-      }
-      else {
-        this.showSnackbar("The selected dates are invalid. The range must not exceed 1 year.");
-        this.startDate = "";
-        this.endDate = "";
-      }
+  updateChartSocket(data: Map<string,number>): void { //{k=v}
+    this.chartData.labels = Object.keys(data);
+    this.chartData.datasets[0].data = Object.values(data);
+    if (this.chart) {
+      this.chart.update();
     }
 
-    /*const name = "simulator-" + this.household?.id.toString();
+  }
+
+  updateChart(): void {
+    let validDates = false;
+    this.custom = this.timeRange === 'custom';
     const timeRangeValue = this.timeRange;
 
     const formattedStartDate = this.startDate
@@ -117,18 +149,104 @@ export class CityConsumptionComponent implements OnInit{
 
     const queryParam =
       timeRangeValue === 'custom' && formattedStartDate && formattedEndDate
-        ? `${formattedStartDate}-${formattedEndDate}`
+        ? `${formattedStartDate} 00:00:00-${formattedEndDate} 00:00:00`
         : timeRangeValue;
 
-    if (this.timeRange !== '1' && this.webSocketService.isConnected) {
-      this.webSocketService.disconnect();
-    }
-    if (this.timeRange === '1') {
-      const simulatorName = `${this.household?.id}`;
-      this.initWebSocket(simulatorName);
+    if (this.custom && this.startDate != undefined && this.endDate != undefined){
+      if (this.validateDateRange(new Date(this.startDate), new Date(this.endDate))){
+        validDates = true;
+      }
+      else {
+        validDates = false;
+        this.showSnackbar("The selected dates are invalid. The range must not exceed 1 year.");
+        this.startDate = "";
+        this.endDate = "";
+        this.total = undefined;
+      }
     }
 
-    this.fetchAvailabilityData(name, queryParam);*/
+    if (this.timeRange !== '1' && this.webSocketService.isConnectedCity.get(this.selectedCity)) {
+      this.webSocketService.disconnectCity(this.selectedCity);
+    }
+
+    if (this.timeRange === '1') {
+      this.initWebSocket(this.selectedCity);
+    }
+    this.webSocketService.cityData$.subscribe(data => {
+      this.updateChartSocket(data);
+    });
+
+    // ako je custom i validni datumi ili ako nije custom
+    if ((this.custom && validDates) || !this.custom){
+      this.consumptionService.getConsumption(this.selectedCity, queryParam).subscribe({
+        next: (data : number) => {
+          if (data === null){
+            this.total = "No data available";
+          }
+          else{
+            this.total = Number(data.toFixed(4)).toString() + " kWh";
+          }
+          this.fetchGraphData(this.selectedCity, queryParam);
+        },
+        error: (mess:any) => {
+          if(mess.status === 200){
+            this.showSnackbar(mess.error.text);
+          } else{
+            this.showSnackbar("Error with consumption");
+          }
+        }
+      });
+    }
+
+  }
+
+  fetchGraphData(name: string, timeRange: string) {
+    this.consumptionService.getGraphData(name, timeRange).subscribe(
+      (graphData: any[]) => {
+        const graphDataArray = Object.entries(graphData).map(([key, value]) => ({
+          key,
+          value,
+        }));
+        graphDataArray.sort((a, b) => {
+          const isHour = /^\d{2}h$/.test(a.key); // Matches "08h", "21h"
+          const isDate = /^\d{2}\.\d{2}\.\d{4}\.$/.test(a.key); // Matches "12.12.2023."
+          const isWeek = /^\d{1,2}(st|nd|rd|th)$/.test(a.key); // Matches "1st", "2nd", "5th"
+
+          if (isHour) {
+            const hourA = parseInt(a.key.slice(0, 2), 10);
+            const hourB = parseInt(b.key.slice(0, 2), 10);
+            return hourA - hourB;
+          } else if (isDate) {
+            const dateA = new Date(a.key.split('.').reverse().join('-'));
+            const dateB = new Date(b.key.split('.').reverse().join('-'));
+            return dateA.getTime() - dateB.getTime();
+          } else if (isWeek) {
+            const weekA = parseInt(a.key.replace(/\D/g, ''), 10);
+            const weekB = parseInt(b.key.replace(/\D/g, ''), 10);
+            return weekA - weekB;
+          } else {
+            const monthMap = { JANUARY: 1, FEBRUARY: 2,
+              MARCH: 3, APRIL: 4, MAY: 5, JUNE: 6, JULY: 7, AUGUST: 8, SEPTEMBER: 9,
+              OCTOBER: 10, NOVEMBER: 11, DECEMBER: 12 };
+            // @ts-ignore
+            const monthA = monthMap[a.key];
+            // @ts-ignore
+            const monthB = monthMap[b.key];
+            return monthA - monthB;
+          }
+
+        });
+
+        this.chartData.labels = graphDataArray.map(item => item.key);
+        this.chartData.datasets[0].data = graphDataArray.map(item => item.value);
+        if (this.chart) {
+          this.chart.update();
+        }
+      },
+      (error) => {
+        console.error("Error fetching graph data", error);
+      }
+    );
   }
 
   updateChartType(): void {
