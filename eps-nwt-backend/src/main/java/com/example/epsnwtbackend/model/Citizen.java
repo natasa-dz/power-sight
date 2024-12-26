@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "employees", indexes = {
-        @Index(name = "idx_username", columnList = "username")
+@Table(name = "citizens", indexes = {
+        @Index(name = "index_username", columnList = "username")
 })
-public class Employee {
+public class Citizen {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,15 +20,6 @@ public class Employee {
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String surname;
-
-    @Column(nullable = false)
-    private Boolean suspended;
 
     @Column
     private String username;

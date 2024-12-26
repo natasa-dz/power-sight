@@ -1,0 +1,28 @@
+<app-navbar-citizen></app-navbar-citizen>
+<div class="search-form">
+  <label>Username:</label>
+  <input [(ngModel)]="username" (input)="debounceSearch()" type="text" placeholder="Search username" />
+  <div class="center-btn">
+    <button (click)="search()">Search</button>
+  </div>
+</div>
+
+<div *ngIf="page.content.length > 0">
+  <h3>Results:</h3>
+  <ul>
+    <li *ngFor="let citizen of page.content">
+      <div>
+        {{ citizen.username }}
+      </div>
+    </li>
+  </ul>
+
+  <div class="pagination">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+    <span>Page {{ currentPage + 1 }} of {{ page.totalPages }}</span>
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= page.totalPages">Next</button>
+  </div>
+</div>
+<div *ngIf="page.content.length === 0">
+  <p>No results found.</p>
+</div>

@@ -5,6 +5,7 @@ import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
 import com.example.epsnwtbackend.model.*;
+import com.example.epsnwtbackend.service.CitizenService;
 import com.example.epsnwtbackend.service.EmailService;
 import com.example.epsnwtbackend.service.EmployeeService;
 import com.example.epsnwtbackend.service.UserService;
@@ -52,6 +53,9 @@ public class UserController {
 
     @Autowired
     EmployeeService employeeService;
+
+    @Autowired
+    private CitizenService citizenService;
 
     private static final String PHOTO_PATH = "/var/www/photos/profiles/";
     @Autowired
@@ -123,7 +127,14 @@ public class UserController {
                 employee.setName(dto.getName());
                 employee.setSurname(dto.getSurname());
                 employee.setSuspended(false);
+                employee.setUsername(user.getUsername());
                 employeeService.saveEmployee(employee);
+            } else if (dto.getRole() == Role.CITIZEN) {
+                User user = userService.findWholeUser(dto.getUsername());
+                Citizen citizen = new Citizen();
+                citizen.setUser(user);
+                citizen.setUsername(user.getUsername());
+                citizenService.saveCitizen(citizen);
             }
 
             // generate unique activation token and send activation email as well
@@ -181,7 +192,14 @@ public class UserController {
                     employee.setName(userData.getName());
                     employee.setSurname(userData.getSurname());
                     employee.setSuspended(false);
+                    employee.setUsername(user.getUsername());
                     employeeService.saveEmployee(employee);
+                } else if (dto.getRole() == Role.CITIZEN) {
+                    User user = userService.findWholeUser(dto.getUsername());
+                    Citizen citizen = new Citizen();
+                    citizen.setUser(user);
+                    citizen.setUsername(user.getUsername());
+                    citizenService.saveCitizen(citizen);
                 }
 
                 String activationLink = "http://localhost:4200/activate?token=" + activationToken;

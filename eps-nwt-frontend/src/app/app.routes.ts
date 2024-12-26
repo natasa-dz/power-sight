@@ -25,6 +25,7 @@ import {
   OwnerHouseholdRequestsComponent
 } from "./requests-module/owner-household-requests/owner-household-requests.component";
 import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
+import {SearchCitizensComponent} from "./citizens/search-citizens/search-citizens.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -44,8 +45,8 @@ export const routes: Routes = [
   { path: 'employee/:id', component: EmployeeProfileComponent },
   { path: 'register-employee', component: RegisterEmployeeComponent },
   { path: 'employee-calendar', component: EmployeeCalendarComponent },
-  { path: 'main', component: MainComponent },
   { path: 'admin/city-consumption', component: CityConsumptionComponent },
+  { path: 'allow-household-access/search', component: SearchCitizensComponent },
   { path: 'main', component: MainComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
