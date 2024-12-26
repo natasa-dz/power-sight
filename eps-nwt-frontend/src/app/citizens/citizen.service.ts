@@ -3,6 +3,8 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Page} from "../model/page.model";
 import {CitizenSearchDto} from "../model/citizen-search-dto";
+import {Household} from "../model/household.model";
+import {ViewHouseholdDto} from "../model/view-household-dto.model";
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +12,7 @@ import {CitizenSearchDto} from "../model/citizen-search-dto";
 export class CitizenService {
 
   private apiUrl = 'http://localhost:8080/citizen';
+  private householdApiUrl = 'http://localhost:8080/household';
 
   constructor(private http: HttpClient) { }
 
@@ -20,5 +23,10 @@ export class CitizenService {
       .set('username', username);
 
     return this.http.get<Page<CitizenSearchDto>>(`${this.apiUrl}/search`, { params });
+  }
+
+  getHouseholdsForOwner(ownerId : number) : Observable<ViewHouseholdDto[]>{
+    return this.http.get<ViewHouseholdDto[]>(`${this.householdApiUrl}/getForOwner/${ownerId}`);
+
   }
 }

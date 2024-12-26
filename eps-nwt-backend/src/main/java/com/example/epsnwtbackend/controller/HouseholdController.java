@@ -257,4 +257,15 @@ public class HouseholdController {
         return (dateRange[1].toEpochDay() - dateRange[0].toEpochDay()) * secondsInDay;
     }
 
+    @GetMapping(path = "/getForOwner/{ownerId}")
+    public ResponseEntity<List<ViewHouseholdDTO>> getForOwner(@PathVariable Long ownerId) {
+        try {
+
+            List<ViewHouseholdDTO> households = householdService.getHouseholdsForOwner(ownerId);
+            return ResponseEntity.ok(households);
+        } catch (NoResourceFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

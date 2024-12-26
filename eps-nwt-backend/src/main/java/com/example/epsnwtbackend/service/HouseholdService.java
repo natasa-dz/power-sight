@@ -381,4 +381,28 @@ public class HouseholdService {
                 .map(household -> household.getId().toString())
                 .collect(Collectors.toList());
     }
+
+    public List<ViewHouseholdDTO> getHouseholdsForOwner(Long id) throws NoResourceFoundException {
+        List<Household> households = householdRepository.findForOwner(id);
+        List<ViewHouseholdDTO> dtos = new ArrayList<>();
+        if (!households.isEmpty()) {
+            for(Household household : households){
+                ViewHouseholdDTO viewHouseholdDTO = new ViewHouseholdDTO();
+                viewHouseholdDTO.setId(household.getId());
+                viewHouseholdDTO.setFloor(household.getFloor());
+                viewHouseholdDTO.setApartmentNumber(household.getApartmentNumber());
+                viewHouseholdDTO.setSquareFootage(household.getSquareFootage());
+
+                viewHouseholdDTO.setOwnerId(household.getOwner() == null ? null : household.getOwner().getId());
+
+                viewHouseholdDTO.setAddress(household.getRealEstate().getAddress());
+                viewHouseholdDTO.setTown(household.getRealEstate().getTown());
+                viewHouseholdDTO.setMunicipality(household.getRealEstate().getMunicipality());
+                dtos.add(viewHouseholdDTO);
+            }
+
+            return dtos;
+        }
+        throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
+    }
 }

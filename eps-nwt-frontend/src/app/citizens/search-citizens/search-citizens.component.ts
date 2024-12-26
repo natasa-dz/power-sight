@@ -5,9 +5,10 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
 import {Page} from "../../model/page.model";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import console from "node:console";
 import {CitizenSearchDto} from "../../model/citizen-search-dto";
 import {CitizenService} from "../citizen.service";
+import {Household} from "../../model/household.model";
+import {ViewHouseholdDto} from "../../model/view-household-dto.model";
 
 @Component({
   selector: 'app-search-citizens',
@@ -28,12 +29,27 @@ export class SearchCitizensComponent implements OnInit{
   page: Page<CitizenSearchDto> = { content: [], totalPages: 0, totalElements: 0, size: 0, number: 0 };
   currentPage: number = 0;
   private debounceTimer: any;
+  selectedAddress = "";
+  selectedIds : number[] = [];
+  households : ViewHouseholdDto[] = [];
 
   constructor(private citizenService: CitizenService,
               private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.loadPage();
+    let ownerId = Number(localStorage.getItem('userId'));
+    if (ownerId != undefined){
+      this.citizenService.getHouseholdsForOwner(ownerId).subscribe({
+        next:(data:ViewHouseholdDto[]) => {
+          this.households = data;
+        }, error: (e:any) => {
+          console.log("Error fetching households for owner: ", e)
+          this.households = [];
+        }
+      })
+    }
+
   }
 
   search(): void {
@@ -70,5 +86,17 @@ export class SearchCitizensComponent implements OnInit{
       horizontalPosition: 'center',
       verticalPosition: 'bottom'
     });
+  }
+
+  submitDetails() {
+
+  }
+
+  addToList(citizenId: number) {
+    this.selectedIds.push(citizenId);
+  }
+
+  removeFromList(citizenId: number) {
+    this.selectedIds = this.selectedIds.filter(id => id !== citizenId);
   }
 }

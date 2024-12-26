@@ -1,28 +1,50 @@
 <app-navbar-citizen></app-navbar-citizen>
-<div class="search-form">
-  <label>Username:</label>
-  <input [(ngModel)]="username" (input)="debounceSearch()" type="text" placeholder="Search username" />
-  <div class="center-btn">
-    <button (click)="search()">Search</button>
-  </div>
-</div>
-
-<div *ngIf="page.content.length > 0">
-  <h3>Results:</h3>
-  <ul>
-    <li *ngFor="let citizen of page.content">
-      <div>
-        {{ citizen.username }}
+<div class="container">
+  <!-- Left Section -->
+  <div class="left-section">
+    <div class="search-form">
+      <label>Username:</label>
+      <input [(ngModel)]="username" (input)="debounceSearch()" type="text" placeholder="Search username" />
+      <div class="center-btn">
+        <button (click)="search()">Search</button>
       </div>
-    </li>
-  </ul>
+    </div>
 
-  <div class="pagination">
-    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
-    <span>Page {{ currentPage + 1 }} of {{ page.totalPages }}</span>
-    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= page.totalPages">Next</button>
+    <div *ngIf="page.content.length > 0">
+      <h3>Results:</h3>
+      <ul>
+        <li *ngFor="let citizen of page.content">
+          <div class="select-citizen">
+            <p>{{ citizen.username }}</p>
+            <button *ngIf="!selectedIds.includes(citizen.id)" (click)="addToList(citizen.id)">Select</button>
+            <button *ngIf="selectedIds.includes(citizen.id)" (click)="removeFromList(citizen.id)">Remove</button>
+          </div>
+        </li>
+      </ul>
+
+      <div class="pagination">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+        <span>Page {{ currentPage + 1 }} of {{ page.totalPages }}</span>
+        <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= page.totalPages">Next</button>
+      </div>
+    </div>
+    <div *ngIf="page.content.length === 0">
+      <p>No results found.</p>
+    </div>
   </div>
-</div>
-<div *ngIf="page.content.length === 0">
-  <p>No results found.</p>
+
+  <!-- Right Section -->
+  <div class="right-section">
+    <h3>Household Details</h3>
+    <form>
+      <label for="address">Address:</label>
+      <select id="address" [(ngModel)]="selectedAddress" name="address">
+        <option *ngFor="let household of households" [value]="household.id">{{ household?.address }}, {{ household?.apartmentNumber }}</option>
+      </select>
+
+      <div class="center-btn">
+        <button (click)="submitDetails()">Submit</button>
+      </div>
+    </form>
+  </div>
 </div>

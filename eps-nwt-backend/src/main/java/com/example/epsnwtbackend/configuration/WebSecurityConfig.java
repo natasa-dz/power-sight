@@ -112,6 +112,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/appointments/available-slots/{employeeId}").permitAll()
                 .requestMatchers("/appointments/get-employees-appointments-for-date/{employeeId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/citizen/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/getForOwner/{ownerId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -181,7 +182,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
                         "appointments/available-slots/", "employee/find-by-user-id/",
                         "appointments/get-employees-appointments-for-date/", "employee/all-employees",
-                        "household/current/", "citizen/search");
+                        "household/current/", "citizen/search", "household/getForOwner/{ownerId}");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

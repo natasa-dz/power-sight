@@ -1,3 +1,64 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.left-section,
+.right-section {
+  width: 48%; /* Each section takes 48% of the container's width */
+}
+
+.right-section {
+  background-color: #f0f4f8;
+  border: 1px solid #37474f;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.right-section h3 {
+  color: #0d47a1;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.right-section form label {
+  font-size: 1rem;
+  color: #37474f;
+  margin-top: 1rem;
+  display: block;
+}
+
+.right-section form select,
+.right-section form input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.right-section form button {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #0288d1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.right-section form button:hover {
+  background-color: #01579b;
+}
+
 .whole-page {
   background-color: #ffffff;
   height: fit-content;
@@ -148,4 +209,22 @@ ul li:hover {
 
 .space {
   min-height: 15px;
+}
+
+.select-citizen{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.select-citizen button {
+  padding: 0.75rem 1.5rem;
+  background-color: #0288d1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
