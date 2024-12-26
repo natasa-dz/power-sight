@@ -44,11 +44,12 @@ public class RabbitMQListener {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             ConsumptionMessage parsedMessage = objectMapper.readValue(messageContent, ConsumptionMessage.class);
-            System.out.println("Parsed message object heartbeat: " + parsedMessage);
+            System.out.println("Parsed message object consumption: " + parsedMessage);
             Map<String, String> tags = Map.of(
-                    "Municipality", message.getMessageProperties().getConsumerQueue().split("_queue_")[1]
+                    "Municipality", message.getMessageProperties().getConsumerQueue().split("_queue_")[1],
+                    "Id", parsedMessage.getId()
             );
-            influxService.saveConsumption(parsedMessage.getId(), parsedMessage.getConsumption(), parsedMessage.getTimestamp(), tags);
+            influxService.saveConsumption("simulators", parsedMessage.getConsumption(), parsedMessage.getTimestamp(), tags);
         } catch (Exception e) {
             e.printStackTrace();
         }

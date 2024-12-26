@@ -46,6 +46,7 @@ export const routes: Routes = [
   { path: 'employee-calendar', component: EmployeeCalendarComponent },
   { path: 'main', component: MainComponent },
   { path: 'admin/city-consumption', component: CityConsumptionComponent },
+  { path: 'main', component: MainComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
 
