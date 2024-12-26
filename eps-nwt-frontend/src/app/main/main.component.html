@@ -13,3 +13,7 @@
   <!-- Owner Navbar Links -->
   <app-navbar-citizen></app-navbar-citizen>
 </div>
+
+<div *ngIf="userRole === Role.EMPLOYEE">
+  <app-navbar-employee></app-navbar-employee>
+</div>

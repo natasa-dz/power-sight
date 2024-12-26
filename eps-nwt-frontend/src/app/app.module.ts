@@ -16,6 +16,7 @@ import {ChangePasswordComponent} from "./change-password/change-password.compone
 import {SearchHouseholdComponent} from "./simulators/search-household/search-household.component";  // Import routes from app.routes.ts
 import {ActivateComponent} from "./activate/activate.component";
 import {MainComponent} from "./main/main.component";
+import {NavbarEmployeeComponent} from "./base/navbar-employee/navbar-employee.component";  // Import routes from app.routes.ts
 import {BaseModule} from "./base/base.module";  // Import routes from app.routes.ts
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -34,8 +35,11 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     HttpClientModule,
     ReactiveFormsModule,
     RouterModule.forRoot(routes),
+    BrowserModule,
+    AccessControlModule,
     BrowserAnimationsModule,
     MatSnackBarModule,
+    NavbarEmployeeComponent,
     SearchHouseholdComponent,
     BaseModule],
   bootstrap: [AppComponent],

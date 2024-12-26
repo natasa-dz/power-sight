@@ -13,71 +13,70 @@ public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
-
-    public void sendActivationEmail(String to, String activationLink) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Electro Power - Activate Your Account");
+    
+    public void sendActivationEmail(String to, String activationLink) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         String emailContent = """
-            Dear User,
-            
-            Welcome to Electro Power! To complete your registration and access your energy management dashboard, please activate your account.
-            
-            Click the link below to activate your account:
-            %s
+        <html>
+        <body>
+            <h2>Welcome to Electro Power!</h2>
+            <p>To complete your registration and access your energy management dashboard, please activate your account.</p>
+            <a href="%s" style="display: inline-block; padding: 10px 20px; color: white; background-color: #007bff; text-decoration: none;">Activate Your Account</a>
+            <p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
+            <p>Best Regards,<br>Electro Power Support Team</p>
+        </body>
+        </html>
+        """.formatted(activationLink);
 
-            If you have any questions or need assistance, feel free to reach out to our support team.
-
-            Best Regards,
-            Electro Power Support Team
-            """.formatted(activationLink);
-
-        message.setText(emailContent);
+        helper.setTo(to);
+        helper.setSubject("Electro Power - Activate Your Account");
+        helper.setText(emailContent, true); // true for HTML
         mailSender.send(message);
     }
 
-    public void sendApprovalEmail(String emailTo) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(emailTo);
-        message.setSubject("Electro Power - Ownership Request Approved");
+    public void sendApprovalEmail(String emailTo) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         String emailContent = """
-            Dear User,
-            
-            We are pleased to inform you that your ownership verification request for your household has been approved. 
-            
-            You can now manage your household's energy consumption through the Electro Power dashboard.
+        <html>
+        <body>
+            <h2>Ownership Request Approved</h2>
+            <p>We are pleased to inform you that your ownership verification request for your household has been approved.</p>
+            <p>You can now manage your household's energy consumption through the Electro Power dashboard.</p>
+            <p>Thank you for choosing Electro Power!</p>
+            <p>Warm Regards,<br>Electro Power Support Team</p>
+        </body>
+        </html>
+        """;
 
-            Thank you for choosing Electro Power!
-
-            Warm Regards,
-            Electro Power Support Team
-            """;
-
-        message.setText(emailContent);
+        helper.setTo(emailTo);
+        helper.setSubject("Electro Power - Ownership Request Approved");
+        helper.setText(emailContent, true);
         mailSender.send(message);
     }
 
-    public void sendRejectionEmail(String emailTo, String rejectionReason) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(emailTo);
-        message.setSubject("Electro Power - Ownership Request Rejected");
+    public void sendRejectionEmail(String emailTo, String rejectionReason) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         String emailContent = """
-            Dear User,
-            
-            We regret to inform you that your ownership verification request for your household was not approved. 
-            
-            Reason for rejection: %s
-            
-            If you have any questions or would like to discuss this further, please contact our support team for assistance.
+        <html>
+        <body>
+            <h2>Ownership Request Rejected</h2>
+            <p>We regret to inform you that your ownership verification request for your household was not approved.</p>
+            <p><strong>Reason for rejection:</strong> %s</p>
+            <p>If you have any questions or would like to discuss this further, please contact our support team for assistance.</p>
+            <p>Best Regards,<br>Electro Power Support Team</p>
+        </body>
+        </html>
+        """.formatted(rejectionReason);
 
-            Best Regards,
-            Electro Power Support Team
-            """.formatted(rejectionReason);
-
-        message.setText(emailContent);
+        helper.setTo(emailTo);
+        helper.setSubject("Electro Power - Ownership Request Rejected");
+        helper.setText(emailContent, true);
         mailSender.send(message);
     }
 

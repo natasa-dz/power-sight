@@ -20,6 +20,7 @@ import {
 import { ViewChild } from '@angular/core';
 import {WebSocketService} from "../../service/websocket.service";
 import {BaseModule} from "../../base/base.module";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 
 @Component({
@@ -59,12 +60,14 @@ export class ViewHouseholdComponent implements OnInit, OnDestroy {
   };
   chartType: ChartType = 'bar';
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+  latestSimulatorData: boolean | undefined;
 
   constructor(
     private route: ActivatedRoute,
     private householdService: HouseholdService,
     private datePipe: DatePipe,
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -93,6 +96,7 @@ export class ViewHouseholdComponent implements OnInit, OnDestroy {
           if (this.timeRange === '3') {
             this.initWebSocket(simulatorName);
           }
+          this.fetchLatestSimulatorData();
         },
         (error) => {
           console.error("Error fetching household details", error);
@@ -220,12 +224,63 @@ export class ViewHouseholdComponent implements OnInit, OnDestroy {
         console.error("Error fetching graph data", error);
       }
     );
+    this.fetchLatestSimulatorData();
   }
 
 
   updateChartType(): void {
     if (this.chart) {
       this.chart.update();
+    }
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
+  }
+
+  fetchLatestSimulatorData(): void {
+    const simulatorName = `simulator-${this.household?.id}`;
+    this.householdService.getLatestValue(simulatorName).subscribe(
+      (data: boolean) => {
+        this.latestSimulatorData = data;
+      },
+      (error) => {
+        console.error('Error fetching latest simulator data:', error);
+        this.latestSimulatorData = undefined;
+      }
+    );
+  }
+
+  formatDuration(secondsString: string | undefined): string {
+    if(secondsString == undefined) return "";
+    var seconds = Number(secondsString);
+    if(seconds != undefined) {
+      if (isNaN(seconds) || seconds <= 0) {
+        return '0 seconds';
+      }
+
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const months = Math.floor(days / 30);
+
+      if (months > 0) {
+        return `${months} month${months > 1 ? 's' : ''}, ${days % 30} day${days % 30 > 1 ? 's' : ''}`;
+      } else if (days > 0) {
+        return `${days} day${days > 1 ? 's' : ''}, ${hours % 24} hour${hours % 24 > 1 ? 's' : ''}`;
+      } else if (hours > 0) {
+        return `${hours} hour${hours > 1 ? 's' : ''}, ${minutes % 60} minute${minutes % 60 > 1 ? 's' : ''}`;
+      } else if (minutes > 0) {
+        return `${minutes} minute${minutes > 1 ? 's' : ''}, ${seconds % 60} second${seconds % 60 > 1 ? 's' : ''}`;
+      } else {
+        return `${seconds} second${seconds > 1 ? 's' : ''}`;
+      }
+    } else {
+      return '';
     }
   }
 

@@ -1,0 +1,102 @@
+/* Base styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;  /* Makes the body take the full height of the viewport */
+  flex-direction: column;
+}
+
+.empty-message {
+  text-align: center;
+  padding: 40px;
+  color: #777;
+}
+
+.request-card {
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 700px; /* Controls the maximum width of the card */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.request-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.request-header h3 {
+  color: #0d47a0;
+  font-size: 1.2rem;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 1.3rem;
+}
+
+.request-container {
+  width: 100%;
+  max-width: 800px;  /* Limits the width of the container */
+  margin: 0 auto;  /* Centers the container */
+  padding: 20px;
+}
+
+.status-badge.approved {
+  background-color: #4caf50;
+  color: white;
+}
+
+.status-badge.pending {
+  background-color: #ff9800;
+  color: white;
+}
+
+.status-badge.rejected {
+  background-color: #f44336;
+  color: white;
+}
+
+.request-details p {
+  margin: 8px 0;
+  font-size: 1rem;
+
+}
+
+.attached-files h4 {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  color: #0a3680;
+}
+
+.attached-files ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.attached-files ul li a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.attached-files ul li a:hover {
+  text-decoration: underline;
+}

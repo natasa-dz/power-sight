@@ -1,0 +1,34 @@
+<app-navbar-admin></app-navbar-admin>
+<div class="register-container">
+
+  <div class="register-left">
+
+    <h2>Add an employee</h2>
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
+      <label for="username">Username</label>
+      <input type="text" id="username" formControlName="username" placeholder="Enter employees' username">
+
+      <label for="jmbg">Jmbg</label>
+      <input type="text" id="jmbg" formControlName="jmbg" placeholder="Enter employees' jmbg">
+
+      <label for="name">Name</label>
+      <input type="text" id="name" formControlName="name" placeholder="Enter employees' name">
+
+      <label for="surname">Surname</label>
+      <input type="text" id="surname" formControlName="surname" placeholder="Enter employees' surname">
+
+      <label for="profilePic">Profile Picture</label>
+      <input type="file" id="profilePic" (change)="onFileSelected($event)" accept="image/*">
+
+      <button type="submit" class="btn btn-register" [disabled]="registerForm.invalid">Add</button>
+    </form>
+  </div>
+
+  <div class="register-right">
+    <div class="register-info">
+      <h3>Employee functionalities</h3>
+      <p>By adding an employee, he or she can talk to customers and solve their problems!</p>
+    </div>
+  </div>
+
+</div>

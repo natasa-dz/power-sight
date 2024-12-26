@@ -1,9 +1,7 @@
 package com.example.epsnwtbackend.controller;
 
-import com.example.epsnwtbackend.dto.AggregatedAvailabilityData;
-import com.example.epsnwtbackend.dto.AvailabilityData;
-import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
-import com.example.epsnwtbackend.dto.ViewHouseholdDTO;
+import com.example.epsnwtbackend.dto.*;
+import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.service.HouseholdService;
 import com.example.epsnwtbackend.service.InfluxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +51,32 @@ public class HouseholdController {
         return ResponseEntity.ok(households);
     }
 
+
+    @GetMapping(path = "/no-owner")
+    public ResponseEntity<Page<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
+        Page<Household> households = householdService.noOwnerHouseholds(pageable);
+
+        // Print the list of households to see what is being returned
+        households.getContent().forEach(household -> {
+            System.out.println("Household ID: " + household.getId());
+            System.out.println("Floor: " + household.getFloor());
+            System.out.println("Square Footage: " + household.getSquareFootage());
+            System.out.println("Apartment Number: " + household.getApartmentNumber());
+            System.out.println("Real Estate ID: " + household.getRealEstate().getId());
+        });
+
+        Page<HouseholdDto> householdDTOs = households.map(household -> new HouseholdDto(
+                household.getId(),
+                household.getFloor(),
+                household.getSquareFootage(),
+                household.getApartmentNumber(),
+                household.getRealEstate().getId()
+        ));
+
+        return ResponseEntity.ok(householdDTOs);
+    }
+
+
     @GetMapping(path = "/search-no-owner/{municipality}/{address}")
     public ResponseEntity<Page<HouseholdSearchDTO>> searchNoOwner(
             @PathVariable String municipality, @PathVariable String address,
@@ -71,6 +95,13 @@ public class HouseholdController {
 
         List<AggregatedAvailabilityData> data = householdService.getDataForGraph(name, timeRange);
         return ResponseEntity.ok(data);
+    }
+
+    @GetMapping(value = "/current/{name}")
+    public ResponseEntity<Boolean> getCurrentStatus(
+            @PathVariable String name) {
+        boolean isOnline = householdService.getCurrentStatus(name);
+        return ResponseEntity.ok(isOnline);
     }
 
     @GetMapping(value = "/availability/{name}/{timeRange}")

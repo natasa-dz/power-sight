@@ -38,4 +38,11 @@ public interface HouseholdRepository extends JpaRepository<Household, Long> {
             @Param("apartmentNumber") Integer apartmentNumber,
             Pageable pageable);
 
+
+    @Query("SELECT h FROM Household h WHERE h.owner IS NULL ")
+    Page<Household> searchNoOwner(Pageable pageable);
+
+
 }
+
+

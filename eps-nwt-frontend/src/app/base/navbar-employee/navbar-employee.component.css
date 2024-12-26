@@ -1,0 +1,104 @@
+/* Navbar Styles */
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  background-color: #e3f2fd; /* Light blue from login theme */
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Light shadow to match the login page */
+}
+
+/* Logo Styling */
+.logo {
+  width: 42px;
+  height: auto;
+  margin-right: 16px;
+  border-radius: 9px;
+}
+
+/* Title Styling */
+.title {
+  color: #0d47a1; /* Deep blue color from login theme */
+  font-size: 32px;
+  line-height: 130%;
+  font-weight: 700;
+  width: min-content;
+  height: min-content;
+  white-space: nowrap;
+  flex-direction: column;
+  font-family: Roboto, 'Segoe UI', Arial, sans-serif;
+}
+
+/* Rectangle (could be a banner or background feature) */
+.rectangle37 {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 176px;
+  height: 46px;
+  border-radius: 8px;
+  background-color: rgba(0, 121, 107, 0.2); /* Light green highlight (from login theme) */
+}
+
+/* Button Styling */
+button.mat-button.mat-accent {
+  color: #0d47a1; /* Deep blue from login theme */
+}
+
+button.mat-button.mat-accent:hover {
+  background-color: transparent;
+}
+
+/* Text Styling */
+.text {
+  color: #0d47a1; /* Matching deep blue from login theme */
+  font-family: Roboto, 'Segoe UI', Arial, sans-serif;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.text1 {
+  color: #0d47a1; /* Matching deep blue from login theme */
+  font-family: Roboto, 'Segoe UI', Arial, sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+mat-toolbar button.text1 {
+  color: #0d47a1; /* This will ensure the text color is blue */
+}
+
+/* Icon Styling */
+.material-icons {
+  font-size: 23px;
+  margin-right: 10px;
+  color: #0d47a1; /* Deep blue for icons */
+}
+
+.icon {
+  font-size: 23px;
+  color: #0d47a1; /* Deep blue for icons */
+  margin-right: 10px;
+}
+
+/* Flex Spacer */
+.spacer {
+  flex: 1;
+}
+
+.mat-menu-panel {
+  background-color: white !important;  /* Set the menu background to white */
+  border-radius: 8px;  /* Optional: add rounded corners to the menu */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Optional: subtle shadow for the dropdown */
+}
+
+/* Style the mat-menu items */
+.mat-menu-item {
+  color: #0d47a1;  /* Make the menu item text deep blue */
+  font-weight: normal;  /* Optional: adjust font weight */
+}
+
+.mat-menu-item:hover {
+  background-color: #e3f2fd;  /* Light blue hover background */
+  color: #0d47a1;  /* Ensure text stays blue on hover */
+}

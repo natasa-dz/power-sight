@@ -34,11 +34,6 @@ export class UserService {
 
   }
 
-  uploadPhoto(userId: number, file: File): Observable<string> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<string>(`${this.apiUrl}/${userId}/upload_photo`, formData);
-  }
 
   getPhotoPath(userId: number): Observable<string> {
     return this.http.get<string>(`${this.apiUrl}/${userId}/photo`);
@@ -48,7 +43,6 @@ export class UserService {
     const url = `${this.apiUrl}/${dto.username}`;
     return this.http.post<User>(url, dto).pipe(
       catchError((error: any) => {
-        console.error('Error updating user:', error);
         return throwError(error);
       })
     );
@@ -115,8 +109,9 @@ export class UserService {
       }
 
       const userId = decodedToken.sub;
-      console.log("User ID: ", userId);
-      return this.getUser(userId);
+      localStorage.setItem('username', userId);
+
+    return this.getUser(userId);
   }
 
   isLoggedIn(): boolean {
@@ -130,9 +125,7 @@ export class UserService {
 
 
   getRole(): any {
-      console.log("usao u getRole")
       if (this.isLoggedIn()) {
-          console.log("is logged in")
           try {
               const accessToken: any = localStorage.getItem('user');
               const helper = new JwtHelperService();

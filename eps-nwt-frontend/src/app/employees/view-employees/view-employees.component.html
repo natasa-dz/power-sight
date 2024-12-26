@@ -1,0 +1,29 @@
+<app-navbar-admin></app-navbar-admin>
+<div class="search-form">
+  <label>Username:</label>
+  <input [(ngModel)]="username" (input)="debounceSearch()" type="text" placeholder="Search username" />
+  <div class="center-btn">
+    <button (click)="search()">Search</button>
+    <button [routerLink]="['/register-employee']">Add Employee</button>
+  </div>
+</div>
+
+<div *ngIf="page.content.length > 0">
+  <h3>Results:</h3>
+  <ul>
+    <li *ngFor="let employee of page.content">
+      <a [routerLink]="['/employee', employee.id]">
+        {{ employee.username }} - {{ employee.name }} {{ employee.surname }}
+      </a>
+    </li>
+  </ul>
+
+  <div class="pagination">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">Previous</button>
+    <span>Page {{ currentPage + 1 }} of {{ page.totalPages }}</span>
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage + 1 >= page.totalPages">Next</button>
+  </div>
+</div>
+<div *ngIf="page.content.length === 0">
+  <p>No results found.</p>
+</div>
