@@ -176,13 +176,13 @@ export class RealEstateRequestComponent implements OnInit{
 
 
         } else {
-          this.showSnackbar("Nije u redu dokumentacija");
+          this.showSnackbar("Invalid documentation");
         }
       } else {
-        this.showSnackbar("Nije u redu forma za household");
+        this.showSnackbar("Household form is not valid");
       }
     } else {
-      this.showSnackbar("Nije u redu forma za nekretninu");
+      this.showSnackbar("Real estate form is not valid");
     }
   }
 

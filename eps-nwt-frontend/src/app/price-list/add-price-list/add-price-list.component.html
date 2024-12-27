@@ -1,0 +1,37 @@
+<app-navbar-citizen></app-navbar-citizen>
+<div class="body">
+  <div class="stepper-container">
+    <div class="stepper-header">
+      <div [class.active]="currentStep === 1" (click)="goToStep(1)">1 - Zone prices</div>
+      <div [class.active]="currentStep === 2" (click)="goToStep(2)">2 - Base and pdv</div>
+    </div>
+
+    <div class="content-container">
+      <div class="stepper-content">
+          <form class="content-form" [formGroup]="zonesForm" (ngSubmit)="nextStep()"  *ngIf="currentStep === 1">
+            <label>*Green zone</label>
+            <input formControlName="green" type="number" />
+            <label>*Blue zone</label>
+            <input formControlName="blue" type="number" />
+            <label>*Red zone</label>
+            <input formControlName="red" type="number" />
+            <div class="next-btn-container">
+              <button class="next-btn" type="submit">Next</button>
+            </div>
+          </form>
+
+        <div class="helper-div2" *ngIf="currentStep === 2">
+          <form class="content-form2" [formGroup]="baseAndPdvForm">
+            <label>*Base price</label>
+            <input formControlName="base" type="number" />
+            <label>*Pdv</label>
+            <input formControlName="pdv" type="number" />
+          </form>
+          <div class="next-btn-container">
+            <button class="next-btn" (click)="submit()">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

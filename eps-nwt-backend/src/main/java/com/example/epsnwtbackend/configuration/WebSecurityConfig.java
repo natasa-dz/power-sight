@@ -131,6 +131,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
+                .requestMatchers(HttpMethod.POST, "/price-list/create").permitAll()
+                .requestMatchers(HttpMethod.GET, "/price-list/find-by-id/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/price-list/find-all").permitAll()
+                .requestMatchers(HttpMethod.GET, "/price-list/find-for-date/{date}").permitAll()
                 .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
@@ -167,6 +171,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
                 .requestMatchers(HttpMethod.POST, "/employee/image")
                 .requestMatchers(HttpMethod.POST, "/appointments/create")
+                .requestMatchers(HttpMethod.POST, "/price-list/create")
                 .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
                 .requestMatchers(HttpMethod.PUT, "/employee/suspend/")
                 .requestMatchers(HttpMethod.PUT, "/household/allow-access/{householdId}")
@@ -184,7 +189,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
                         "appointments/available-slots/", "employee/find-by-user-id/",
                         "appointments/get-employees-appointments-for-date/", "employee/all-employees",
-                        "household/current/", "citizen/search", "household/getForOwner/{ownerId}");
+                        "household/current/", "citizen/search", "household/getForOwner/{ownerId}",
+                        "price-list/find-all", "price-list/find-by-id/{id}", "price-list/find-for-date/{date}");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
