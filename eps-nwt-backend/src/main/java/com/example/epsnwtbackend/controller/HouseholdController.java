@@ -52,18 +52,10 @@ public class HouseholdController {
     }
 
 
+
     @GetMapping(path = "/no-owner")
     public ResponseEntity<Page<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
         Page<Household> households = householdService.noOwnerHouseholds(pageable);
-
-        // Print the list of households to see what is being returned
-        households.getContent().forEach(household -> {
-            System.out.println("Household ID: " + household.getId());
-            System.out.println("Floor: " + household.getFloor());
-            System.out.println("Square Footage: " + household.getSquareFootage());
-            System.out.println("Apartment Number: " + household.getApartmentNumber());
-            System.out.println("Real Estate ID: " + household.getRealEstate().getId());
-        });
 
         Page<HouseholdDto> householdDTOs = households.map(household -> new HouseholdDto(
                 household.getId(),

@@ -25,6 +25,7 @@ import {
   OwnerHouseholdRequestsComponent
 } from "./requests-module/owner-household-requests/owner-household-requests.component";
 import {RequestAppointmentComponent} from "./requests-module/request-appointment/request-appointment.component";
+import {HouseholdConsumptionComponent} from "./requests-module/household-consumption/household-consumption.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -37,6 +38,7 @@ export const routes: Routes = [
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
   { path: 'request-appointment', component: RequestAppointmentComponent },
+  { path: 'household-consumption', component: HouseholdConsumptionComponent },
 
   { path: 'manage-household-requests', component: AdminHouseholdRequestsComponent},
   { path: 'household-no-owner', component: OwnerHouseholdsListingComponent},
