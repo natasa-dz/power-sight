@@ -1,7 +1,7 @@
 <app-navbar-citizen></app-navbar-citizen>
 <div class="container">
   <!-- Left Section -->
-  <div class="left-section">
+  <div class="left-section" *ngIf="selected">
     <div class="search-form">
       <label>Username:</label>
       <input [(ngModel)]="username" (input)="debounceSearch()" type="text" placeholder="Search username" />
@@ -13,7 +13,7 @@
     <div *ngIf="page.content.length > 0">
       <h3>Results:</h3>
       <ul>
-        <li *ngFor="let citizen of page.content">
+        <li *ngFor="let citizen of filteredContent">
           <div class="select-citizen">
             <p>{{ citizen.username }}</p>
             <button *ngIf="!selectedIds.includes(citizen.id)" (click)="addToList(citizen.id)">Select</button>
@@ -38,7 +38,8 @@
     <h3>Household Details</h3>
     <form>
       <label for="address">Address:</label>
-      <select id="address" [(ngModel)]="selectedAddress" name="address">
+      <select id="address" (change)="onHouseholdChange($event)" >
+        <option value="" disabled selected>Select a household</option>
         <option *ngFor="let household of households" [value]="household.id">{{ household?.address }}, {{ household?.apartmentNumber }}</option>
       </select>
 

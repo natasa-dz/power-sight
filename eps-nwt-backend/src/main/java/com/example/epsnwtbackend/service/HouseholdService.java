@@ -1,9 +1,6 @@
 package com.example.epsnwtbackend.service;
 
-import com.example.epsnwtbackend.dto.AggregatedAvailabilityData;
-import com.example.epsnwtbackend.dto.AvailabilityData;
-import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
-import com.example.epsnwtbackend.dto.ViewHouseholdDTO;
+import com.example.epsnwtbackend.dto.*;
 import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.repository.HouseholdRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -382,27 +379,33 @@ public class HouseholdService {
                 .collect(Collectors.toList());
     }
 
-    public List<ViewHouseholdDTO> getHouseholdsForOwner(Long id) throws NoResourceFoundException {
+    public List<HouseholdAccessDTO> getHouseholdsForOwner(Long id) throws NoResourceFoundException {
         List<Household> households = householdRepository.findForOwner(id);
-        List<ViewHouseholdDTO> dtos = new ArrayList<>();
+        List<HouseholdAccessDTO> dtos = new ArrayList<>();
         if (!households.isEmpty()) {
             for(Household household : households){
-                ViewHouseholdDTO viewHouseholdDTO = new ViewHouseholdDTO();
-                viewHouseholdDTO.setId(household.getId());
-                viewHouseholdDTO.setFloor(household.getFloor());
-                viewHouseholdDTO.setApartmentNumber(household.getApartmentNumber());
-                viewHouseholdDTO.setSquareFootage(household.getSquareFootage());
+                HouseholdAccessDTO householdAccessDTO = new HouseholdAccessDTO();
+                householdAccessDTO.setId(household.getId());
+                householdAccessDTO.setFloor(household.getFloor());
+                householdAccessDTO.setApartmentNumber(household.getApartmentNumber());
+                householdAccessDTO.setSquareFootage(household.getSquareFootage());
 
-                viewHouseholdDTO.setOwnerId(household.getOwner() == null ? null : household.getOwner().getId());
-
-                viewHouseholdDTO.setAddress(household.getRealEstate().getAddress());
-                viewHouseholdDTO.setTown(household.getRealEstate().getTown());
-                viewHouseholdDTO.setMunicipality(household.getRealEstate().getMunicipality());
-                dtos.add(viewHouseholdDTO);
+                householdAccessDTO.setOwnerId(household.getOwner() == null ? null : household.getOwner().getId());
+                householdAccessDTO.setAccessGranted(household.getAccessGranted());
+                householdAccessDTO.setAddress(household.getRealEstate().getAddress());
+                householdAccessDTO.setTown(household.getRealEstate().getTown());
+                householdAccessDTO.setMunicipality(household.getRealEstate().getMunicipality());
+                dtos.add(householdAccessDTO);
             }
 
             return dtos;
         }
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
+    }
+
+    public void allowAccess(Long householdId, List<Long> ids) {
+        Household household = householdRepository.getReferenceById(householdId);
+        household.setAccessGranted(ids);
+        householdRepository.save(household);
     }
 }

@@ -258,13 +258,25 @@ public class HouseholdController {
     }
 
     @GetMapping(path = "/getForOwner/{ownerId}")
-    public ResponseEntity<List<ViewHouseholdDTO>> getForOwner(@PathVariable Long ownerId) {
+    public ResponseEntity<List<HouseholdAccessDTO>> getForOwner(@PathVariable Long ownerId) {
         try {
 
-            List<ViewHouseholdDTO> households = householdService.getHouseholdsForOwner(ownerId);
+            List<HouseholdAccessDTO> households = householdService.getHouseholdsForOwner(ownerId);
             return ResponseEntity.ok(households);
         } catch (NoResourceFoundException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @PutMapping(path = "/allow-access/{householdId}")
+    public ResponseEntity<String> allowAccess(@PathVariable Long householdId,
+                                              @RequestBody List<Long> ids) {
+        try {
+            householdService.allowAccess(householdId, ids);
+            return ResponseEntity.ok("Successfully allowed access.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 

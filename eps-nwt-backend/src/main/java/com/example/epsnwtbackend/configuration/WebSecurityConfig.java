@@ -113,6 +113,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/appointments/get-employees-appointments-for-date/{employeeId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/citizen/search").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/getForOwner/{ownerId}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/household/allow-access/{householdId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -168,6 +169,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.POST, "/appointments/create")
                 .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
                 .requestMatchers(HttpMethod.PUT, "/employee/suspend/")
+                .requestMatchers(HttpMethod.PUT, "/household/allow-access/{householdId}")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/ownership-requests/**","/ownership-requests/requestOwnership", "/ownership-requests/pending",

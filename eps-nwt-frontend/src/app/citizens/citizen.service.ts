@@ -3,8 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Page} from "../model/page.model";
 import {CitizenSearchDto} from "../model/citizen-search-dto";
-import {Household} from "../model/household.model";
-import {ViewHouseholdDto} from "../model/view-household-dto.model";
+import {HouseholdAccessDto} from "../model/household-access-dto.model";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +15,7 @@ export class CitizenService {
 
   constructor(private http: HttpClient) { }
 
-  search(username: string = '', page: number = 0, size: number = 10): Observable<Page<CitizenSearchDto>> {
+  search(username: string = '', page: number = 0, size: number = 5): Observable<Page<CitizenSearchDto>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
@@ -25,8 +24,12 @@ export class CitizenService {
     return this.http.get<Page<CitizenSearchDto>>(`${this.apiUrl}/search`, { params });
   }
 
-  getHouseholdsForOwner(ownerId : number) : Observable<ViewHouseholdDto[]>{
-    return this.http.get<ViewHouseholdDto[]>(`${this.householdApiUrl}/getForOwner/${ownerId}`);
+  getHouseholdsForOwner(ownerId : number) : Observable<HouseholdAccessDto[]>{
+    return this.http.get<HouseholdAccessDto[]>(`${this.householdApiUrl}/getForOwner/${ownerId}`);
 
+  }
+
+  allowAccess(householdId: number, selectedIds: number[]) : Observable<string> {
+    return this.http.put<string>(`${this.householdApiUrl}/allow-access/${householdId}`, selectedIds);
   }
 }
