@@ -54,6 +54,10 @@ public class HouseholdService {
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
     }
 
+    public List<Household> getAll() {
+        return householdRepository.findAll();
+    }
+
     public Page<HouseholdSearchDTO> searchNoOwner(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
         return householdRepository.findHouseholdsWithoutOwner(municipality, address, apartmentNumber, pageable);
     }

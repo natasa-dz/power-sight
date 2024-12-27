@@ -1,6 +1,8 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.model.Receipt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -124,6 +126,38 @@ public class EmailService {
             helper.setSubject("Electro Power - Notification of Real Estate Registration Request Decision");
             helper.setText(emailContentDenied, true);
         }
+
+        mailSender.send(message);
+    }
+
+    public void sendReceipt(String emailTo, String month, int year, byte[] pdfAttachment) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(emailTo);
+
+        String emailContentApproved = """
+                <html>
+            <body>
+                <p>Dear User,</p>
+                <br/>
+                <p>Thank you for your continued trust in Electro Power. Please find attached the receipt for your energy usage for the month of <strong>" + month + " " + year + "</strong>.</p>
+                <p><strong>Details:</strong></p>
+                <ul>
+                    <li>Month: " + month + "</li>
+                    <li>Year: " + year + "</li>
+                </ul>
+                <br/>
+                <p>If you have any questions or need further assistance, please don’t hesitate to reach out to our support team.</p>
+                <br/>
+                <p><strong>Warm Regards,</strong><br/><em>Electro Power Support Team</em></p>
+            </body>
+            </html>
+            """;
+
+        helper.setSubject("Electro Power - Reciept for " + month + " " + year + ".");
+        helper.setText(emailContentApproved, true);
+
+        helper.addAttachment("Receipt_" + month + "_" + year + ".pdf", new ByteArrayResource(pdfAttachment));
 
         mailSender.send(message);
     }
