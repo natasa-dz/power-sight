@@ -145,7 +145,7 @@ public class UserController {
             @RequestParam(value = "userData", required = false) String userDataJson) {
 
         try {
-            String uploadDir = "uploads/";  // Directory to store user photos
+            String uploadDir = "src/main/resources/pictures/";  // Directory to store user photos
             File uploadDirectory = new File(uploadDir);
             if (!uploadDirectory.exists()) {
                 uploadDirectory.mkdir();

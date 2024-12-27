@@ -40,6 +40,11 @@ public class EmployeeService {
     }
 
     public Page<EmployeeSearchDTO> search(String username, Pageable pageable) {
+        if (username == null || username.trim().isEmpty()) {
+            return employeeRepository.findAll(pageable).map(
+                    e -> new EmployeeSearchDTO(e.getId(), e.getUser().getUsername(), e.getName(), e.getSurname())
+            );
+        }
         return employeeRepository.findAllWithUsername(username, pageable);
     }
 

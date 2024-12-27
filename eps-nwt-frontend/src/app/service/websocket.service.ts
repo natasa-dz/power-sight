@@ -9,8 +9,11 @@ import { Subject } from 'rxjs';
 export class WebSocketService {
   client: Client | null = null;
   isConnected = false;
+  isConnectedCity : Map<string, boolean> = new Map();
   private dataSubject = new Subject<any>();
+  private dataSubjectCity = new Subject<any>();
   public data$ = this.dataSubject.asObservable();
+  public cityData$ = this.dataSubjectCity.asObservable();
 
   private serverUrl = 'http://localhost:8080/socket';
 
@@ -34,10 +37,41 @@ export class WebSocketService {
     });
   }
 
+  connectCity(city : string): void {
+    if (this.isConnectedCity.get(city)) return;
+
+    const accessToken: any = localStorage.getItem('user');
+    const socket = new SockJS(this.serverUrl);
+    this.client = over(socket);
+
+    this.client.connect({ Authorization: `Bearer ${accessToken}` }, (frame) => {
+      this.isConnectedCity.set(city, true);
+      // @ts-ignore
+      this.client.subscribe('/data/graph/' + city, (messageOutput) => {
+        const cityData = JSON.parse(messageOutput.body);
+        /*console.log(cityData)
+        console.log(city)*/
+        this.dataSubjectCity.next(cityData);
+      });
+    }, (error) => {
+      console.error('WebSocket connection error', error);
+    });
+  }
+
   disconnect(): void {
     if (this.client) {
       this.client.disconnect(() => {
         this.isConnected = false;
+      });
+    }
+  }
+
+  disconnectCity(city : string): void {
+    if (this.client) {
+      this.client.disconnect(() => {
+        this.isConnectedCity.set(city, false);
+        this.dataSubjectCity = new Subject<any>();
+        this.cityData$ = this.dataSubjectCity.asObservable();
       });
     }
   }

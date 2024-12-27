@@ -1,6 +1,7 @@
 package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.AvailabilityData;
+import com.example.epsnwtbackend.dto.ConsumptionData;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.QueryApi;
 import com.influxdb.client.WriteApiBlocking;
@@ -8,12 +9,14 @@ import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class InfluxService {
@@ -21,8 +24,16 @@ public class InfluxService {
     @Value("${influxdb.bucket.heartbeat}")
     private String heartbeatBucket;
 
+    @Value("${influxdb.bucket.consumption}")
+    private String consumptionBucket;
+
     private final InfluxDBClient influxDbClientHeartbeat;
     private final InfluxDBClient influxDbClientConsumption;
+
+    @Autowired
+    private RealEstateRequestService realEstateRequestService;
+
+    private Map<String, List<String>> citiesAndMunicipalities;
 
     public InfluxService(InfluxDBClient influxDbClientHeartbeat, InfluxDBClient influxDbClientConsumption) {
         this.influxDbClientHeartbeat = influxDbClientHeartbeat;
@@ -51,6 +62,20 @@ public class InfluxService {
                 .addField("consumption_value", value)
                 .time(adjustedTimestamp, WritePrecision.MS);
         writeApi.writePoint(point);
+    }
+
+    public boolean getLatestAvailability(String name) {
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: -1y) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"value\") " +
+                        "|> last()",
+                this.heartbeatBucket, name);
+        List<AvailabilityData> data = this.queryAvailability(fluxQuery);
+        if(data.isEmpty()) return false;
+        AvailabilityData availabilityData = data.getFirst();
+        return availabilityData.isOnline();
     }
 
     public List<AvailabilityData> getAvailabilityByTimeRange(String measurementName, String duration) {
@@ -96,4 +121,163 @@ public class InfluxService {
         }
         return result;
     }
+
+    public Double getConsumptionForCityByTimeRange(String city, String duration) {
+        List<String> municipalities = citiesAndMunicipalities.get(city);
+
+        String municipalityFilter = municipalities.stream()
+                .map(municipality -> String.format("r[\"Municipality\"] == \"%s\"", municipality.replace(" ", "").trim().toLowerCase()))
+                .collect(Collectors.joining(" or "));
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: -%s, stop: now()) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => %s )" +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> group(columns: [\"simulator_id\"]) " +
+                        "|> sum()" +
+                        "|> yield(name: \"total_consumption\")",
+                this.consumptionBucket, duration, "simulators", municipalityFilter);
+
+        return this.queryCityConsumption(fluxQuery);
+    }
+
+    public Double getConsumptionForCityByTimeRangeForGraph(String city, String start, String stop) {
+        List<String> municipalities = citiesAndMunicipalities.get(city);
+
+        String municipalityFilter = municipalities.stream()
+                .map(municipality -> String.format("r[\"Municipality\"] == \"%s\"", municipality.replace(" ", "").trim().toLowerCase()))
+                .collect(Collectors.joining(" or "));
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: %s, stop: %s) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => %s )" +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> group(columns: [\"simulator_id\"]) " +
+                        "|> sum()" +
+                        "|> yield(name: \"total_consumption\")",
+                this.consumptionBucket, start, stop, "simulators", municipalityFilter);
+
+        return this.queryCityConsumption(fluxQuery);
+    }
+
+    public Double getConsumptionForCityByDateRange(String city, LocalDateTime startDate, LocalDateTime endDate) {
+        List<String> municipalities = citiesAndMunicipalities.get(city);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneOffset.UTC);
+
+        String start = startDate.format(formatter);
+        String end = endDate.plusDays(1).format(formatter);
+
+        /*
+        * from(bucket: "consumptions")
+          |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+          |> filter(fn: (r) => r["_measurement"] == "simulators")
+          |> filter(fn: (r) => r["Municipality"] == "novisad")
+          |> filter(fn: (r) => r["_field"] == "consumption_value")
+          |> group(columns: ["simulator_id"])
+          |> sum()
+          |> yield(name: "total_consumption_per_simulator")
+        * */
+
+        String municipalityFilter = municipalities.stream()
+                .map(municipality -> String.format("r[\"Municipality\"] == \"%s\"", municipality.replace(" ", "").trim().toLowerCase()))
+                .collect(Collectors.joining(" or "));
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: %s, stop: %s) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => %s )" +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> group(columns: [\"id\"]) " +
+                        "|> sum()" +
+                        "|> yield(name: \"total_consumption\")",
+                this.consumptionBucket, start, end, "simulators", municipalityFilter);
+
+
+        return this.queryCityConsumption(fluxQuery);
+    }
+
+    private Double queryCityConsumption(String fluxQuery) {
+        List<ConsumptionData> result = new ArrayList<>();
+        QueryApi queryApi = this.influxDbClientConsumption.getQueryApi();
+        List<FluxTable> tables;
+        try {
+            tables = queryApi.query(fluxQuery);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //if something goes wrong just return an empty list
+            return null;
+        }
+        for (FluxTable fluxTable : tables) {
+            for (FluxRecord record : fluxTable.getRecords()) {
+                Double consumption = (Double) record.getValue();
+                result.add(new ConsumptionData(record.getTime(), consumption));
+            }
+        }
+        if (!result.isEmpty()){
+            return result.get(0).getConsumption();
+        } else{
+            return null;
+        }
+
+    }
+
+    public List<String> getMunicipalitiesFromInflux() {
+        citiesAndMunicipalities = realEstateRequestService.getCitiesWithMunicipalities();
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: 1970-01-01T00:00:00Z, stop: 2099-12-31T00:00:00Z) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"simulators\") " +
+                        "|> keep(columns: [\"Municipality\"]) " +
+                        "|> distinct(column: \"Municipality\") " +
+                        "|> yield(name: \"unique_municipalities\") ",
+                this.consumptionBucket);
+        return this.queryMunicipalities(fluxQuery);
+    }
+
+    private List<String> queryMunicipalities(String fluxQuery) {
+        List<String> result = new ArrayList<>();
+        QueryApi queryApi = this.influxDbClientConsumption.getQueryApi();
+        List<FluxTable> tables;
+        try {
+            tables = queryApi.query(fluxQuery);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //if something goes wrong just return an empty list
+            return new ArrayList<>();
+        }
+        for (FluxTable fluxTable : tables) {
+            for (FluxRecord record : fluxTable.getRecords()) {
+                String municipality = (String) record.getValue();
+                result.add(municipality);
+            }
+        }
+        return result;
+    }
+
+    public List<String> getExistingCities() {
+        List<String> existingCities = new ArrayList<>();
+        List<String> existingMunicipalities = getMunicipalitiesFromInflux();
+        Map<String, List<String>> citiesAndMunicipalities = realEstateRequestService.getCitiesWithMunicipalities();
+
+        for (String municipality : existingMunicipalities) {
+            for (Map.Entry<String, List<String>> entry : citiesAndMunicipalities.entrySet()) {
+                String city = entry.getKey();
+                List<String> municipalities = entry.getValue()
+                        .stream()
+                        .map(item -> item.toLowerCase().replace(" ", ""))
+                        .toList();
+                if (municipalities.contains(municipality)) {
+                    if (!existingCities.contains(city)) {
+                        existingCities.add(city);
+                    }
+                }
+            }
+        }
+        return existingCities;
+    }
+
 }

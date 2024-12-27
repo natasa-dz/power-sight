@@ -9,6 +9,10 @@
     <p><strong>Municipality:</strong> {{ household?.municipality }}</p>
     <p><strong>Town:</strong> {{ household?.town }}</p>
     <p><strong>Owner ID:</strong> {{ household?.ownerId }}</p>
+    <br>
+    <div class="latest-simulator-data" *ngIf="latestSimulatorData !== undefined">
+      <p><strong>Current status:</strong> {{ latestSimulatorData ? 'Online' : 'Offline' }}</p>
+    </div>
   </div>
 
   <div class="household-right">
@@ -33,10 +37,12 @@
     </div>
 
     <div class="availability-data" *ngIf="onlinePercentage !== undefined">
-      <p><strong>Online Duration:</strong> {{ onlineDuration }} seconds</p>
-      <p><strong>Offline Duration:</strong> {{ offlineDuration }} seconds</p>
+      <p><strong>Online Duration:</strong> {{ formatDuration(onlineDuration) }}</p>
+      <p><strong>Offline Duration:</strong> {{ formatDuration(offlineDuration) }}</p>
       <p><strong>Online Percentage:</strong> {{ onlinePercentage | number:'1.2-2' }}%</p>
       <p><strong>Offline Percentage:</strong> {{ offlinePercentage | number:'1.2-2' }}%</p>
+      <br>
+      <p><strong>Note:</strong> The conversion from seconds to hours, days and months is approximate and could be wrong by a small percentage. </p>
     </div>
 
     <div class="graph-container" *ngIf="chartData.labels != undefined && chartData.labels.length > 0">

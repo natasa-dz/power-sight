@@ -358,6 +358,10 @@ public class HouseholdService {
         return aggregatedData;
     }
 
+    public boolean getCurrentStatus(String name) {
+        return influxService.getLatestAvailability(name);
+    }
+
     public String parseTimeRange(String timeRange) {
         return switch (timeRange.toLowerCase()) {
             case "3" -> "3h";

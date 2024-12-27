@@ -95,6 +95,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers("/employee/search").permitAll()
+                .requestMatchers("/employee/search?username").permitAll()
                 .requestMatchers("ownership-requests/**").permitAll()
                 .requestMatchers("ownership-requests/requestOwnership").permitAll()
                 .requestMatchers("ownership-requests/pending").permitAll()
@@ -123,6 +125,11 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/household/search-no-owner/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/availability/{name}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/graph/{name}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/{city}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/graph/{city}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/municipalities").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/cities").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/current/{name}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
@@ -172,7 +179,14 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
-                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/", 
+                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
+                        "/consumption/{city}/{timeRange}", "/consumption/municipalities", "/consumption/graph/{city}/{timeRange}",
+                        "/consumption/cities",
+                        "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
+                        "appointments/available-slots/", "employee/find-by-user-id/",
+                        "appointments/get-employees-appointments-for-date/", "employee/all-employees",
+                        "household/current/");
+                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
                         "/socket/info/", "/socket/", "/employee/search/", "employee/find-by-id/",
                 "/employee/all-employees-no-pagination",
 

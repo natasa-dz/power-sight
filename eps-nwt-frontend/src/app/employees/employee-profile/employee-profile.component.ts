@@ -10,6 +10,7 @@ import {WebSocketService} from "../../service/websocket.service";
 import {EmployeeService} from "../employee.service";
 import {Page} from "../../model/page.model";
 import {EmployeeSearchDto} from "../../model/employee-search-dto.model";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-employee-profile',
@@ -32,7 +33,8 @@ export class EmployeeProfileComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private employeeService: EmployeeService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -66,13 +68,21 @@ export class EmployeeProfileComponent implements OnInit {
       .subscribe(
         (result: Boolean) => {
           if(result) {
-            alert("Employee suspended successfuly!")
+            this.showSnackbar("Employee suspended successfuly!")
           }
         },
         (error: any) => {
-          alert("Error suspending employee.");
+          this.showSnackbar("Error suspending employee.");
           console.error(error);
         }
       );
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

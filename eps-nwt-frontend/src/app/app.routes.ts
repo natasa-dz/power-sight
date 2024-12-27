@@ -24,6 +24,7 @@ import {HouseholdRequestComponent} from "./requests-module/household-request/hou
 import {
   OwnerHouseholdRequestsComponent
 } from "./requests-module/owner-household-requests/owner-household-requests.component";
+import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
 import {RequestAppointmentComponent} from "./requests-module/request-appointment/request-appointment.component";
 import {HouseholdConsumptionComponent} from "./requests-module/household-consumption/household-consumption.component";
 
@@ -52,6 +53,7 @@ export const routes: Routes = [
   { path: 'register-employee', component: RegisterEmployeeComponent },
   { path: 'employee-calendar', component: EmployeeCalendarComponent },
   { path: 'main', component: MainComponent },
+  { path: 'admin/city-consumption', component: CityConsumptionComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
 

@@ -50,6 +50,9 @@ public class AppointmentController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam(defaultValue = "1") int timeSlotCount) {
         try {
+            if (startTime.isBefore(LocalDateTime.now())) {
+                return ResponseEntity.status(400).body("Appointment cannot be booked in the past.");
+            }
             boolean success = appointmentService.tryBookAppointment(employeeId, userId, startTime, timeSlotCount);
             if (success) {
                 return ResponseEntity.ok("Appointment booked successfully!");
