@@ -6,6 +6,7 @@ import {FormsModule} from "@angular/forms";
 import {NgFor, NgIf} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {BaseModule} from "../../base/base.module";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-search-household',
@@ -28,11 +29,12 @@ export class SearchHouseholdComponent {
   page: Page<HouseholdSearchDTO> = { content: [], totalPages: 0, totalElements: 0, size: 0, number: 0 };
   currentPage: number = 0;
 
-  constructor(private householdService: HouseholdService) {}
+  constructor(private householdService: HouseholdService,
+              private snackBar: MatSnackBar) {}
 
   search(): void {
     if (!this.municipality || !this.address) {
-      alert("Please enter both municipality and address.");
+      this.showSnackbar("Please enter both municipality and address.");
       return;
     }
     this.householdService.search(this.municipality, this.address, this.apartmentNumber, this.currentPage)
@@ -42,7 +44,7 @@ export class SearchHouseholdComponent {
           console.log(result)
         },
         error => {
-          alert("Error fetching households.");
+          this.showSnackbar("Error fetching households.");
           console.error(error);
         }
       );
@@ -51,5 +53,13 @@ export class SearchHouseholdComponent {
   goToPage(pageNumber: number): void {
     this.currentPage = pageNumber;
     this.search();
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }

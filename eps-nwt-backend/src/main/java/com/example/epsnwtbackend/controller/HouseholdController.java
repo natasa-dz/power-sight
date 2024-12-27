@@ -97,6 +97,13 @@ public class HouseholdController {
         return ResponseEntity.ok(data);
     }
 
+    @GetMapping(value = "/current/{name}")
+    public ResponseEntity<Boolean> getCurrentStatus(
+            @PathVariable String name) {
+        boolean isOnline = householdService.getCurrentStatus(name);
+        return ResponseEntity.ok(isOnline);
+    }
+
     @GetMapping(value = "/availability/{name}/{timeRange}")
     public ResponseEntity<?> getAvailability(
             @PathVariable String name, @PathVariable String timeRange) {
@@ -248,6 +255,29 @@ public class HouseholdController {
         }
         LocalDate[] dateRange = parseDateRange(timeRange);
         return (dateRange[1].toEpochDay() - dateRange[0].toEpochDay()) * secondsInDay;
+    }
+
+    @GetMapping(path = "/getForOwner/{ownerId}")
+    public ResponseEntity<List<HouseholdAccessDTO>> getForOwner(@PathVariable Long ownerId) {
+        try {
+
+            List<HouseholdAccessDTO> households = householdService.getHouseholdsForOwner(ownerId);
+            return ResponseEntity.ok(households);
+        } catch (NoResourceFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @PutMapping(path = "/allow-access/{householdId}")
+    public ResponseEntity<String> allowAccess(@PathVariable Long householdId,
+                                              @RequestBody List<Long> ids) {
+        try {
+            householdService.allowAccess(householdId, ids);
+            return ResponseEntity.ok("Successfully allowed access.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 }

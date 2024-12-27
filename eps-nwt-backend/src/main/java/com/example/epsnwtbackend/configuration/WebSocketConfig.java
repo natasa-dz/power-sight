@@ -1,7 +1,9 @@
 package com.example.epsnwtbackend.configuration;
 
 import com.example.epsnwtbackend.dto.AggregatedAvailabilityData;
+import com.example.epsnwtbackend.service.ConsumptionService;
 import com.example.epsnwtbackend.service.HouseholdService;
+import com.example.epsnwtbackend.service.InfluxService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 
     @Autowired private HouseholdService householdService;
+    @Autowired
+    private ConsumptionService consumptionService;
+    @Autowired
+    private InfluxService influxService;
     @Autowired @Lazy
     private SimpMessagingTemplate template;
     private final ObjectMapper mapper = new ObjectMapper();
@@ -52,6 +58,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             Map<String, Object> message = Map.of("data", data);
             template.convertAndSend(
                     "/data/graph/" + simulatorId,
+                    message
+            );
+        }
+    }
+
+    @Scheduled(fixedRate = 3000, initialDelay = 1000)
+    public void streamConsumptionData() throws JsonProcessingException {
+        for (String city : influxService.getExistingCities()) {
+            Map<String, Double> message = consumptionService.getGraphConsumptionData(city, "1");
+            System.out.println(message);
+            template.convertAndSend(
+                    "/data/graph/" + city,
                     message
             );
         }

@@ -6,6 +6,7 @@ import {UserService} from "../../service/user.service";
 import {NgxImageCompressService} from "ngx-image-compress";
 import {Role} from "../../model/user.model";
 import {BaseModule} from "../../base/base.module";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-register-employee',
@@ -33,6 +34,7 @@ export class RegisterEmployeeComponent {
     private router: Router,
     private imageCompress: NgxImageCompressService,
     private route:ActivatedRoute,
+    private snackBar: MatSnackBar
   ) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
@@ -86,7 +88,7 @@ export class RegisterEmployeeComponent {
       console.log(formData)
       this.userService.registerUser(formData).subscribe({
         next: (response) => {
-          alert('Employee is registered!');
+          this.showSnackbar('Employee is registered!');
           this.registerForm.reset();
           this.selectedFile = null;
           this.profilePic = null;
@@ -95,7 +97,15 @@ export class RegisterEmployeeComponent {
         }
       });
     } else {
-      alert('Please fill out all required fields with valid information.');
+      this.showSnackbar('Please fill out all required fields with valid information.');
     }
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom'
+    });
   }
 }
