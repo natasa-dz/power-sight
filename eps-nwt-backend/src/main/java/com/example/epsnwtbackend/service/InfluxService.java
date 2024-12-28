@@ -214,6 +214,8 @@ public class InfluxService {
                         "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
                         "|> filter(fn: (r) => r[\"Id\"] == \"simulator-%s\")" +
                         "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> group(columns: [\"id\"]) " +
+                        "|> sum()" +
                         "|> yield(name: \"consumption_value\")",
                 this.consumptionBucket, start, end, "simulators", householdId);
 

@@ -140,11 +140,11 @@ public class EmailService {
             <body>
                 <p>Dear User,</p>
                 <br/>
-                <p>Thank you for your continued trust in Electro Power. Please find attached the receipt for your energy usage for the month of <strong>" + month + " " + year + "</strong>.</p>
+                <p>Thank you for your continued trust in Electro Power. Please find attached the receipt for your energy usage for the month of <strong>%s %s</strong>.</p>
                 <p><strong>Details:</strong></p>
                 <ul>
-                    <li>Month: " + month + "</li>
-                    <li>Year: " + year + "</li>
+                    <li>Month: %s</li>
+                    <li>Year: %s</li>
                 </ul>
                 <br/>
                 <p>If you have any questions or need further assistance, please don’t hesitate to reach out to our support team.</p>
@@ -152,7 +152,7 @@ public class EmailService {
                 <p><strong>Warm Regards,</strong><br/><em>Electro Power Support Team</em></p>
             </body>
             </html>
-            """;
+            """.formatted(month, String.valueOf(year), month, String.valueOf(year));
 
         helper.setSubject("Electro Power - Reciept for " + month + " " + year + ".");
         helper.setText(emailContentApproved, true);

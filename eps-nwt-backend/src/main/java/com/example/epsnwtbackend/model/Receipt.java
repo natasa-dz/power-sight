@@ -26,6 +26,15 @@ public class Receipt {
     private Double price;
 
     @Column
+    private Double greenZoneConsumption;
+
+    @Column
+    private Double blueZoneConsumption;
+
+    @Column
+    private Double redZoneConsumption;
+
+    @Column
     private boolean isPaid;
 
     @Column

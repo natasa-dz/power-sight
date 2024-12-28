@@ -27,6 +27,7 @@ import {
 import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
 import {SearchCitizensComponent} from "./citizens/search-citizens/search-citizens.component";
 import {AddPriceListComponent} from "./price-list/add-price-list/add-price-list.component";
+import {CreateReceiptsComponent} from "./price-list/create-receipts/create-receipts.component";
 
 export const routes: Routes = [
   { path: 'activate', component: ActivateComponent },  // Activation route
@@ -49,6 +50,7 @@ export const routes: Routes = [
   { path: 'admin/city-consumption', component: CityConsumptionComponent },
   { path: 'allow-household-access/search', component: SearchCitizensComponent },
   { path: 'add-price-list', component: AddPriceListComponent },
+  { path: 'generate-receipts', component: CreateReceiptsComponent },
   { path: 'main', component: MainComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths

@@ -13,16 +13,16 @@ public class ReceiptController {
     @Autowired private ReceiptService receiptService;
 
     @PostMapping("/create/{month}/{year}")
-    public ResponseEntity<Void> createForMonth(@PathVariable String month, @PathVariable int year) {
+    public ResponseEntity<String> createForMonth(@PathVariable String month, @PathVariable int year) {
         String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
         if (Arrays.stream(months).noneMatch(m -> m.equalsIgnoreCase(month))) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Month is not in correct format!");
         }
         try {
             receiptService.createReceipts(month, year);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("Success");
     }
 }
