@@ -1,7 +1,9 @@
 package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.*;
+import com.example.epsnwtbackend.model.AccessGranted;
 import com.example.epsnwtbackend.model.Household;
+import com.example.epsnwtbackend.repository.AccessGrantedRepository;
 import com.example.epsnwtbackend.repository.HouseholdRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,6 +35,9 @@ public class HouseholdService {
 
     @Autowired
     private InfluxService influxService;
+
+    @Autowired
+    private AccessGrantedRepository accessGrantedRepository;
 
     public ViewHouseholdDTO getHousehold(Long id) throws NoResourceFoundException {
         Optional<Household> reference = householdRepository.findById(id);
@@ -395,7 +400,7 @@ public class HouseholdService {
                 householdAccessDTO.setSquareFootage(household.getSquareFootage());
 
                 householdAccessDTO.setOwnerId(household.getOwner() == null ? null : household.getOwner().getId());
-                householdAccessDTO.setAccessGranted(household.getAccessGranted());
+                householdAccessDTO.setAccessGranted(accessGrantedRepository.findCitizenIdsByHouseholdId(household.getId()));
                 householdAccessDTO.setAddress(household.getRealEstate().getAddress());
                 householdAccessDTO.setTown(household.getRealEstate().getTown());
                 householdAccessDTO.setMunicipality(household.getRealEstate().getMunicipality());
@@ -409,7 +414,22 @@ public class HouseholdService {
 
     public void allowAccess(Long householdId, List<Long> ids) {
         Household household = householdRepository.getReferenceById(householdId);
-        household.setAccessGranted(ids);
-        householdRepository.save(household);
+        List<Long> existingIds = accessGrantedRepository.findCitizenIdsByHouseholdId(householdId);
+        List<Long> idsToDelete = existingIds.stream()
+                .filter(existingId -> !ids.contains(existingId))
+                .toList();
+        List<Long> idsToAdd = ids.stream()
+                .filter(id -> !existingIds.contains(id))
+                .toList();
+
+        for (Long idToDelete : idsToDelete) {
+            accessGrantedRepository.deleteByHouseholdIdAndCitizenId(householdId, idToDelete);
+        }
+        for (Long id : idsToAdd) {
+            AccessGranted accessGranted = new AccessGranted();
+            accessGranted.setHousehold(household);
+            accessGranted.setCitizenId(id);
+            accessGrantedRepository.save(accessGranted);
+        }
     }
 }

@@ -14,4 +14,7 @@ public interface CitizenRepository extends JpaRepository<Citizen, Long> {
             "FROM Citizen c " +
             "WHERE LOWER(c.user.username) LIKE LOWER(CONCAT(:username, '%'))")
     Page<CitizenSearchDTO> findAllWithUsername(@Param("username") String username, Pageable pageable);
+
+    @Query("SELECT c FROM Citizen c WHERE c.user.id = :userId")
+    Citizen findByUserId(@Param("userId") Long userId);
 }

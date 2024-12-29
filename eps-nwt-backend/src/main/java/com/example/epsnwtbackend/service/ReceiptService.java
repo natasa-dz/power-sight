@@ -1,9 +1,12 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.dto.PaymentSlipDTO;
+import com.example.epsnwtbackend.dto.ReceiptDTO;
 import com.example.epsnwtbackend.model.CreatedReceipts;
 import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.model.PriceList;
 import com.example.epsnwtbackend.model.Receipt;
+import com.example.epsnwtbackend.repository.CitizenRepository;
 import com.example.epsnwtbackend.repository.CreatedReceiptsRepository;
 import com.example.epsnwtbackend.repository.ReceiptRepository;
 import com.example.epsnwtbackend.utils.QRCodeGenerator;
@@ -27,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +38,7 @@ import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -50,20 +55,45 @@ public class ReceiptService {
     @Autowired
     private CreatedReceiptsRepository createdReceiptsRepository;
 
-    @Autowired EmailService emailService;
+    @Autowired
+    private EmailService emailService;
 
-    @Autowired private HouseholdService householdService;
+    @Autowired
+    private HouseholdService householdService;
 
-    @Autowired private PriceListService priceListService;
+    @Autowired
+    private PriceListService priceListService;
 
-    @Autowired private InfluxService influxService;
+    @Autowired
+    private InfluxService influxService;
 
-    public Receipt getReceipt(Long receiptId) {
-        return receiptRepository.getReferenceById(receiptId);
+    @Autowired
+    private CitizenRepository citizenRepository;
+
+
+
+    public ReceiptDTO getReceipt(Long receiptId) {
+        return ReceiptDTO.toDTO(receiptRepository.getReferenceById(receiptId));
     }
 
-    public List<Receipt> getAllReceiptsForOwner(Long ownerId) {
-        return receiptRepository.getAllByHousehold_Owner_Id(ownerId);
+    public List<ReceiptDTO> getAllReceiptsForOwner(Long ownerId) {
+        List<Receipt> result = new ArrayList<>();
+        List<ReceiptDTO> receipts = new ArrayList<>();
+        result.addAll(receiptRepository.getAllByHousehold_Owner_Id(ownerId));
+        result.addAll(receiptRepository.getAllByHousehold_AccessGranted_CitizenId(citizenRepository.findByUserId(ownerId).getId()));
+        for(Receipt receipt : result){
+            receipts.add(ReceiptDTO.toDTO(receipt));
+        }
+        return receipts;
+    }
+
+    public List<ReceiptDTO> getAllReceiptsForHousehold(Long householdId) {
+        List<ReceiptDTO> receipts = new ArrayList<>();
+        List<Receipt> result = receiptRepository.getAllByHousehold_Id(householdId);
+        for(Receipt receipt : result){
+            receipts.add(ReceiptDTO.toDTO(receipt));
+        }
+        return receipts;
     }
 
     public void createReceipts(String month, int year) throws Exception {
@@ -122,6 +152,9 @@ public class ReceiptService {
             receipt.setPriceList(current);
             Double price = calculatePrice(current, household.getId(), monthNum, year, receipt);
             receipt.setPrice(price);
+            receipt.setMonth(month);
+            receipt.setYear(year);
+            receipt.setPaymentDate(null);
             receiptRepository.save(receipt);
 
             //create pdf
@@ -292,6 +325,100 @@ public class ReceiptService {
         separator.setMarginBottom(10);
         document.add(separator);
         Paragraph footer = new Paragraph("Thank you for your payment.")
+                .setFontSize(10)
+                .setTextAlignment(TextAlignment.CENTER);
+        document.add(footer);
+
+        // Finalize document
+        document.close();
+
+        return byteArrayOutputStream.toByteArray(); // Return PDF as byte array
+    }
+
+    public void payment(Long receiptId, PaymentSlipDTO paymentSlip) throws Exception {
+        Receipt receipt = receiptRepository.getReferenceById(receiptId);
+        if (receipt != null ){
+            receipt.setPaid(true);
+            receipt.setPaymentDate(new Date());
+            receiptRepository.save(receipt);
+            byte[] pdf = generatePaymentSlipPDF(paymentSlip);
+            String path = "src/main/resources/data/paymentSlips";
+            Path folder = Paths.get(path);
+            try {
+                Files.createDirectories(folder);
+                String fileName = receipt.getMonth() + "_" + receipt.getYear() + ".pdf";
+                Path filePath = folder.resolve(fileName);
+                Files.write(filePath, pdf);
+            } catch (IOException e) {
+                throw new RuntimeException("File upload failed for receipt: " + receiptId, e);
+            }
+            emailService.sendPaymentSlip(receipt.getHousehold().getOwner().getUsername(), pdf, receipt);
+        }
+        else{
+            throw new Exception("Receipt not found");
+        }
+    }
+
+    public static byte[] generatePaymentSlipPDF(PaymentSlipDTO paymentSlip) throws Exception {
+        // Prepare PDF
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(byteArrayOutputStream);
+        PdfDocument pdf = new PdfDocument(writer);
+        Document document = new Document(pdf, PageSize.A4);
+        document.setMargins(20, 20, 20, 20);
+
+        // Header Section
+        Paragraph header = new Paragraph("Payment Slip")
+                .setFontSize(20)
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER);
+        document.add(header);
+
+        document.add(new Paragraph(" ")); // Spacer
+
+        // Customer and Recipient Information
+        Table infoTable = new Table(UnitValue.createPercentArray(new float[]{1, 2}));
+        infoTable.setWidth(UnitValue.createPercentValue(100));
+
+        infoTable.addCell(new Cell().add(new Paragraph("Customer:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getCustomerName() + ", " + paymentSlip.getCustomerAddress())));
+
+        infoTable.addCell(new Cell().add(new Paragraph("Recipient:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getRecipientName())));
+
+        infoTable.addCell(new Cell().add(new Paragraph("Purpose:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getPurpose())));
+
+        infoTable.addCell(new Cell().add(new Paragraph("Recipient Account:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getRecipientAccount())));
+
+        document.add(infoTable);
+
+        document.add(new Paragraph(" ")); // Spacer
+
+        // Payment Details
+        Table paymentTable = new Table(UnitValue.createPercentArray(new float[]{1, 2}));
+        paymentTable.setWidth(UnitValue.createPercentValue(100));
+
+        paymentTable.addCell(new Cell().add(new Paragraph("Model:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph(String.valueOf(paymentSlip.getModel()))));
+
+        paymentTable.addCell(new Cell().add(new Paragraph("Reference Number:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph(paymentSlip.getReferenceNumber())));
+
+        paymentTable.addCell(new Cell().add(new Paragraph("Amount:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        BigDecimal roundedAmount = BigDecimal.valueOf(paymentSlip.getAmount()).setScale(2, RoundingMode.HALF_UP);
+        paymentTable.addCell(new Cell().add(new Paragraph(roundedAmount + " RSD")));
+
+        paymentTable.addCell(new Cell().add(new Paragraph("Date:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph(String.valueOf(new Date()))));
+
+        document.add(paymentTable);
+
+        document.add(new Paragraph(" ")); // Spacer
+
+        // Footer Section
+        Paragraph footer = new Paragraph("This document is automatically generated.")
                 .setFontSize(10)
                 .setTextAlignment(TextAlignment.CENTER);
         document.add(footer);

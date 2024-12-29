@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+import java.util.Date;
+
 @Service
 public class EmailService {
 
@@ -162,4 +164,30 @@ public class EmailService {
         mailSender.send(message);
     }
 
+    public void sendPaymentSlip(String emailTo, byte[] pdf, Receipt receipt) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(emailTo);
+
+        String emailContentApproved = """
+                <html>
+            <body>
+                <p>Dear User,</p>
+                <br/>
+                <p>Thank you for your payment. Please find attached the payment slip for the payed receipt for the month of <strong>%s %s</strong>.</p>
+                <br/>
+                <p>If you have any questions or need further assistance, please don’t hesitate to reach out to our support team.</p>
+                <br/>
+                <p><strong>Warm Regards,</strong><br/><em>Electro Power Support Team</em></p>
+            </body>
+            </html>
+            """.formatted(receipt.getMonth(), String.valueOf(receipt.getYear()));
+
+        helper.setSubject("Electro Power - Payment Slip");
+        helper.setText(emailContentApproved, true);
+
+        helper.addAttachment("PaymentSlip_" + receipt.getMonth() + "_" + receipt.getYear() + ".pdf", new ByteArrayResource(pdf));
+
+        mailSender.send(message);
+    }
 }

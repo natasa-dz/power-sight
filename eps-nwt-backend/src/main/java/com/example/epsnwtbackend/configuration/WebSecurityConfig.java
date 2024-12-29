@@ -133,6 +133,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
                 .requestMatchers(HttpMethod.POST, "/price-list/create").permitAll()
                 .requestMatchers(HttpMethod.POST, "/receipts/create/{month}/{year}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/receipts/by-id/{receiptId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/receipts/all-for-household/{householdId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/receipts/all-for-owner/{ownerId}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/receipts/pay/{receiptId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/price-list/find-by-id/{id}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/price-list/find-all").permitAll()
                 .requestMatchers(HttpMethod.GET, "/price-list/find-for-date/{date}").permitAll()
@@ -177,6 +181,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
                 .requestMatchers(HttpMethod.PUT, "/employee/suspend/")
                 .requestMatchers(HttpMethod.PUT, "/household/allow-access/{householdId}")
+                .requestMatchers(HttpMethod.PUT, "/receipts/pay/{receiptId}")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/ownership-requests/**","/ownership-requests/requestOwnership", "/ownership-requests/pending",
@@ -192,7 +197,9 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "appointments/available-slots/", "employee/find-by-user-id/",
                         "appointments/get-employees-appointments-for-date/", "employee/all-employees",
                         "household/current/", "citizen/search", "household/getForOwner/{ownerId}",
-                        "price-list/find-all", "price-list/find-by-id/{id}", "price-list/find-for-date/{date}");
+                        "price-list/find-all", "price-list/find-by-id/{id}", "price-list/find-for-date/{date}",
+                        "/receipts/all-for-household/{householdId}", "/receipts/all-for-owner/{ownerId}",
+                        "/receipts/by-id/{receiptId}");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

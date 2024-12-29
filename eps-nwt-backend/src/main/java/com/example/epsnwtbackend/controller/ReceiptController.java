@@ -1,11 +1,16 @@
 package com.example.epsnwtbackend.controller;
 
+import com.example.epsnwtbackend.dto.PaymentSlipDTO;
+import com.example.epsnwtbackend.dto.ReceiptDTO;
+import com.example.epsnwtbackend.model.Receipt;
 import com.example.epsnwtbackend.service.ReceiptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/receipts")
@@ -24,5 +29,50 @@ public class ReceiptController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
         return ResponseEntity.ok().body("Success");
+    }
+
+    @GetMapping("/all-for-household/{householdId}")
+    public ResponseEntity<List<ReceiptDTO>> allReceiptsForHousehold(@PathVariable Long householdId){
+        try {
+            List<ReceiptDTO> receipts = receiptService.getAllReceiptsForHousehold(householdId);
+            return ResponseEntity.ok().body(receipts);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new ArrayList<>());
+        }
+    }
+
+    @GetMapping("/all-for-owner/{ownerId}")
+    public ResponseEntity<List<ReceiptDTO>> allReceiptsForOwner(@PathVariable Long ownerId){
+        try {
+            List<ReceiptDTO> receipts = receiptService.getAllReceiptsForOwner(ownerId);
+            return ResponseEntity.ok().body(receipts);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new ArrayList<>());
+        }
+    }
+
+    @GetMapping("/by-id/{receiptId}")
+    public ResponseEntity<ReceiptDTO> getReceiptById(@PathVariable Long receiptId){
+        try {
+            return ResponseEntity.ok().body(receiptService.getReceipt(receiptId));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
+
+    @PutMapping("/pay/{receiptId}")
+    public ResponseEntity<String> payReceipt(@PathVariable Long receiptId,
+                                             @RequestBody PaymentSlipDTO paymentSlip){
+        try {
+            receiptService.payment(receiptId, paymentSlip);
+            return ResponseEntity.ok().body("Success");
+        } catch (Exception e) {
+            if (e.getMessage().equals("Receipt not found")){
+                return ResponseEntity.notFound().build();
+            }
+            else{
+                return ResponseEntity.internalServerError().body(e.getMessage());
+            }
+        }
     }
 }

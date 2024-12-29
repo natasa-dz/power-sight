@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,5 +40,14 @@ public class Receipt {
     private boolean isPaid;
 
     @Column
+    private Date paymentDate;
+
+    @Column
     private String path;
+
+    @Column
+    private String month;
+
+    @Column
+    private int year;
 }

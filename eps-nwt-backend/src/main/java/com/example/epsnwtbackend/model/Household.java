@@ -41,6 +41,6 @@ public class Household {
     @JoinColumn(name = "user_id", nullable = true)
     private User owner;
 
-    @Column
-    private List<Long> accessGranted;
+    @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
+    private List<AccessGranted> accessGranted;
 }

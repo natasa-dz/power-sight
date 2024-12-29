@@ -5,24 +5,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "citizens", indexes = {
-        @Index(name = "index_username", columnList = "username")
-})
-public class Citizen {
+public class AccessGranted {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @ManyToOne
+    @JoinColumn(name = "household_id", nullable = false)
+    private Household household;
 
     @Column
-    private String username;
+    private Long citizenId;
 }
