@@ -67,4 +67,32 @@ public class ConsumptionController {
         return new ResponseEntity<>(influxService.getExistingCities(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/household/graph/{householdId}/{timeRange}")
+    public ResponseEntity<?> getHouseholdConsumption(@PathVariable Long householdId,@PathVariable String timeRange) {
+        LocalDateTime[] dateRange = null;
+        String duration = null;
+
+        try {
+            if (timeRange.contains("-")) {
+                dateRange = consumptionService.parseDateRange(timeRange);
+            } else {
+                duration = consumptionService.parseTimeRange(timeRange);
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        Double summary;
+        if (dateRange != null) {
+            summary = influxService.getHouseholdConsumptionByDateRange(householdId, dateRange[0], dateRange[1]);
+        } else {
+            summary = influxService.getHouseholdConsumptionByTimeRange(householdId, duration);
+        }
+        return new ResponseEntity<>(summary, HttpStatus.OK);
+    }
+    @GetMapping(value = "/household/{householdId}/{timeRange}")
+    public ResponseEntity<?> getGraphHouseholdConsumption(@PathVariable Long householdId,@PathVariable String timeRange){
+        return new ResponseEntity<>(this.consumptionService.getHouseholdConsumptionGraph(householdId, timeRange), HttpStatus.OK);
+    }
+
 }

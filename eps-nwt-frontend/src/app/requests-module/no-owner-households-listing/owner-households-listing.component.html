@@ -2,16 +2,6 @@
 
 <div class="whole-page">
   <h2>Households Without Owners</h2>
-<!--TODO: Dodaj search bar?-->
-<!--  <div class="search-form">-->
-<!--    <label>Municipality:</label>-->
-<!--    <input [(ngModel)]="municipality" type="text" required />-->
-<!--    <label>Address:</label>-->
-<!--    <input [(ngModel)]="address" type="text" required />-->
-<!--    <label>Apartment Number:</label>-->
-<!--    <input [(ngModel)]="apartmentNumber" type="number" min="0" />-->
-<!--    <button (click)="search()">Search</button>-->
-<!--  </div>-->
 
   <div class="result-part">
     <table class="households-table" *ngIf="page.content.length>0; else noData" >

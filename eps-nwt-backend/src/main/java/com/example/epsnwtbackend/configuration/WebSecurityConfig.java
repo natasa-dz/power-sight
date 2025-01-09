@@ -127,9 +127,13 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/household/graph/{name}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/{city}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/graph/{city}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/household/{householdId}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/household/graph/{householdId}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/municipalities").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/cities").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/current/{name}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/owner").permitAll()
+
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
@@ -181,12 +185,12 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
                         "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
                         "/consumption/{city}/{timeRange}", "/consumption/municipalities", "/consumption/graph/{city}/{timeRange}",
-                        "/consumption/cities",
+                        "/consumption/cities", "consumption/household/graph/{householdId}/{timeRange}", "consumption/household/{householdId}/{timeRange}",
                         "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
                         "appointments/available-slots/", "employee/find-by-user-id/",
                         "appointments/get-employees-appointments-for-date/", "employee/all-employees",
-                        "household/current/");
-                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
+                        "household/current/", "household/owner",
+                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}",
                         "/socket/info/", "/socket/", "/employee/search/", "employee/find-by-id/",
                 "/employee/all-employees-no-pagination",
 

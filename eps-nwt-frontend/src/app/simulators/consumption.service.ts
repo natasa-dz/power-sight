@@ -16,10 +16,18 @@ export class ConsumptionService {
   }
 
   getConsumption(city: string, timeRange: string): Observable<number> {
-    return this.http.get<number>(`${this.apiUrl}/${city}/${timeRange}`);
+    return this.http.get<number> (`${this.apiUrl}/${city}/${timeRange}`);
   }
 
   getGraphData(name: string, timeRange: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/graph/${name}/${timeRange}`);
+  }
+
+  getHouseholdConsumption(householdId: number, timeRange: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/household/${householdId}/${timeRange}`);
+  }
+
+  getGraphHouseholdConsumption(householdId:number, timeRange: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/household/graph/${householdId}/${timeRange}`);
   }
 }

@@ -69,6 +69,23 @@ public class HouseholdController {
     }
 
 
+    @GetMapping(path = "/owner")
+    public ResponseEntity<Page<HouseholdDto>> getOwnerHouseholds(Pageable pageable, @RequestParam Long ownerId) {
+        Page<Household> households = householdService.ownerHouseholds(pageable, ownerId);
+
+        Page<HouseholdDto> householdDTOs = households.map(household -> new HouseholdDto(
+                household.getId(),
+                household.getFloor(),
+                household.getSquareFootage(),
+                household.getApartmentNumber(),
+                household.getRealEstate().getId()
+        ));
+
+        return ResponseEntity.ok(householdDTOs);
+    }
+
+
+
     @GetMapping(path = "/search-no-owner/{municipality}/{address}")
     public ResponseEntity<Page<HouseholdSearchDTO>> searchNoOwner(
             @PathVariable String municipality, @PathVariable String address,

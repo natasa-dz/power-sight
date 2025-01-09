@@ -35,7 +35,7 @@ public class OwnershipRequestService {
     @Autowired
     private UserRepository userRepository;
 
-    private final String baseDirectory = "resources/data/requests/ownership";
+    private final String baseDirectory = "src/main/resources/data/requests/house";
 
     public String storeFiles(Long requestId, List<MultipartFile> files) {
         String folderPath = baseDirectory + requestId;

@@ -25,6 +25,15 @@ export class HouseholdService {
     return this.http.get<Page<HouseholdDto>>(url, {params});
   }
 
+  getOwnerHouseholds(ownerId: number, page: number, size: number): Observable<Page<HouseholdDto>> {
+    const params = new HttpParams()
+      .set('ownerId', ownerId.toString())
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<Page<HouseholdDto>>(`${this.apiUrl}/owner`, { params });
+  }
+
+
   createOwnershipRequest(formData: FormData): Observable<any> {
     const url =`${this.apiUrl}/no-owner`;
     return this.http.post(url, formData);

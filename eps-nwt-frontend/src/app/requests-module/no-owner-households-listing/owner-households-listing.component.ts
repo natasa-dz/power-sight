@@ -57,8 +57,12 @@ export class OwnerHouseholdsListingComponent implements OnInit {
   }
 
   onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadHouseholds();
+    if (page < 0 || page >= this.page.totalPages) {
+      return;
+    }
+    this.currentPage = page + 1; // Update the 1-based `currentPage` for UI
+    this.page.number = page; // Keep `page.number` updated for 0-based index
+    this.loadHouseholds(); // Fetch data for the new page
   }
 
   onHouseholdClick(household: HouseholdDto): void {
