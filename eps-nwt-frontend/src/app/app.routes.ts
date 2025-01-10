@@ -33,9 +33,11 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'real-estate-registration', component: RealEstateRequestComponent },
+
   { path: 'real-estate-requests/:ownerId/all', component: OwnerRequestListingComponent },
   { path: 'real-estate-requests/admin/requests', component: AdminRequestListingComponent },
   { path: 'real-estate-requests/admin/:requestId', component: RequestViewAdminComponent },
+
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
   { path: 'request-appointment', component: RequestAppointmentComponent },
@@ -44,7 +46,6 @@ export const routes: Routes = [
   { path: 'manage-household-requests', component: AdminHouseholdRequestsComponent},
   { path: 'household-no-owner', component: OwnerHouseholdsListingComponent},
   { path: 'household-ownership-request/:householdId', component: HouseholdRequestComponent},
-
   { path: 'my-household-ownership-requests', component: OwnerHouseholdRequestsComponent},
 
 
