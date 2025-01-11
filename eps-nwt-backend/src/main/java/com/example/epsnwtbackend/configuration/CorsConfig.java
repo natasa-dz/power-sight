@@ -20,7 +20,7 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        //config.setAllowedOrigins(List.of("http://localhost:4200")); //angular
+        config.setAllowedOrigins(List.of("http://localhost:4200")); //angular
         config.setAllowedOrigins(List.of("http://localhost")); // nginx
 
         config.addAllowedMethod("*");

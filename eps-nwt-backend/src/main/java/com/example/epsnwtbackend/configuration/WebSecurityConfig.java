@@ -33,7 +33,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                //.allowedOrigins("http://localhost:4200") ---> angular app
+                .allowedOrigins("http://localhost:4200") //angular app
                 .allowedOrigins("http://localhost") // nginx
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*");
