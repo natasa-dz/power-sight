@@ -109,7 +109,6 @@ public class UserController {
         Optional<UserCredentials> credentials = userDetailsService.register(dto);
 
         if (credentials.isPresent()){
-            System.out.println("Usao u credentialsPresent!!!");
 
             tokenService.generateToken(dto.getUsername(), dto.getRole(), dto.getId());
 
@@ -184,7 +183,12 @@ public class UserController {
                     employeeService.saveEmployee(employee);
                 }
 
-                String activationLink = "http://localhost:4200/activate?token=" + activationToken;
+                // angular
+                //String activationLink = "http://localhost:4200/activate?token=" + activationToken;
+
+                //nginx
+                String activationLink = "http://localhost/nwt-eps-frontend/activate?token=" + activationToken;
+
                 emailService.sendActivationEmail(dto.getUsername(), activationLink);
 
                 return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
