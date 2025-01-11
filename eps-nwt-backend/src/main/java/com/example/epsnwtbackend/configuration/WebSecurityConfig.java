@@ -33,7 +33,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200")
+                //.allowedOrigins("http://localhost:4200") ---> angular app
+                .allowedOrigins("http://localhost") // nginx
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*");
     }
@@ -102,8 +103,6 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("ownership-requests/pending").permitAll()
                 .requestMatchers("ownership-requests/{userId}").permitAll()
                 .requestMatchers("ownership-requests/process/{id}").permitAll()
-
-
 
                 .requestMatchers("/employee/search/{username}").permitAll()
                 .requestMatchers("/employee/all-employees").permitAll()
