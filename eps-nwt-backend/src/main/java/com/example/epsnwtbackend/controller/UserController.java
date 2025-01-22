@@ -187,7 +187,11 @@ public ResponseEntity<UserCredentials> registerUser(
 
             // Send activation email
             // Adjust the activation link based on your frontend setup
-            String activationLink = "http://localhost/nwt-eps-frontend/activate?token=" + activationToken;
+            // TODO: change the activation link based on ur needs!
+            //angular
+            String activationLink = "http://localhost:4200/activate?token=" + activationToken;
+            // nginx
+            //String activationLink = "http://localhost/nwt-eps-frontend/activate?token=" + activationToken;
             emailService.sendActivationEmail(dto.getUsername(), activationLink);
 
             return ResponseEntity.status(HttpStatus.OK).body(credentials.get());

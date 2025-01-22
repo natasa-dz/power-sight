@@ -8,11 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -83,8 +88,6 @@ public class HouseholdController {
 
         return ResponseEntity.ok(householdDTOs);
     }
-
-
 
     @GetMapping(path = "/search-no-owner/{municipality}/{address}")
     public ResponseEntity<Page<HouseholdSearchDTO>> searchNoOwner(
@@ -264,6 +267,39 @@ public class HouseholdController {
         }
         LocalDate[] dateRange = parseDateRange(timeRange);
         return (dateRange[1].toEpochDay() - dateRange[0].toEpochDay()) * secondsInDay;
+    }
+
+    //todo: dodaj putanju u webConfig i izmeni front!!!!
+    @PostMapping(value = "/docs")
+    public ResponseEntity<byte[]> getDocsByHouseholdId(@RequestBody Long householdId) {
+
+        try {
+            Path path = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId).normalize();
+            System.out.println("Fetching householdOwnershipReq at path: " + path);            // Ensure the file exists and is a regular file
+            if (!Files.exists(path) || !Files.isRegularFile(path)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            // Read the file bytes
+            byte[] fileBytes = Files.readAllBytes(path);
+
+            // Determine the file's content type
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) {
+                // Fallback for unknown MIME types
+                contentType = "application/octet-stream";
+            }
+
+            // Return the file bytes with the appropriate content type
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header("Content-Disposition", "inline; filename=\"" + path.getFileName().toString() + "\"") // Suggest inline display
+                    .body(fileBytes);
+
+        } catch (IOException e) {
+            // Handle IO exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

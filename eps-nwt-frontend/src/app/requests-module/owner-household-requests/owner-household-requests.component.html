@@ -16,12 +16,14 @@
     <p><b>Submitted At:</b> {{ request.submittedAt | date: 'medium' }}</p>
     <p><b>Updated At:</b> {{ request.updatedAt | date: 'medium' }}</p>
   </div>
-
+<!--TODO: IZMENI DOCUMENTATION FETCH!-->
   <div *ngIf="request.documentationPath" class="attached-files">
     <h4>Attached Files:</h4>
     <ul>
       <li>
-        <a [href]="'/api/files/' + request.documentationPath" target="_blank">View Files</a>
+        <button class="doc-btn" (click)="downloadDocument(request.householdId)">
+        Download Document for Household #{{ request.householdId }}
+    </button>
       </li>
     </ul>
   </div>

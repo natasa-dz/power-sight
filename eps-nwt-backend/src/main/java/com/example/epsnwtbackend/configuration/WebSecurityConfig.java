@@ -131,6 +131,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/consumption/cities").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/current/{name}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/owner").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/docs").permitAll()
 
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
@@ -177,8 +178,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/**.html", "/**.css", "/**.js",
                         "/ownership-requests/**","/ownership-requests/requestOwnership", "/ownership-requests/pending",
                         "/ownership-requests/process/{id}", "/ownership-requests/{userId}",
-
-                        "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
+                        "/household/docs", "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
                         "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
