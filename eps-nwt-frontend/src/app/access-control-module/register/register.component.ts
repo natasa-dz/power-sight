@@ -35,16 +35,6 @@ export class RegisterComponent {
     });
   }
 
-  // ngOnInit(): void {
-  //   // Check for the activation token in the URL on component initialization
-  //   this.route.queryParams.subscribe(params => {
-  //     const token = params['token'];
-  //     if (token) {
-  //       this.activateAccount(token);
-  //     }
-  //   });
-  // }
-
   base64ToFile(base64String: string, fileName: string): File {
     const arr = base64String.split(',');
     const mime = arr[0].match(/:(.*?);/)![1];

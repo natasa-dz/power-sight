@@ -134,74 +134,74 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
+//optimized register, store pics by ID and not by username
+@PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+public ResponseEntity<UserCredentials> registerUser(
+        @RequestParam("username") String username,
+        @RequestParam("password") String password,
+        @RequestParam("role") String role,
+        @RequestParam("userPhoto") MultipartFile userPhoto,
+        @RequestParam(value = "userData", required = false) String userDataJson) {
 
-    @PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserCredentials> registerUser(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            @RequestParam("role") String role,
-            @RequestParam("userPhoto") MultipartFile userPhoto,
-            @RequestParam(value = "userData", required = false) String userDataJson) {
+    try {
+        // Register user credentials
+        UserDto dto = new UserDto(username, password, Role.valueOf(role), false, true, ""); // Assume 'false' for isActive
+        Optional<UserCredentials> credentials = userDetailsService.register(dto);
 
-        try {
-            String uploadDir = "src/main/resources/pictures/";  // Directory to store user photos
+        if (credentials.isPresent()) {
+            User user = userService.findWholeUser(dto.getUsername());
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+
+            // Generate and save activation token
+            String activationToken = UUID.randomUUID().toString();
+            userService.saveActivationToken(dto.getUsername(), activationToken); // Save token and set user as inactive
+
+            // Save the photo using the user ID
+            String uploadDir = "src/main/resources/pictures/";
             File uploadDirectory = new File(uploadDir);
             if (!uploadDirectory.exists()) {
                 uploadDirectory.mkdir();
             }
 
-            UserDto dto = new UserDto(username, password, Role.valueOf(role), false,true, ""); // Assume 'false' for isActive
-
-
-            String fileName = username + "_profile.jpg";
+            String fileName = "profile_" + user.getId() + ".jpg";
             Path filePath = Paths.get(uploadDir + fileName);
-            Files.write(filePath, userPhoto.getBytes());  // Save the photo to the file system
+            Files.write(filePath, userPhoto.getBytes()); // Save the photo to the file system
             dto.setUserPhoto(filePath.toString());
 
-            // Register user credentials
-            Optional<UserCredentials> credentials = userDetailsService.register(dto);
-
-            if (credentials.isPresent()) {
-                // Generate and save activation token
-                String activationToken = UUID.randomUUID().toString();
-                userService.saveActivationToken(dto.getUsername(), activationToken);  // Save token and set user as inactive
-
-                if (dto.getRole() == Role.EMPLOYEE) {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    System.out.println("userDataJson is " + userDataJson);
-                    System.out.println("userDataJson is " + dto.getId());
-                    if(userDataJson == null) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-                    }
-                    AdditionalDataUser userData = objectMapper.readValue(userDataJson, AdditionalDataUser.class);
-                    User user = userService.findWholeUser(dto.getUsername());
-                    Employee employee = new Employee();
-                    employee.setUser(user);
-                    employee.setName(userData.getName());
-                    employee.setSurname(userData.getSurname());
-                    employee.setSuspended(false);
-                    employeeService.saveEmployee(employee);
+            // Process additional data if the role is EMPLOYEE
+            if (dto.getRole() == Role.EMPLOYEE) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                if (userDataJson == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                 }
-
-                // angular
-                //String activationLink = "http://localhost:4200/activate?token=" + activationToken;
-
-                //nginx
-                String activationLink = "http://localhost/nwt-eps-frontend/activate?token=" + activationToken;
-
-                emailService.sendActivationEmail(dto.getUsername(), activationLink);
-
-                return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
+                AdditionalDataUser userData = objectMapper.readValue(userDataJson, AdditionalDataUser.class);
+                Employee employee = new Employee();
+                employee.setUser(user);
+                employee.setName(userData.getName());
+                employee.setSurname(userData.getSurname());
+                employee.setSuspended(false);
+                employeeService.saveEmployee(employee);
             }
 
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);  // Handle errors like file storage issues
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            // Send activation email
+            // Adjust the activation link based on your frontend setup
+            String activationLink = "http://localhost/nwt-eps-frontend/activate?token=" + activationToken;
+            emailService.sendActivationEmail(dto.getUsername(), activationLink);
+
+            return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // In case registration fails
+    } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Handle errors like file storage issues
+    } catch (MessagingException e) {
+        throw new RuntimeException(e);
     }
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // In case registration fails
+}
+
 
     @PreAuthorize("permitAll()")
     @GetMapping(path = "/{email}")
