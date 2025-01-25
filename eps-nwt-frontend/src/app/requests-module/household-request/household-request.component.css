@@ -92,3 +92,40 @@ textarea:focus {
 .btn:hover {
   background-color: #01579b;
 }
+
+
+.upload-section input[type="file"] {
+  display: none;
+}
+
+.upload-section label {
+  display: inline-block;
+  padding: 8px 18px;
+  font-weight: bold;
+  background-color: #0288d1;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-section label:hover {
+  background-color: #01579b;
+}
+
+/* Style for the remove button */
+.upload-section li button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-section li button:hover {
+  background-color: #b71c1c;
+}

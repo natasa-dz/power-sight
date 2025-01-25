@@ -12,9 +12,16 @@
 
       <div class="upload-section">
         <h3>Upload Supporting Documents</h3>
-        <input type="file" multiple (change)="onFileSelected($event)" />
+        <!-- Label as the "browse" button -->
+        <label for="fileUpload">Browse Files</label>
+        <input type="file" id="fileUpload" multiple (change)="onFileSelected($event)" />
+
+        <!-- List uploaded files -->
         <ul *ngIf="uploadedFiles.length">
-          <li *ngFor="let file of uploadedFiles">{{ file.name }}</li>
+          <li *ngFor="let file of uploadedFiles; let i = index">
+            {{ file.name }}
+            <button (click)="removeFile(i)">Remove</button>
+          </li>
         </ul>
       </div>
     </div>

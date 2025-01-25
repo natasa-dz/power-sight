@@ -269,35 +269,53 @@ public class HouseholdController {
         return (dateRange[1].toEpochDay() - dateRange[0].toEpochDay()) * secondsInDay;
     }
 
-    //todo: dodaj putanju u webConfig i izmeni front!!!!
-    @PostMapping(value = "/docs")
-    public ResponseEntity<byte[]> getDocsByHouseholdId(@RequestBody Long householdId) {
 
+    @GetMapping(value = "/docs/{householdId}")
+    public ResponseEntity<List<Map<String, String>>> getDocsByHouseholdId(@PathVariable Long householdId) {
         try {
-            Path path = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId).normalize();
-            System.out.println("Fetching householdOwnershipReq at path: " + path);            // Ensure the file exists and is a regular file
-            if (!Files.exists(path) || !Files.isRegularFile(path)) {
+            Path directoryPath = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId).normalize();
+
+            if (!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
-            // Read the file bytes
-            byte[] fileBytes = Files.readAllBytes(path);
+            List<Map<String, String>> fileList = new ArrayList<>();
+            Files.list(directoryPath).forEach(file -> {
+                try {
+                    Map<String, String> fileMetadata = new HashMap<>();
+                    fileMetadata.put("fileName", file.getFileName().toString());
+                    fileMetadata.put("contentType", Files.probeContentType(file));
+                    fileList.add(fileMetadata);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
-            // Determine the file's content type
-            String contentType = Files.probeContentType(path);
-            if (contentType == null) {
-                // Fallback for unknown MIME types
-                contentType = "application/octet-stream";
+            return ResponseEntity.ok(fileList);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping(value = "/docs/{householdId}/{fileName}")
+    public ResponseEntity<byte[]> getFile(@PathVariable Long householdId, @PathVariable String fileName) {
+        try {
+            Path filePath = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId, fileName).normalize();
+
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
 
-            // Return the file bytes with the appropriate content type
+            byte[] fileBytes = Files.readAllBytes(filePath);
+            String contentType = Files.probeContentType(filePath);
+
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header("Content-Disposition", "inline; filename=\"" + path.getFileName().toString() + "\"") // Suggest inline display
+                    .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
                     .body(fileBytes);
 
         } catch (IOException e) {
-            // Handle IO exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -11,6 +11,17 @@
     <p><b>Household ID:</b> {{ request.householdId }}</p>
   </div>
 
+  <div class="file-list">
+    <h4>Submitted Files</h4>
+    <button (click)="loadSubmittedFiles(request.id)">View Files</button>
+    <ul *ngIf="request.files">
+      <li *ngFor="let file of request.files">
+        {{ file.fileName }}
+        <button (click)="viewFile(request.householdId, file.fileName)">Open</button>
+      </li>
+    </ul>
+  </div>
+
   <label *ngIf="!request.approved" class="reason-label">
     Rejection Reason:
     <textarea [(ngModel)]="request.reason" placeholder="Provide reason for rejection"></textarea>
