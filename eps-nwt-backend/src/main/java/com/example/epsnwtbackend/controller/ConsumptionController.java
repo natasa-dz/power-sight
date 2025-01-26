@@ -67,7 +67,7 @@ public class ConsumptionController {
         return new ResponseEntity<>(influxService.getExistingCities(), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/household/graph/{householdId}/{timeRange}")
+    @GetMapping(value = "/household/{householdId}/{timeRange}")
     public ResponseEntity<?> getHouseholdConsumption(@PathVariable Long householdId,@PathVariable String timeRange) {
         LocalDateTime[] dateRange = null;
         String duration = null;
@@ -90,7 +90,7 @@ public class ConsumptionController {
         }
         return new ResponseEntity<>(summary, HttpStatus.OK);
     }
-    @GetMapping(value = "/household/{householdId}/{timeRange}")
+    @GetMapping(value = "/household/graph/{householdId}/{timeRange}")
     public ResponseEntity<?> getGraphHouseholdConsumption(@PathVariable Long householdId,@PathVariable String timeRange){
         return new ResponseEntity<>(this.consumptionService.getHouseholdConsumptionGraph(householdId, timeRange), HttpStatus.OK);
     }
