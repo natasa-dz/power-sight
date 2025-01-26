@@ -93,10 +93,8 @@ export class WebSocketService {
       // @ts-ignore
       this.client.subscribe('/data/household/graph/' + houseId, (messageOutput) => {
         const houseData = JSON.parse(messageOutput.body);
-        console.log("Print from connectHouse: ")
         console.log(houseData)
         console.log(houseId)
-        console.log("--------------------------------------")
         this.dataSubjectHouse.next(houseData);
       });
     }, (error) => {

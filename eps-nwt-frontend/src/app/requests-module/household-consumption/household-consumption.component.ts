@@ -226,17 +226,17 @@ export class HouseholdConsumptionComponent implements OnInit {
     }
 
     if (this.timeRange !== '1' && this.webSocketService.isConnectedHouse.get(this.selectedHouseholdId!)) {
-      console.log("Useo u disconnect")
+      console.log("Usao u disconnect")
       this.webSocketService.disconnectHouse(this.selectedHouseholdId!);
     }
 
     if (this.timeRange === '1') {
-      console.log("Useo u init")
+      console.log("Usao u init")
 
       this.initWebSocket(this.selectedHouseholdId!);
     }
     this.webSocketService.houseData$.subscribe(data => {
-      console.log("Useo u update")
+      console.log("Usao u update")
 
       this.updateChartSocket(data);
     });
@@ -251,23 +251,22 @@ export class HouseholdConsumptionComponent implements OnInit {
           }
           else{
             console.log("Data: ", data)
-            //this.total = Number(data.toFixed(4)).toString() + " kWh";
+            this.total = Number(data.toFixed(4)).toString() + " kWh";
 
-            let totalValue = 0; // Variable to hold the sum of all values
-
-            let formattedData: { [key: string]: string } = {};  // To store formatted values for each key
-
-            // Iterate through the keys of the data object
-            for (let key in data) {
-              let value = data[key];
-
-              // Format each value with 4 decimal places and append " kWh"
-              formattedData[key] = value === 0 ? "0.0000 kWh" : Number(value.toFixed(4)).toString() + " kWh";
-
-              // Add value to total if it's a valid number
-              totalValue += value;
-              this.total = totalValue.toString();
-            }
+            // let totalValue = 0; // Variable to hold the sum of all values
+            //
+            // let formattedData: { [key: string]: string } = {};  // To store formatted values for each key
+            //
+            // // Iterate through the keys of the data object
+            // for (let key in data) {
+            //   let value = data[key];
+            //
+            //   // Format each value with 4 decimal places and append " kWh"
+            //   formattedData[key] = value === 0 ? "0.0000 kWh" : Number(value.toFixed(4)).toString() + " kWh";
+            //
+            //   // Add value to total if it's a valid number
+            //   totalValue += value;
+            //   this.total = totalValue.toString();}
 
           }
           this.fetchGraphData(this.selectedHouseholdId!, queryParam);
