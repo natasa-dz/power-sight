@@ -168,6 +168,7 @@ public class RealEstateRequestService {
         household.setApartmentNumber(request.getApartmentNumber());
         household.setRealEstate(realEstate);
         //household.setOwner(owner);
+        household.setAccessGranted(new ArrayList<>());
         return household;
     }
 }

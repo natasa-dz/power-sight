@@ -1,10 +1,9 @@
 package com.example.epsnwtbackend.service;
 
-import com.example.epsnwtbackend.dto.AggregatedAvailabilityData;
-import com.example.epsnwtbackend.dto.AvailabilityData;
-import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
-import com.example.epsnwtbackend.dto.ViewHouseholdDTO;
+import com.example.epsnwtbackend.dto.*;
+import com.example.epsnwtbackend.model.AccessGranted;
 import com.example.epsnwtbackend.model.Household;
+import com.example.epsnwtbackend.repository.AccessGrantedRepository;
 import com.example.epsnwtbackend.repository.HouseholdRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,6 +36,9 @@ public class HouseholdService {
     @Autowired
     private InfluxService influxService;
 
+    @Autowired
+    private AccessGrantedRepository accessGrantedRepository;
+
     public ViewHouseholdDTO getHousehold(Long id) throws NoResourceFoundException {
         Optional<Household> reference = householdRepository.findById(id);
         if (reference.isPresent()) {
@@ -55,6 +57,10 @@ public class HouseholdService {
             return viewHouseholdDTO;
         }
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
+    }
+
+    public List<Household> getAll() {
+        return householdRepository.findAll();
     }
 
     public Page<HouseholdSearchDTO> searchNoOwner(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
@@ -384,5 +390,50 @@ public class HouseholdService {
         return householdRepository.findAll().stream()
                 .map(household -> household.getId().toString())
                 .collect(Collectors.toList());
+    }
+
+    public List<HouseholdAccessDTO> getHouseholdsForOwner(Long id) throws NoResourceFoundException {
+        List<Household> households = householdRepository.findForOwner(id);
+        List<HouseholdAccessDTO> dtos = new ArrayList<>();
+        if (!households.isEmpty()) {
+            for(Household household : households){
+                HouseholdAccessDTO householdAccessDTO = new HouseholdAccessDTO();
+                householdAccessDTO.setId(household.getId());
+                householdAccessDTO.setFloor(household.getFloor());
+                householdAccessDTO.setApartmentNumber(household.getApartmentNumber());
+                householdAccessDTO.setSquareFootage(household.getSquareFootage());
+
+                householdAccessDTO.setOwnerId(household.getOwner() == null ? null : household.getOwner().getId());
+                householdAccessDTO.setAccessGranted(accessGrantedRepository.findCitizenIdsByHouseholdId(household.getId()));
+                householdAccessDTO.setAddress(household.getRealEstate().getAddress());
+                householdAccessDTO.setTown(household.getRealEstate().getTown());
+                householdAccessDTO.setMunicipality(household.getRealEstate().getMunicipality());
+                dtos.add(householdAccessDTO);
+            }
+
+            return dtos;
+        }
+        throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
+    }
+
+    public void allowAccess(Long householdId, List<Long> ids) {
+        Household household = householdRepository.getReferenceById(householdId);
+        List<Long> existingIds = accessGrantedRepository.findCitizenIdsByHouseholdId(householdId);
+        List<Long> idsToDelete = existingIds.stream()
+                .filter(existingId -> !ids.contains(existingId))
+                .toList();
+        List<Long> idsToAdd = ids.stream()
+                .filter(id -> !existingIds.contains(id))
+                .toList();
+
+        for (Long idToDelete : idsToDelete) {
+            accessGrantedRepository.deleteByHouseholdIdAndCitizenId(householdId, idToDelete);
+        }
+        for (Long id : idsToAdd) {
+            AccessGranted accessGranted = new AccessGranted();
+            accessGranted.setHousehold(household);
+            accessGranted.setCitizenId(id);
+            accessGrantedRepository.save(accessGranted);
+        }
     }
 }

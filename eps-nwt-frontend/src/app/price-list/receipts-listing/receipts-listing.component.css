@@ -1,0 +1,135 @@
+.background {
+  background-color: #f0f4f8;
+  min-height: 84vh;
+  height: fit-content;
+  padding: 1rem 8rem 2rem 8rem;
+}
+
+.placeholder {
+  height: fit-content;
+  padding: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.h-background{
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h2{
+  color: #0d47a1;
+  margin: 15px 50px;
+  width: fit-content;
+  font-size: 30px;
+  font-stretch: extra-expanded;
+}
+
+app-owner-request-card {
+  background-color: transparent;
+  height: fit-content;
+}
+
+.card_div {
+  width: 50%;
+  height: fit-content;
+  max-height: min-content;
+  margin: 2px;
+}
+
+.sort-filter{
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.toggle-filters-btn{
+  width: fit-content;
+  height: fit-content;
+  padding: 0.60rem;
+  margin-top: 1rem;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: white;
+  color: #00796b;
+  transition: background-color 0.3s;
+}
+
+.sort{
+  flex: 1;
+  color: #00796b;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter{
+  flex: 4;
+  color: #00796b;
+  display: flex;
+  flex-direction: column;
+}
+
+.filer label, .sort label {
+  width: fit-content;
+}
+
+.dates, .address{
+  margin-top: 20px;
+}
+
+.dates label, .address label{
+  margin-right: 15px;
+}
+
+.dates input, .address input{
+  padding: 5px;
+  margin-top: 5px;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #00796b;
+}
+
+.dates input:focus, .address input:focus {
+  border-color: #37474f;
+  outline: none;
+}
+
+.filter-select, .sort select {
+  padding: 5px;
+  margin-top: 5px;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  color: #00796b;
+}
+
+.filter-select:focus, .sort select:focus {
+  border-color: #37474f;
+  outline: none;
+}
+
+.reset-btn {
+  width: 20%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  background-color: #0288d1;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.reset-btn:hover {
+  background-color: #01579b;
+}
+
+
+

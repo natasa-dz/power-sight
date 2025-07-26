@@ -200,6 +200,30 @@ public class InfluxService {
         return this.queryCityConsumption(fluxQuery);
     }
 
+    public Double getConsumptionByDateRange(Long householdId, LocalDateTime startDate, LocalDateTime endDate) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneOffset.UTC);
+
+        String start = startDate.format(formatter);
+        String end = endDate.plusDays(1).format(formatter);
+
+        String fluxQuery = String.format(
+                "from(bucket:\"%s\") " +
+                        "|> range(start: %s, stop: %s) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"%s\") " +
+                        "|> filter(fn: (r) => r[\"Id\"] == \"simulator-%s\")" +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> group(columns: [\"id\"]) " +
+                        "|> sum()" +
+                        "|> yield(name: \"consumption_value\")",
+                this.consumptionBucket, start, end, "simulators", householdId);
+
+        System.out.println(fluxQuery);
+
+        return this.queryCityConsumption(fluxQuery);
+    }
+
     private Double queryCityConsumption(String fluxQuery) {
         List<ConsumptionData> result = new ArrayList<>();
         QueryApi queryApi = this.influxDbClientConsumption.getQueryApi();
