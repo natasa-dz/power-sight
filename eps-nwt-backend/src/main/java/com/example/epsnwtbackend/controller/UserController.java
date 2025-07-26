@@ -5,6 +5,7 @@ import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
 import com.example.epsnwtbackend.model.*;
+import com.example.epsnwtbackend.service.CitizenService;
 import com.example.epsnwtbackend.service.EmailService;
 import com.example.epsnwtbackend.service.EmployeeService;
 import com.example.epsnwtbackend.service.UserService;
@@ -52,6 +53,9 @@ public class UserController {
 
     @Autowired
     EmployeeService employeeService;
+
+    @Autowired
+    private CitizenService citizenService;
 
     private static final String PHOTO_PATH = "/var/www/photos/profiles/";
     @Autowired
@@ -122,7 +126,14 @@ public class UserController {
                 employee.setName(dto.getName());
                 employee.setSurname(dto.getSurname());
                 employee.setSuspended(false);
+                employee.setUsername(user.getUsername());
                 employeeService.saveEmployee(employee);
+            } else if (dto.getRole() == Role.CITIZEN) {
+                User user = userService.findWholeUser(dto.getUsername());
+                Citizen citizen = new Citizen();
+                citizen.setUser(user);
+                citizen.setUsername(user.getUsername());
+                citizenService.saveCitizen(citizen);
             }
 
             // generate unique activation token and send activation email as well
@@ -134,77 +145,85 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
-//optimized register, store pics by ID and not by username
-@PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-public ResponseEntity<UserCredentials> registerUser(
-        @RequestParam("username") String username,
-        @RequestParam("password") String password,
-        @RequestParam("role") String role,
-        @RequestParam("userPhoto") MultipartFile userPhoto,
-        @RequestParam(value = "userData", required = false) String userDataJson) {
+    //optimized register, store pics by ID and not by username
+    @PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserCredentials> registerUser(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("role") String role,
+            @RequestParam("userPhoto") MultipartFile userPhoto,
+            @RequestParam(value = "userData", required = false) String userDataJson) {
 
-    try {
-        // Register user credentials
-        UserDto dto = new UserDto(username, password, Role.valueOf(role), false, true, ""); // Assume 'false' for isActive
-        Optional<UserCredentials> credentials = userDetailsService.register(dto);
+        try {
+            // Register user credentials
+            UserDto dto = new UserDto(username, password, Role.valueOf(role), false, true, ""); // Assume 'false' for isActive
+            Optional<UserCredentials> credentials = userDetailsService.register(dto);
 
-        if (credentials.isPresent()) {
-            User user = userService.findWholeUser(dto.getUsername());
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-            }
-
-            // Generate and save activation token
-            String activationToken = UUID.randomUUID().toString();
-            userService.saveActivationToken(dto.getUsername(), activationToken); // Save token and set user as inactive
-
-            // Save the photo using the user ID
-            String uploadDir = "src/main/resources/pictures/";
-            File uploadDirectory = new File(uploadDir);
-            if (!uploadDirectory.exists()) {
-                uploadDirectory.mkdir();
-            }
-
-            String fileName = "profile_" + user.getId() + ".jpg";
-            Path filePath = Paths.get(uploadDir + fileName);
-            Files.write(filePath, userPhoto.getBytes()); // Save the photo to the file system
-            dto.setUserPhoto(filePath.toString());
-
-            // Process additional data if the role is EMPLOYEE
-            if (dto.getRole() == Role.EMPLOYEE) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                if (userDataJson == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            if (credentials.isPresent()) {
+                User user = userService.findWholeUser(dto.getUsername());
+                if (user == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
                 }
-                AdditionalDataUser userData = objectMapper.readValue(userDataJson, AdditionalDataUser.class);
-                Employee employee = new Employee();
-                employee.setUser(user);
-                employee.setName(userData.getName());
-                employee.setSurname(userData.getSurname());
-                employee.setSuspended(false);
-                employeeService.saveEmployee(employee);
+
+                // Generate and save activation token
+                String activationToken = UUID.randomUUID().toString();
+                userService.saveActivationToken(dto.getUsername(), activationToken); // Save token and set user as inactive
+
+                // Save the photo using the user ID
+                String uploadDir = "src/main/resources/pictures/";
+                File uploadDirectory = new File(uploadDir);
+                if (!uploadDirectory.exists()) {
+                    uploadDirectory.mkdir();
+                }
+
+                String fileName = "profile_" + user.getId() + ".jpg";
+                Path filePath = Paths.get(uploadDir + fileName);
+                Files.write(filePath, userPhoto.getBytes()); // Save the photo to the file system
+                dto.setUserPhoto(filePath.toString());
+
+
+                // Process additional data if the role is EMPLOYEE
+                if (dto.getRole() == Role.EMPLOYEE) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    if (userDataJson == null) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                    }
+                    AdditionalDataUser userData = objectMapper.readValue(userDataJson, AdditionalDataUser.class);
+                    Employee employee = new Employee();
+                    employee.setUser(user);
+                    employee.setName(userData.getName());
+                    employee.setSurname(userData.getSurname());
+                    employee.setSuspended(false);
+                    employee.setUsername(user.getUsername());
+                    employeeService.saveEmployee(employee);
+                } else if (dto.getRole() == Role.CITIZEN) {
+                    Citizen citizen = new Citizen();
+                    citizen.setUser(user);
+                    citizen.setUsername(user.getUsername());
+                    citizenService.saveCitizen(citizen);
+                }
+
+
+                // Send activation email
+                // Adjust the activation link based on your frontend setup
+                // TODO: change the activation link based on ur needs!
+                //angular
+                String activationLink = "http://localhost:4200/activate?token=" + activationToken;
+                // nginx
+                //String activationLink = "http://localhost/nwt-eps-frontend/activate?token=" + activationToken;
+                emailService.sendActivationEmail(dto.getUsername(), activationLink);
+
+                return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
             }
 
-            // Send activation email
-            // Adjust the activation link based on your frontend setup
-            // TODO: change the activation link based on ur needs!
-            //angular
-            String activationLink = "http://localhost:4200/activate?token=" + activationToken;
-            // nginx
-            //String activationLink = "http://localhost/nwt-eps-frontend/activate?token=" + activationToken;
-            emailService.sendActivationEmail(dto.getUsername(), activationLink);
-
-            return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Handle errors like file storage issues
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
         }
 
-    } catch (IOException e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Handle errors like file storage issues
-    } catch (MessagingException e) {
-        throw new RuntimeException(e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // In case registration fails
     }
-
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // In case registration fails
-}
 
 
     @PreAuthorize("permitAll()")

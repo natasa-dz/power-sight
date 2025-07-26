@@ -25,6 +25,12 @@ import {
   OwnerHouseholdRequestsComponent
 } from "./requests-module/owner-household-requests/owner-household-requests.component";
 import {CityConsumptionComponent} from "./simulators/city-consumption/city-consumption.component";
+import {SearchCitizensComponent} from "./citizens/search-citizens/search-citizens.component";
+import {AddPriceListComponent} from "./price-list/add-price-list/add-price-list.component";
+import {CreateReceiptsComponent} from "./price-list/create-receipts/create-receipts.component";
+import {ReceiptsListingComponent} from "./price-list/receipts-listing/receipts-listing.component";
+import {ReceiptViewComponent} from "./price-list/receipt-view/receipt-view.component";
+import {PaymentComponent} from "./price-list/payment/payment.component";
 import {RequestAppointmentComponent} from "./requests-module/request-appointment/request-appointment.component";
 import {HouseholdConsumptionComponent} from "./requests-module/household-consumption/household-consumption.component";
 
@@ -33,28 +39,29 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'real-estate-registration', component: RealEstateRequestComponent },
-
   { path: 'real-estate-requests/:ownerId/all', component: OwnerRequestListingComponent },
   { path: 'real-estate-requests/admin/requests', component: AdminRequestListingComponent },
   { path: 'real-estate-requests/admin/:requestId', component: RequestViewAdminComponent },
-
   { path: 'search-households', component: SearchHouseholdComponent },
   { path: 'household/:id', component: ViewHouseholdComponent },
   { path: 'request-appointment', component: RequestAppointmentComponent },
   { path: 'household-consumption', component: HouseholdConsumptionComponent },
-
   { path: 'manage-household-requests', component: AdminHouseholdRequestsComponent},
   { path: 'household-no-owner', component: OwnerHouseholdsListingComponent},
   { path: 'household-ownership-request/:householdId', component: HouseholdRequestComponent},
   { path: 'my-household-ownership-requests', component: OwnerHouseholdRequestsComponent},
-
-
   { path: 'view-employees', component: ViewEmployeesComponent },
   { path: 'employee/:id', component: EmployeeProfileComponent },
   { path: 'register-employee', component: RegisterEmployeeComponent },
   { path: 'employee-calendar', component: EmployeeCalendarComponent },
-  { path: 'main', component: MainComponent },
   { path: 'admin/city-consumption', component: CityConsumptionComponent },
+  { path: 'allow-household-access/search', component: SearchCitizensComponent },
+  { path: 'add-price-list', component: AddPriceListComponent },
+  { path: 'generate-receipts', component: CreateReceiptsComponent },
+  { path: 'receipts', component: ReceiptsListingComponent },
+  { path: 'receipt/:receiptId', component: ReceiptViewComponent },
+  { path: 'receipt/:receiptId/payment', component: PaymentComponent },
+  { path: 'main', component: MainComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },  // Redirect to login by default
   { path: '**', redirectTo: '/login', pathMatch: 'full' }, // Catch-all for undefined paths
 

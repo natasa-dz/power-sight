@@ -29,4 +29,7 @@ public class Employee {
 
     @Column(nullable = false)
     private Boolean suspended;
+
+    @Column
+    private String username;
 }

@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c6fc03b-c9b7-4131-adc6-967839e2ded5" name="Changes" comment="" />
+    <list default="true" id="3c6fc03b-c9b7-4131-adc6-967839e2ded5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/service/ReceiptService.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/service/ReceiptService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/app.routes.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,9 +19,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2nhYjkOlme1EXemiFVVokyje43S" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -29,8 +32,8 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "model-dev",
-    "last_opened_file_path": "C:/SIIT/SIIT-cetvrta godina/eps_nwt",
+    "git-widget-placeholder": "feature/payment",
+    "last_opened_file_path": "C:/Users/dunja/OneDrive/Radna površina/siit/napredne veb tehnologije/projekat/eps_nwt",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -48,6 +51,7 @@
       <option name="presentableId" value="Default" />
       <updated>1729426911184</updated>
       <workItem from="1729426912197" duration="716000" />
+      <workItem from="1744790334497" duration="16000" />
     </task>
     <servers />
   </component>

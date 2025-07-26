@@ -1,12 +1,16 @@
 package com.example.epsnwtbackend.service;
 
+import com.example.epsnwtbackend.model.Receipt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+
+import java.util.Date;
 
 @Service
 public class EmailService {
@@ -128,4 +132,62 @@ public class EmailService {
         mailSender.send(message);
     }
 
+    public void sendReceipt(String emailTo, String month, int year, byte[] pdfAttachment) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(emailTo);
+
+        String emailContentApproved = """
+                <html>
+            <body>
+                <p>Dear User,</p>
+                <br/>
+                <p>Thank you for your continued trust in Electro Power. Please find attached the receipt for your energy usage for the month of <strong>%s %s</strong>.</p>
+                <p><strong>Details:</strong></p>
+                <ul>
+                    <li>Month: %s</li>
+                    <li>Year: %s</li>
+                </ul>
+                <br/>
+                <p>If you have any questions or need further assistance, please don’t hesitate to reach out to our support team.</p>
+                <br/>
+                <p><strong>Warm Regards,</strong><br/><em>Electro Power Support Team</em></p>
+            </body>
+            </html>
+            """.formatted(month, String.valueOf(year), month, String.valueOf(year));
+
+        helper.setSubject("Electro Power - Reciept for " + month + " " + year + ".");
+        helper.setText(emailContentApproved, true);
+
+        helper.addAttachment("Receipt_" + month + "_" + year + ".pdf", new ByteArrayResource(pdfAttachment));
+
+        mailSender.send(message);
+    }
+
+    public void sendPaymentSlip(String emailTo, byte[] pdf, Receipt receipt) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(emailTo);
+
+        String emailContentApproved = """
+                <html>
+            <body>
+                <p>Dear User,</p>
+                <br/>
+                <p>Thank you for your payment. Please find attached the payment slip for the payed receipt for the month of <strong>%s %s</strong>.</p>
+                <br/>
+                <p>If you have any questions or need further assistance, please don’t hesitate to reach out to our support team.</p>
+                <br/>
+                <p><strong>Warm Regards,</strong><br/><em>Electro Power Support Team</em></p>
+            </body>
+            </html>
+            """.formatted(receipt.getMonth(), String.valueOf(receipt.getYear()));
+
+        helper.setSubject("Electro Power - Payment Slip");
+        helper.setText(emailContentApproved, true);
+
+        helper.addAttachment("PaymentSlip_" + receipt.getMonth() + "_" + receipt.getYear() + ".pdf", new ByteArrayResource(pdf));
+
+        mailSender.send(message);
+    }
 }

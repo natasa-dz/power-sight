@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "households", indexes = {
         @Index(name = "idx_household_owner", columnList = "user_id")
@@ -38,4 +40,7 @@ public class Household {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true)
     private User owner;
+
+    @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
+    private List<AccessGranted> accessGranted;
 }
