@@ -12,10 +12,27 @@ import {HouseholdDto} from "../model/householdDTO";
 })
 export class HouseholdService {
 
+
+
   private apiUrl = 'http://localhost:8080/household';  // Adjust to your backend URL
   private ownershipUrl = 'http://localhost:8080/ownership-requests';  // Adjust to your backend URL
 
+  getDocumentBytes(householdId: number): Observable<ArrayBuffer> {
+    const url = `${this.apiUrl}/docs`;
+    return this.http.post(url, householdId, { responseType: 'arraybuffer' });
+  }
+
   constructor(private http: HttpClient) {}
+
+  getSubmittedFiles(requestId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/docs/${requestId}`);
+  }
+
+  downloadFile(householdId: number, fileName: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/docs/${householdId}/${fileName}`, {
+      responseType: 'blob',
+    });
+  }
 
   getHouseholdsWithoutOwner(page: number, size: number): Observable<any> {
     let params = new HttpParams()
@@ -24,6 +41,15 @@ export class HouseholdService {
     const url =`${this.apiUrl}/no-owner`;
     return this.http.get<Page<HouseholdDto>>(url, {params});
   }
+
+  getOwnerHouseholds(ownerId: number, page: number, size: number): Observable<Page<HouseholdDto>> {
+    const params = new HttpParams()
+      .set('ownerId', ownerId.toString())
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<Page<HouseholdDto>>(`${this.apiUrl}/owner`, { params });
+  }
+
 
   createOwnershipRequest(formData: FormData): Observable<any> {
     const url =`${this.apiUrl}/no-owner`;

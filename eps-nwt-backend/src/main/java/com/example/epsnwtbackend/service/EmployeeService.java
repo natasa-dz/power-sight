@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
@@ -24,6 +25,15 @@ public class EmployeeService {
         return employeeRepository.findAll(pageable)
                 .map(employee -> EmployeeSearchDTO.toDto(employee));
     }
+
+    public List<EmployeeSearchDTO> getAllEmployeesNoPagination() {
+        return employeeRepository.findAll()
+                .stream()
+                .map(EmployeeSearchDTO::toDto)
+                .collect(Collectors.toList());
+    }
+
+
 
     public Optional<Employee> getEmployeeById(Long id) {
         return employeeRepository.findById(id);

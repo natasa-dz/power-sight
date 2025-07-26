@@ -14,6 +14,8 @@ public class InfluxDbConfiguration {
     private final String bucketHeartbeat;
     private final String bucketConsumption;
 
+
+
     public InfluxDbConfiguration(Environment env) {
         this.url = String.format("http://%s:%s", env.getProperty("influxdb.host"),
                 env.getProperty("influxdb.port"));
@@ -21,6 +23,8 @@ public class InfluxDbConfiguration {
         this.organization = env.getProperty("influxdb.organization");
         this.bucketHeartbeat = env.getProperty("influxdb.bucket.heartbeat");
         this.bucketConsumption = env.getProperty("influxdb.bucket.consumption");
+
+
     }
 
     @Bean

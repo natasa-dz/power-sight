@@ -6,7 +6,7 @@ import {Page} from "../../model/page.model";
 import {RouterLink} from "@angular/router";
 import {EmployeeSearchDto} from "../../model/employee-search-dto.model";
 import {EmployeeService} from "../employee.service";
-import * as console from "node:console";
+//import * as console from "node:console";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
@@ -49,7 +49,8 @@ export class ViewEmployeesComponent implements OnInit {
         },
         (error: any) => {
           this.showSnackbar("Error fetching employees.");
-          console.error(error);
+          console.log(error(error))
+          //console.error(error);
         }
       );
   }

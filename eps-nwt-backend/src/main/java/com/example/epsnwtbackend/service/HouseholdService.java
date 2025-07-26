@@ -71,6 +71,10 @@ public class HouseholdService {
         return householdRepository.searchNoOwner(pageable);
     }
 
+    public Page<Household> ownerHouseholds(Pageable pageable, Long ownerId){
+        return householdRepository.searchOwner(pageable, ownerId);
+    }
+
     public Page<HouseholdSearchDTO> search(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
         return householdRepository.findAllOnAddress(municipality, address, apartmentNumber, pageable);
     }

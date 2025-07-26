@@ -1,10 +1,33 @@
 <app-navbar-citizen></app-navbar-citizen>
 
-<div *ngIf="ownershipRequests.length === 0" class="empty-message">
-  <p>You have no ownership requests at the moment.</p>
+<div class="filters">
+  <label for="statusFilter">Filter by Status:</label>
+  <select id="statusFilter" [(ngModel)]="statusFilter" (change)="filterAndSortRequests()">
+    <option value="">All</option>
+    <option value="APPROVED">Approved</option>
+    <option value="PENDING">Pending</option>
+    <option value="REJECTED">Rejected</option>
+  </select>
+
+  <label for="sortCriteria">Sort By:</label>
+  <select id="sortCriteria" [(ngModel)]="sortCriteria" (change)="filterAndSortRequests()">
+    <option value="submittedAtAsc">Submitted At (Ascending)</option>
+    <option value="submittedAtDesc">Submitted At (Descending)</option>
+    <option value="updatedAtAsc">Updated At (Ascending)</option>
+    <option value="updatedAtDesc">Updated At (Descending)</option>
+  </select>
 </div>
 
-<div *ngFor="let request of ownershipRequests" class="request-card">
+<!-- Empty State -->
+<div *ngIf="ownershipRequests.length === 0 && !filteredRequests.length" class="empty-message">
+  <p>You have no ownership requests at the moment.</p>
+</div>
+<div *ngIf="filteredRequests.length === 0 && ownershipRequests.length > 0" class="empty-message">
+  <p>You have no ownership requests matching the selected criteria.</p>
+</div>
+
+<!-- Requests -->
+<div *ngFor="let request of filteredRequests" class="request-card">
   <div class="request-header">
     <h3>Request #{{ request.id }}</h3>
     <span class="status-badge" [ngClass]="getStatusClass(request.status)">{{ request.status }}</span>
@@ -15,14 +38,5 @@
     <p><b>Reason:</b> {{ request.reason || 'N/A' }}</p>
     <p><b>Submitted At:</b> {{ request.submittedAt | date: 'medium' }}</p>
     <p><b>Updated At:</b> {{ request.updatedAt | date: 'medium' }}</p>
-  </div>
-
-  <div *ngIf="request.documentationPath" class="attached-files">
-    <h4>Attached Files:</h4>
-    <ul>
-      <li>
-        <a [href]="'/api/files/' + request.documentationPath" target="_blank">View Files</a>
-      </li>
-    </ul>
   </div>
 </div>

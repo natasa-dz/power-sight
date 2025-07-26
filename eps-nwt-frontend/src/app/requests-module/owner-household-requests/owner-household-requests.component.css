@@ -100,3 +100,51 @@ body {
 .attached-files ul li a:hover {
   text-decoration: underline;
 }
+
+.filters {
+  display: flex;
+  justify-content: center; /* Centers the filters */
+  gap: 20px; /* Adds spacing between the filter and sort dropdowns */
+  margin-top: 50px;
+  margin-bottom: 30px; /* Adds space below the filters */
+  flex-wrap: wrap; /* Ensures proper layout on smaller screens */
+}
+
+.filters label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px;
+}
+
+.filters select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+  cursor: pointer;
+}
+
+.filters select:focus {
+  border-color: #0d47a0; /* Matches the color of the header */
+  box-shadow: 0 0 5px rgba(13, 71, 160, 0.5);
+}
+
+.filters select:hover {
+  border-color: #0a3680;
+}
+
+.filters select option {
+  padding: 5px; /* Adds spacing inside the dropdown options */
+}
+
+.filters select:disabled {
+  background-color: #f4f7fa;
+  color: #999;
+  cursor: not-allowed;
+}
+

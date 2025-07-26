@@ -1,0 +1,68 @@
+<app-navbar-citizen></app-navbar-citizen>
+<!--TODO: List owner households, show the graph data for the selected household, flux query!-->
+<div class="consumption-container">
+  <div class="consumption-left">
+    <!-- Household Dropdown -->
+    <div class="dropdown-container">
+      <label for="householdDropdown">Select a Household:</label>
+      <select id="householdDropdown" (change)="onSelectHousehold($event)">
+        <option value="" disabled selected>Select a household</option>
+        <option *ngFor="let household of households" [value]="household.id">
+          Household {{household.id}} - {{ household.squareFootage }} sq. ft.
+        </option>
+        <option
+          *ngIf="currentPage < page.totalPages"
+          value="load-more"
+          (click)="onPageChange()">
+          Load More...
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="consumption-right" *ngIf="selected">
+    <h3>Consumption for Household {{ selectedHouseholdId }}</h3>
+    <div class="time-range-container">
+      <select id="timeRange" [(ngModel)]="timeRange" (ngModelChange)="updateChart()">
+        <option value="1">Last Hour</option>
+        <option value="6">Last 6 Hours</option>
+        <option value="12">Last 12 Hours</option>
+        <option value="24">Last 24 Hours</option>
+        <option value="week">Last 7 Days</option>
+        <option value="month">Last Month</option>
+        <option value="3months">Last 3 Months</option>
+        <option value="year">Last Year</option>
+        <option value="custom">Custom dates</option>
+      </select>
+
+      <input *ngIf="custom" type="date" id="startDate" [(ngModel)]="startDate">
+      <input *ngIf="custom" type="date" id="endDate" [(ngModel)]="endDate">
+
+      <button (click)="updateChart()">Fetch Data</button>
+    </div>
+
+    <div class="consumption-data" *ngIf="total !== undefined">
+      <p><strong>Total consumption:</strong> {{ total }} kWh</p>
+    </div>
+
+    <div class="graph-container" *ngIf="chartData.labels!=undefined">
+      <div class="time-range-container2">
+        <h4>Energy Consumption Chart</h4>
+        <div class="chart-type-selector">
+          <label for="chartType">Select Chart Type:</label>
+          <select id="chartType" [(ngModel)]="chartType" (ngModelChange)="updateChartType()">
+            <option value="bar">Bar Chart</option>
+            <option value="line">Line Chart</option>
+          </select>
+        </div>
+      </div>
+      <canvas
+        baseChart
+        [type]="chartType"
+        [data]="chartData"
+        [options]="{ responsive: true, maintainAspectRatio: false }">
+      </canvas>
+    </div>
+  </div>
+</div>
+

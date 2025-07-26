@@ -74,4 +74,8 @@ export class EmployeeService {
     const url = `${this.apiUrl}/all-employees`;
     return this.http.get<Page<EmployeeSearchDto>>(url, { params });
   }
+
+  getAllEmployeesNoPagination(): Observable<EmployeeViewDto[]> {
+    return this.http.get<EmployeeViewDto[]>(`${this.apiUrl}/all-employees-no-pagination`);
+  }
 }

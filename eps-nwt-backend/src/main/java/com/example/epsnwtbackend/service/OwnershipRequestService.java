@@ -35,7 +35,7 @@ public class OwnershipRequestService {
     @Autowired
     private UserRepository userRepository;
 
-    private final String baseDirectory = "resources/data/requests/ownership";
+    private final String baseDirectory = "src/main/resources/data/requests/house";
 
     public String storeFiles(Long requestId, List<MultipartFile> files) {
         String folderPath = baseDirectory + requestId;
@@ -57,7 +57,7 @@ public class OwnershipRequestService {
     public List<OwnershipRequest> getPendingRequests() {
         return ownershipRequestRepository.findByStatus(Status.PENDING);
     }
-
+    //TODO: modify register funkciju, setovanje i id usera, pronalazenje!
     public void processRequest(Long requestId, boolean approved, String reason) throws MessagingException, NoResourceFoundException {
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));

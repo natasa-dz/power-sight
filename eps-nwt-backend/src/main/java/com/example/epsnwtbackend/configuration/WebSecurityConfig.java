@@ -33,7 +33,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200")
+                .allowedOrigins("http://localhost","http://localhost:4200") //angular app
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*");
     }
@@ -95,6 +95,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers("/household/docs/**").permitAll()
                 .requestMatchers("/employee/search").permitAll()
                 .requestMatchers("/employee/search?username").permitAll()
                 .requestMatchers("ownership-requests/**").permitAll()
@@ -102,8 +103,11 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("ownership-requests/pending").permitAll()
                 .requestMatchers("ownership-requests/{userId}").permitAll()
                 .requestMatchers("ownership-requests/process/{id}").permitAll()
+
                 .requestMatchers("/employee/search/{username}").permitAll()
                 .requestMatchers("/employee/all-employees").permitAll()
+                .requestMatchers("/employee/all-employees-no-pagination").permitAll()
+
                 .requestMatchers("/employee/find-by-id/{id}").permitAll()
                 .requestMatchers("/employee/find-by-user-id/{id}").permitAll()
                 .requestMatchers("/employee/image").permitAll()
@@ -125,9 +129,12 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/household/graph/{name}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/{city}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/graph/{city}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/household/{householdId}/{timeRange}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/consumption/household/graph/{householdId}/{timeRange}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/municipalities").permitAll()
                 .requestMatchers(HttpMethod.GET, "/consumption/cities").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/current/{name}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/owner").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
@@ -186,20 +193,19 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/**.html", "/**.css", "/**.js",
                         "/ownership-requests/**","/ownership-requests/requestOwnership", "/ownership-requests/pending",
                         "/ownership-requests/process/{id}", "/ownership-requests/{userId}",
-
-                        "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
+                        "/household/docs/**", "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
                         "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
                         "/consumption/{city}/{timeRange}", "/consumption/municipalities", "/consumption/graph/{city}/{timeRange}",
-                        "/consumption/cities",
+                        "/consumption/cities", "consumption/household/graph/{householdId}/{timeRange}", "consumption/household/{householdId}/{timeRange}",
                         "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
                         "appointments/available-slots/", "employee/find-by-user-id/",
                         "appointments/get-employees-appointments-for-date/", "employee/all-employees",
-                        "household/current/", "citizen/search", "household/getForOwner/{ownerId}",
+                        "household/current/", "household/owner", "citizen/search", "household/getForOwner/{ownerId}",
                         "price-list/find-all", "price-list/find-by-id/{id}", "price-list/find-for-date/{date}",
                         "/receipts/all-for-household/{householdId}", "/receipts/all-for-owner/{ownerId}",
-                        "/receipts/by-id/{receiptId}");
+                        "/receipts/by-id/{receiptId}", "/employee/all-employees-no-pagination");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

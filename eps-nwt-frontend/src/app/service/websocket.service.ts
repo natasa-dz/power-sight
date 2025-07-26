@@ -10,10 +10,15 @@ export class WebSocketService {
   client: Client | null = null;
   isConnected = false;
   isConnectedCity : Map<string, boolean> = new Map();
+  isConnectedHouse : Map<number, boolean> = new Map();
+  private dataSubjectHouse = new Subject<any>();
+
   private dataSubject = new Subject<any>();
   private dataSubjectCity = new Subject<any>();
   public data$ = this.dataSubject.asObservable();
   public cityData$ = this.dataSubjectCity.asObservable();
+
+  public houseData$ = this.dataSubjectCity.asObservable();
 
   private serverUrl = 'http://localhost:8080/socket';
 
@@ -72,6 +77,37 @@ export class WebSocketService {
         this.isConnectedCity.set(city, false);
         this.dataSubjectCity = new Subject<any>();
         this.cityData$ = this.dataSubjectCity.asObservable();
+      });
+    }
+  }
+
+  connectHouse(houseId:number){
+    if (this.isConnectedHouse.get(houseId)) return;
+
+    const accessToken: any = localStorage.getItem('user');
+    const socket = new SockJS(this.serverUrl);
+    this.client = over(socket);
+
+    this.client.connect({ Authorization: `Bearer ${accessToken}` }, (frame) => {
+      this.isConnectedHouse.set(houseId, true);
+      // @ts-ignore
+      this.client.subscribe('/data/household/graph/' + houseId, (messageOutput) => {
+        const houseData = JSON.parse(messageOutput.body);
+        console.log(houseData)
+        console.log(houseId)
+        this.dataSubjectHouse.next(houseData);
+      });
+    }, (error) => {
+      console.error('WebSocket connection error', error);
+    });
+  }
+
+  disconnectHouse(houseId:number){
+    if (this.client) {
+      this.client.disconnect(() => {
+        this.isConnectedHouse.set(houseId, false);
+        this.dataSubjectHouse = new Subject<any>();
+        this.houseData$ = this.dataSubjectHouse.asObservable();
       });
     }
   }

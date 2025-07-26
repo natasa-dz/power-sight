@@ -41,7 +41,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
-                .setAllowedOrigins("http://localhost:4200")
+                .setAllowedOrigins("http://localhost","http://localhost:4200") //angular and nginx
                 .withSockJS();
     }
 
@@ -74,5 +74,20 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             );
         }
     }
+
+    @Scheduled(fixedRate = 3000, initialDelay = 1000)
+    public void streamHouseholdData() throws JsonProcessingException {
+        for (String simulator : householdService.getAllSimulatorIds()) {
+            System.out.println(simulator);
+            Map<String, Double> message = consumptionService.getHouseholdConsumptionGraph(Long.parseLong(simulator), "1");
+            System.out.println("Household data: "+message);
+            template.convertAndSend(
+                    "/data/household/graph/" + simulator,
+                    message
+            );
+        }
+    }
+
+
 
 }

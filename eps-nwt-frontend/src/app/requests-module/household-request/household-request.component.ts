@@ -59,6 +59,11 @@ export class HouseholdRequestComponent implements OnInit {
     }
   }
 
+
+  removeFile(index: number): void {
+    this.uploadedFiles.splice(index, 1);
+  }
+
   submitRequest(): void {
     if (!this.requestNote.trim() || this.uploadedFiles.length === 0) {
       alert('Please provide a note and attach at least one file.');

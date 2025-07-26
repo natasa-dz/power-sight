@@ -249,6 +249,75 @@ public class InfluxService {
 
     }
 
+    public Double getHouseholdConsumptionByDateRange(Long householdId, LocalDateTime startDate, LocalDateTime endDate){
+        // Formatter for the date to match the expected format in Flux query.
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneOffset.UTC);
+
+        // Format start and end dates.
+        String start = startDate.format(formatter);
+        String end = endDate.plusDays(1).format(formatter);  // Plus one day for inclusive range.
+
+        // Prepare the simulatorID.
+        String simulatorID = "simulator-" + householdId;
+
+        // Correct Flux query string with proper substitution for simulatorID.
+        String fluxQuery = String.format(
+                "from(bucket: \"%s\") " +  // %s will be replaced with the consumptionBucket
+                        "|> range(start: time(v: \"%s\"), stop: time(v: \"%s\")) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"simulators\") " +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> filter(fn: (r) => r[\"simulator_id\"] == \"%s\") " +
+                        "|> sum() " +
+                        "|> yield(name: \"total_consumption\")",
+                this.consumptionBucket, start, end, simulatorID
+        );
+
+        // Call the query method and return the result.
+        return this.queryCityConsumption(fluxQuery);
+    }
+
+    public Double getHouseholdConsumptionForGraph(Long householdId, String start, String end){
+        // Prepare simulatorID
+        String simulatorID = "simulator-" + householdId;
+
+        // Correct Flux query string with actual simulatorID
+        String fluxQuery = String.format(
+                "from(bucket: \"%s\") " +
+                        "|> range(start: time(v: \"%s\"), stop: time(v: \"%s\")) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"simulators\") " +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> filter(fn: (r) => r[\"simulator_id\"] == \"%s\") " +
+                        "|> sum() " +
+                        "|> yield(name: \"total_consumption\")",
+                this.consumptionBucket, start, end, simulatorID
+        );
+
+        // Execute the query and return the result
+        return this.queryCityConsumption(fluxQuery);
+    }
+
+
+    public Double getHouseholdConsumptionByTimeRange(Long householdId, String duration){
+        // Prepare simulatorID
+        String simulatorID = "simulator-" + householdId;
+
+        // Correct Flux query string with actual simulatorID and time range duration
+        String fluxQuery = String.format(
+                "from(bucket: \"%s\") " +
+                        "|> range(start: time(v: \"%s\"), stop: time(v: \"%s\")) " +
+                        "|> filter(fn: (r) => r[\"_measurement\"] == \"simulators\") " +
+                        "|> filter(fn: (r) => r[\"_field\"] == \"consumption_value\") " +
+                        "|> filter(fn: (r) => r[\"simulator_id\"] == \"%s\") " +
+                        "|> sum() " +
+                        "|> yield(name: \"total_consumption\")",
+                this.consumptionBucket, duration, duration, simulatorID
+        );
+
+        // Execute the query and return the result
+        return this.queryCityConsumption(fluxQuery);
+    }
+
     public List<String> getMunicipalitiesFromInflux() {
         citiesAndMunicipalities = realEstateRequestService.getCitiesWithMunicipalities();
         String fluxQuery = String.format(

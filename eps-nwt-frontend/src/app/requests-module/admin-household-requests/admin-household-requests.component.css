@@ -110,3 +110,40 @@ textarea:focus {
 .reject-button:hover {
   background-color: #e53935;
 }
+
+
+/* Styling for the View Files button */
+.file-list button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  background-color: #0d47a0; /* Matches the theme's primary color */
+  color: white;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.file-list button:hover {
+  background-color: #0b3a80; /* Darker shade for hover effect */
+  transform: translateY(-2px); /* Subtle lift effect on hover */
+}
+
+/* Styling for the Open button */
+.file-list li button {
+  margin-left: 10px;
+  padding: 5px 15px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  background-color: #0d47a0; /* Secondary accent color */
+  color: white;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.file-list li button:hover {
+  background-color: #01579b; /* Darker shade for hover effect */
+  transform: translateY(-2px); /* Subtle lift effect on hover */
+}
+

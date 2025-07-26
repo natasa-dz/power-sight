@@ -8,11 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -52,18 +57,10 @@ public class HouseholdController {
     }
 
 
+
     @GetMapping(path = "/no-owner")
     public ResponseEntity<Page<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
         Page<Household> households = householdService.noOwnerHouseholds(pageable);
-
-        // Print the list of households to see what is being returned
-        households.getContent().forEach(household -> {
-            System.out.println("Household ID: " + household.getId());
-            System.out.println("Floor: " + household.getFloor());
-            System.out.println("Square Footage: " + household.getSquareFootage());
-            System.out.println("Apartment Number: " + household.getApartmentNumber());
-            System.out.println("Real Estate ID: " + household.getRealEstate().getId());
-        });
 
         Page<HouseholdDto> householdDTOs = households.map(household -> new HouseholdDto(
                 household.getId(),
@@ -76,6 +73,21 @@ public class HouseholdController {
         return ResponseEntity.ok(householdDTOs);
     }
 
+
+    @GetMapping(path = "/owner")
+    public ResponseEntity<Page<HouseholdDto>> getOwnerHouseholds(Pageable pageable, @RequestParam Long ownerId) {
+        Page<Household> households = householdService.ownerHouseholds(pageable, ownerId);
+
+        Page<HouseholdDto> householdDTOs = households.map(household -> new HouseholdDto(
+                household.getId(),
+                household.getFloor(),
+                household.getSquareFootage(),
+                household.getApartmentNumber(),
+                household.getRealEstate().getId()
+        ));
+
+        return ResponseEntity.ok(householdDTOs);
+    }
 
     @GetMapping(path = "/search-no-owner/{municipality}/{address}")
     public ResponseEntity<Page<HouseholdSearchDTO>> searchNoOwner(
@@ -277,6 +289,56 @@ public class HouseholdController {
             return ResponseEntity.ok("Successfully allowed access.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping(value = "/docs/{householdId}")
+    public ResponseEntity<List<Map<String, String>>> getDocsByHouseholdId(@PathVariable Long householdId) {
+        try {
+            Path directoryPath = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId).normalize();
+
+            if (!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            List<Map<String, String>> fileList = new ArrayList<>();
+            Files.list(directoryPath).forEach(file -> {
+                try {
+                    Map<String, String> fileMetadata = new HashMap<>();
+                    fileMetadata.put("fileName", file.getFileName().toString());
+                    fileMetadata.put("contentType", Files.probeContentType(file));
+                    fileList.add(fileMetadata);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            return ResponseEntity.ok(fileList);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping(value = "/docs/{householdId}/{fileName}")
+    public ResponseEntity<byte[]> getFile(@PathVariable Long householdId, @PathVariable String fileName) {
+        try {
+            Path filePath = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId, fileName).normalize();
+
+            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+
+            byte[] fileBytes = Files.readAllBytes(filePath);
+            String contentType = Files.probeContentType(filePath);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                    .body(fileBytes);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
