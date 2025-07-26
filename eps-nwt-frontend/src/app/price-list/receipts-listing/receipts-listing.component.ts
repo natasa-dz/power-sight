@@ -5,6 +5,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ReceiptsCardComponent} from "../receipts-card/receipts-card.component";
 import {Receipt} from "../../model/receipt.model";
 import {PriceListService} from "../price-list.service";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-receipts-listing',
@@ -15,7 +16,8 @@ import {PriceListService} from "../price-list.service";
     NgIf,
     ReactiveFormsModule,
     ReceiptsCardComponent,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
   templateUrl: './receipts-listing.component.html',
   styleUrl: './receipts-listing.component.css'
@@ -122,10 +124,10 @@ export class ReceiptsListingComponent implements OnInit{
   applyFilters(): void {
     this.filteredReceipts = this.receipts.filter((receipt) => {
       // Status filter
-      if (this.filterParams.status === 'Paid' && !receipt.isPaid) {
+      if (this.filterParams.status === 'Paid' && !receipt.paid) {
         return false;
       }
-      if (this.filterParams.status === 'Not Paid' && receipt.isPaid) {
+      if (this.filterParams.status === 'Not Paid' && receipt.paid) {
         return false;
       }
 

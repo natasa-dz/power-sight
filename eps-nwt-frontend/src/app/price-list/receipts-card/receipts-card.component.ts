@@ -32,7 +32,7 @@ export class ReceiptsCardComponent implements OnInit{
     this.receipt = {
       id: 0,
       ownerId: 0,
-      isPaid: false,
+      paid: false,
       month: "null",
       year: 0,
       paymentDate: null,
@@ -57,7 +57,7 @@ export class ReceiptsCardComponent implements OnInit{
 
   ngOnInit(): void {
     if (this.receipt !== undefined){
-      this.status = this.receipt.isPaid ? 'Paid' : 'Not paid';
+      this.status = this.receipt.paid ? 'Paid' : 'Not paid';
       this.consumption = this.receipt.blueZoneConsumption + this.receipt.greenZoneConsumption + this.receipt.redZoneConsumption;
       if (this.receipt.paymentDate !== undefined && this.receipt.paymentDate !== null) {
         this.finishedAt = format(new Date(this.receipt.paymentDate), 'dd.MM.yyyy.');

@@ -81,7 +81,7 @@
       </div>
     </div>
     <div *ngFor="let receipt of filteredReceipts" class="card_div">
-      <app-receipts-card [receipt]="receipt" ></app-receipts-card>
+      <app-receipts-card [routerLink]="['/receipt', receipt.id]" [receipt]="receipt" ></app-receipts-card>
     </div>
   </div>
 </div>

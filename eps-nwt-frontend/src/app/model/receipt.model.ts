@@ -13,7 +13,7 @@ export interface Receipt {
   greenZoneConsumption: number;
   blueZoneConsumption: number;
   redZoneConsumption: number;
-  isPaid: boolean;
+  paid: boolean;
   paymentDate: Date | null;
   path: string;
   month: string;

@@ -25,4 +25,17 @@ export class PriceListService {
   getAllReceiptsForOwner(userId: number) : Observable<Receipt[]> {
     return this.http.get<Receipt[]>(`${this.receiptUrl}/all-for-owner/${userId}`);
   }
+
+  getReceipt(receiptId: number) : Observable<Receipt> {
+    return this.http.get<Receipt>(`${this.receiptUrl}/by-id/${receiptId}`);
+  }
+
+  pay(receiptId: number) : Observable<string> {
+    let username = localStorage.getItem('username');
+    const body = { username }
+    return this.http.put(`${this.receiptUrl}/pay/${receiptId}`, body, {
+      headers: { 'Content-Type': 'application/json' },
+      responseType: "text"
+    });
+  }
 }

@@ -2,13 +2,12 @@ package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.PaymentSlipDTO;
 import com.example.epsnwtbackend.dto.ReceiptDTO;
-import com.example.epsnwtbackend.model.CreatedReceipts;
-import com.example.epsnwtbackend.model.Household;
-import com.example.epsnwtbackend.model.PriceList;
-import com.example.epsnwtbackend.model.Receipt;
+import com.example.epsnwtbackend.dto.UserDto;
+import com.example.epsnwtbackend.model.*;
 import com.example.epsnwtbackend.repository.CitizenRepository;
 import com.example.epsnwtbackend.repository.CreatedReceiptsRepository;
 import com.example.epsnwtbackend.repository.ReceiptRepository;
+import com.example.epsnwtbackend.utils.CyrillicConverter;
 import com.example.epsnwtbackend.utils.QRCodeGenerator;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.font.PdfFont;
@@ -69,6 +68,9 @@ public class ReceiptService {
 
     @Autowired
     private CitizenRepository citizenRepository;
+
+    @Autowired
+    private UserService userService;
 
 
 
@@ -155,10 +157,10 @@ public class ReceiptService {
             receipt.setMonth(month);
             receipt.setYear(year);
             receipt.setPaymentDate(null);
-            receiptRepository.save(receipt);
+            receipt = receiptRepository.save(receipt);
 
             //create pdf
-            String paymentUrl = "http://localhost:4200/add-price-list";        //TODO: change
+            String paymentUrl = "http://localhost:4200/receipt/" + receipt.getId();
             byte[] pdf = generateReceiptPDF(receipt, month, year, paymentUrl);
 
             //save pdf
@@ -335,12 +337,13 @@ public class ReceiptService {
         return byteArrayOutputStream.toByteArray(); // Return PDF as byte array
     }
 
-    public void payment(Long receiptId, PaymentSlipDTO paymentSlip) throws Exception {
+    public void payment(Long receiptId, String username) throws Exception {
         Receipt receipt = receiptRepository.getReferenceById(receiptId);
-        if (receipt != null ){
+        if (receipt != null){
             receipt.setPaid(true);
             receipt.setPaymentDate(new Date());
             receiptRepository.save(receipt);
+            PaymentSlipDTO paymentSlip = generatePaymentSlip(receipt, username);
             byte[] pdf = generatePaymentSlipPDF(paymentSlip);
             String path = "src/main/resources/data/paymentSlips";
             Path folder = Paths.get(path);
@@ -357,6 +360,34 @@ public class ReceiptService {
         else{
             throw new Exception("Receipt not found");
         }
+    }
+
+    public PaymentSlipDTO generatePaymentSlip (Receipt receipt, String username){
+        PaymentSlipDTO paymentSlip = new PaymentSlipDTO();
+        paymentSlip.setCustomerName(username);
+        Household household = receipt.getHousehold();
+        String latin = CyrillicConverter.toLatin(household.getRealEstate().getAddress());
+        System.out.println("ADresa: " + latin);
+        paymentSlip.setCustomerAddress(latin+", "+household.getApartmentNumber());
+        paymentSlip.setPurpose("Receipt payment: " + receipt.getMonth() + " "+receipt.getYear());
+        paymentSlip.setModel(97);
+        paymentSlip.setAmount(receipt.getPrice());
+        paymentSlip.setRecipientName("EPS AD Beograd");
+        paymentSlip.setRecipientAccount("200-75406-08");
+        paymentSlip.setReferenceNumber(generateReferenceNumber(household));
+        return paymentSlip;
+    }
+
+    private String generateReferenceNumber(Household household) {
+        // household id + hash adrese
+        String base = String.format("%07d", household.getId());
+        String addressDigits = household.getRealEstate().getAddress().replaceAll("\\D", "");
+        if (addressDigits.length() > 5) {
+            addressDigits = addressDigits.substring(addressDigits.length() - 5);
+        }
+
+        String referenceBody = base + addressDigits;
+        return "56-"+referenceBody;
     }
 
     public static byte[] generatePaymentSlipPDF(PaymentSlipDTO paymentSlip) throws Exception {
@@ -410,7 +441,7 @@ public class ReceiptService {
         BigDecimal roundedAmount = BigDecimal.valueOf(paymentSlip.getAmount()).setScale(2, RoundingMode.HALF_UP);
         paymentTable.addCell(new Cell().add(new Paragraph(roundedAmount + " RSD")));
 
-        paymentTable.addCell(new Cell().add(new Paragraph("Date:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph("Payment Date:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         paymentTable.addCell(new Cell().add(new Paragraph(String.valueOf(new Date()))));
 
         document.add(paymentTable);

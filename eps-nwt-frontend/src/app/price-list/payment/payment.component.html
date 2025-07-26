@@ -1,1 +1,67 @@
-<p>payment works!</p>
+<app-navbar-citizen></app-navbar-citizen>
+
+<div class="payment-body">
+  <div class="payment-container">
+    <h2>Payment Information</h2>
+    <form (ngSubmit)="submitPayment()" #paymentForm="ngForm">
+      <div class="form-group">
+        <label for="cardNumber">Card Number</label>
+        <input
+          type="text"
+          id="cardNumber"
+          name="cardNumber"
+          maxlength="19"
+          required
+          [(ngModel)]="payment.cardNumber"
+          (keyup)="formatCardNumber()"
+          placeholder="1234 5678 9012 3456" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="expiryDate">Expiry Date</label>
+          <input
+            type="text"
+            id="expiryDate"
+            name="expiryDate"
+            maxlength="5"
+            required
+            [(ngModel)]="payment.expiryDate"
+            (keyup)="formatExpiryDate()"
+            placeholder="MM/YY" />
+        </div>
+
+        <div class="form-group">
+          <label for="cvv">CVV</label>
+          <input
+            type="text"
+            id="cvv"
+            name="cvv"
+            maxlength="4"
+            required
+            [(ngModel)]="payment.cvv"
+            placeholder="123" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cardholderName">Cardholder Name</label>
+        <input
+          type="text"
+          id="cardholderName"
+          name="cardholderName"
+          required
+          [(ngModel)]="payment.cardholderName"
+          placeholder="John Doe" />
+      </div>
+
+      <button
+        type="submit"
+        class="btn-pay"
+        [disabled]="!paymentForm.valid || isLoading">
+        <span *ngIf="!isLoading">Confirm Payment</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </form>
+  </div>
+</div>
