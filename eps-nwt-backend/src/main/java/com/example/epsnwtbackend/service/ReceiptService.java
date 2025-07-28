@@ -15,9 +15,9 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.element.*;
-import com.itextpdf.layout.property.HorizontalAlignment;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.UnitValue;
+import com.itextpdf.layout.properties.HorizontalAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -240,10 +240,14 @@ public class ReceiptService {
         Document document = new Document(pdf, PageSize.A4);
         document.setMargins(20, 20, 20, 20);
 
+        PdfFont boldFont = PdfFontFactory.createFont(
+                com.itextpdf.io.font.constants.StandardFonts.HELVETICA_BOLD
+        );
+
         // Header Section
         Paragraph header = new Paragraph("Receipt")
                 .setFontSize(20)
-                .setBold()
+                .setFont(boldFont)
                 .setTextAlignment(TextAlignment.CENTER);
         document.add(header);
 
@@ -257,9 +261,9 @@ public class ReceiptService {
         // Household and Owner Information
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{1, 2}));
         infoTable.setWidth(UnitValue.createPercentValue(100));
-        infoTable.addCell(new Cell().add(new Paragraph("Household:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph("Household:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         infoTable.addCell(new Cell().add(new Paragraph(receipt.getHousehold().getRealEstate().getAddress() + ", " + receipt.getHousehold().getApartmentNumber())));
-        infoTable.addCell(new Cell().add(new Paragraph("Owner:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph("Owner:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         infoTable.addCell(new Cell().add(new Paragraph(receipt.getHousehold().getOwner().getUsername())));
         document.add(infoTable);
 
@@ -277,15 +281,15 @@ public class ReceiptService {
         Table zoneConsumptionTable = new Table(UnitValue.createPercentArray(new float[]{3, 2, 3}));
         zoneConsumptionTable.setWidth(UnitValue.createPercentValue(100));
 
-        zoneConsumptionTable.addCell(new Cell().add(new Paragraph("Green Zone Consumption:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        zoneConsumptionTable.addCell(new Cell().add(new Paragraph("Green Zone Consumption:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         zoneConsumptionTable.addCell(new Cell().add(new Paragraph(greenZoneConsumption + " kWh")));
         zoneConsumptionTable.addCell(new Cell().add(new Paragraph(greenZonePrice + " RSD/kWh")));
 
-        zoneConsumptionTable.addCell(new Cell().add(new Paragraph("Blue Zone Consumption:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        zoneConsumptionTable.addCell(new Cell().add(new Paragraph("Blue Zone Consumption:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         zoneConsumptionTable.addCell(new Cell().add(new Paragraph(blueZoneConsumption + " kWh")));
         zoneConsumptionTable.addCell(new Cell().add(new Paragraph(blueZonePrice + " RSD/kWh")));
 
-        zoneConsumptionTable.addCell(new Cell().add(new Paragraph("Red Zone Consumption:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        zoneConsumptionTable.addCell(new Cell().add(new Paragraph("Red Zone Consumption:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         zoneConsumptionTable.addCell(new Cell().add(new Paragraph(redZoneConsumption + " kWh")));
         zoneConsumptionTable.addCell(new Cell().add(new Paragraph(redZonePrice + " RSD/kWh")));
 
@@ -299,8 +303,8 @@ public class ReceiptService {
 
         Table amountTable = new Table(UnitValue.createPercentArray(new float[]{3, 1}));
         amountTable.setWidth(UnitValue.createPercentValue(100));
-        amountTable.addCell(new Cell(1, 2).add(new Paragraph("Amount Due").setBold().setTextAlignment(TextAlignment.CENTER)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
-        amountTable.addCell(new Cell().add(new Paragraph("Amount: ").setBold()));
+        amountTable.addCell(new Cell(1, 2).add(new Paragraph("Amount Due").setFont(boldFont).setTextAlignment(TextAlignment.CENTER)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        amountTable.addCell(new Cell().add(new Paragraph("Amount: ").setFont(boldFont)));
         amountTable.addCell(new Cell().add(new Paragraph(roundedValue.toString() + " RSD")));
         document.add(amountTable);
 
@@ -398,10 +402,14 @@ public class ReceiptService {
         Document document = new Document(pdf, PageSize.A4);
         document.setMargins(20, 20, 20, 20);
 
+        PdfFont boldFont = PdfFontFactory.createFont(
+                com.itextpdf.io.font.constants.StandardFonts.HELVETICA_BOLD
+        );
+
         // Header Section
         Paragraph header = new Paragraph("Payment Slip")
                 .setFontSize(20)
-                .setBold()
+                .setFont(boldFont)
                 .setTextAlignment(TextAlignment.CENTER);
         document.add(header);
 
@@ -411,16 +419,16 @@ public class ReceiptService {
         Table infoTable = new Table(UnitValue.createPercentArray(new float[]{1, 2}));
         infoTable.setWidth(UnitValue.createPercentValue(100));
 
-        infoTable.addCell(new Cell().add(new Paragraph("Customer:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph("Customer:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getCustomerName() + ", " + paymentSlip.getCustomerAddress())));
 
-        infoTable.addCell(new Cell().add(new Paragraph("Recipient:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph("Recipient:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getRecipientName())));
 
-        infoTable.addCell(new Cell().add(new Paragraph("Purpose:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph("Purpose:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getPurpose())));
 
-        infoTable.addCell(new Cell().add(new Paragraph("Recipient Account:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        infoTable.addCell(new Cell().add(new Paragraph("Recipient Account:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         infoTable.addCell(new Cell().add(new Paragraph(paymentSlip.getRecipientAccount())));
 
         document.add(infoTable);
@@ -431,17 +439,17 @@ public class ReceiptService {
         Table paymentTable = new Table(UnitValue.createPercentArray(new float[]{1, 2}));
         paymentTable.setWidth(UnitValue.createPercentValue(100));
 
-        paymentTable.addCell(new Cell().add(new Paragraph("Model:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph("Model:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         paymentTable.addCell(new Cell().add(new Paragraph(String.valueOf(paymentSlip.getModel()))));
 
-        paymentTable.addCell(new Cell().add(new Paragraph("Reference Number:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph("Reference Number:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         paymentTable.addCell(new Cell().add(new Paragraph(paymentSlip.getReferenceNumber())));
 
-        paymentTable.addCell(new Cell().add(new Paragraph("Amount:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph("Amount:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         BigDecimal roundedAmount = BigDecimal.valueOf(paymentSlip.getAmount()).setScale(2, RoundingMode.HALF_UP);
         paymentTable.addCell(new Cell().add(new Paragraph(roundedAmount + " RSD")));
 
-        paymentTable.addCell(new Cell().add(new Paragraph("Payment Date:").setBold()).setBackgroundColor(ColorConstants.LIGHT_GRAY));
+        paymentTable.addCell(new Cell().add(new Paragraph("Payment Date:").setFont(boldFont)).setBackgroundColor(ColorConstants.LIGHT_GRAY));
         paymentTable.addCell(new Cell().add(new Paragraph(String.valueOf(new Date()))));
 
         document.add(paymentTable);
