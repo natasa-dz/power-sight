@@ -147,6 +147,9 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/price-list/find-by-id/{id}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/price-list/find-all").permitAll()
                 .requestMatchers(HttpMethod.GET, "/price-list/find-for-date/{date}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
+                .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
