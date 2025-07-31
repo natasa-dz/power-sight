@@ -55,6 +55,12 @@ export class RealEstateRequestService {
     });
   }
 
+  getDocumentationByRealEstateId(realEstateId: number) {
+    return this.http.get<string[]>(`${this.apiUrl}/documentation/${realEstateId}`, {
+      responseType: 'json'
+    });
+  }
+
   getDocumentBytes(filePath: string) {
     return this.http.post(this.apiUrl + '/docs', filePath, {
       responseType: 'arraybuffer'

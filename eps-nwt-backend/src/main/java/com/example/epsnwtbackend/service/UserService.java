@@ -8,6 +8,7 @@ import com.example.epsnwtbackend.model.User;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,14 +35,14 @@ public class UserService implements UserDetailsService {
     UserRepository userRepository;
 
     @Autowired
-    private EmailService emailService; // Your email service
+    private EmailService emailService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Value("${superadmin.password.filepath}") // Set this in your application.properties
+    @Value("${superadmin.password.filepath}")
     private String passwordFilePath;
 
     @PostConstruct
@@ -55,7 +56,7 @@ public class UserService implements UserDetailsService {
     }
 
     private String generateRandomPassword(){
-        int length = 12; // Length of the password
+        int length = 12;
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
         Random random = new Random();
         StringBuilder password = new StringBuilder(length);
@@ -69,9 +70,8 @@ public class UserService implements UserDetailsService {
 
     private void savePasswordToFile(String password) {
         try {
-            // Create directories if they don't exist
             File file = new File(passwordFilePath);
-            file.getParentFile().mkdirs(); // Create the parent directories
+            file.getParentFile().mkdirs();
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(passwordFilePath))) {
                 writer.write(password);
@@ -102,7 +102,7 @@ public class UserService implements UserDetailsService {
             superAdmin.setRole(Role.SUPERADMIN);
             superAdmin.setActive(true);
             superAdmin.setUsername("admin@gmail.com");
-            superAdmin.setPasswordChanged(false); // Set initial password change requirement
+            superAdmin.setPasswordChanged(false);
             userRepository.save(superAdmin);
             savePasswordToFile(randomPassword);
         }
@@ -143,7 +143,7 @@ public class UserService implements UserDetailsService {
         // Set the new password and mark the password as changed
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setPasswordChanged(true);
-        userRepository.save(user);  // Save the updated user to persist the changes
+        userRepository.save(user);
 
         return true;
     }

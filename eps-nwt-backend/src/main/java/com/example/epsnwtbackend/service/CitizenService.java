@@ -1,7 +1,6 @@
 package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.CitizenSearchDTO;
-import com.example.epsnwtbackend.dto.EmployeeSearchDTO;
 import com.example.epsnwtbackend.model.Citizen;
 import com.example.epsnwtbackend.repository.CitizenRepository;
 import org.springframework.beans.factory.annotation.Autowired;

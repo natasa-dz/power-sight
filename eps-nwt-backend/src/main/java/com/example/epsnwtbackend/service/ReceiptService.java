@@ -37,6 +37,7 @@ import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.awt.image.BufferedImage;
@@ -341,6 +342,7 @@ public class ReceiptService {
         return byteArrayOutputStream.toByteArray(); // Return PDF as byte array
     }
 
+    @Transactional
     public void payment(Long receiptId, String username) throws Exception {
         Receipt receipt = receiptRepository.getReferenceById(receiptId);
         if (receipt != null){

@@ -32,6 +32,7 @@ export class RequestViewAdminComponent implements OnInit{
   finishedAt: string = '';
   status: string = '';
   images: string[] = [];
+  documentation: string[] = [];
 
   constructor(private service: RealEstateRequestService,
               private route: ActivatedRoute,
@@ -76,6 +77,16 @@ export class RequestViewAdminComponent implements OnInit{
               console.error('Error loading images', err);
             }
           });
+
+          this.service.getDocumentationByRealEstateId(id).subscribe({
+            next: (documentPaths: string[]) => {
+              console.log("Učitane putanje dokumenata:", documentPaths);
+              this.documentation = documentPaths;
+            },
+            error: (err) => {
+              console.error('Error loading docs', err);
+            }
+          });
         },
         error: (_:any) => {
           console.log("Error fetching request " + id + " for admin!")
@@ -101,6 +112,7 @@ export class RequestViewAdminComponent implements OnInit{
   }
 
   finishRequest(approved: boolean) {
+    alert("alalalx")
     let note = false;
     if (!note){
       // ako se odbija
