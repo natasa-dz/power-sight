@@ -5,11 +5,11 @@ import com.example.epsnwtbackend.dto.ViewEmployeeDTO;
 import com.example.epsnwtbackend.model.Employee;
 import com.example.epsnwtbackend.service.AppointmentService;
 import com.example.epsnwtbackend.service.EmployeeService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;

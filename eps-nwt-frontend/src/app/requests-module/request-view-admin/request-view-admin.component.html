@@ -18,7 +18,7 @@
 
       <div class="images">
         <h3>Images</h3>
-        <div class="photo-box" *ngIf="request?.images?.length; else noImages">
+        <div class="photo-box" *ngIf="this.images?.length; else noImages">
           <div *ngFor="let image of this.images">
             <img [src]="'data:image/jpeg;base64,' + image" alt="Real Estate Image" />
           </div>
@@ -30,9 +30,9 @@
 
       <div class="documents">
         <h3>Documentation</h3>
-        <div class="document-box" *ngIf="request?.documentation?.length; else noDocs">
+        <div class="document-box" *ngIf="this.documentation?.length; else noDocs">
           <ul>
-            <li *ngFor="let doc of request?.documentation">
+            <li *ngFor="let doc of this.documentation">
               <button class="doc-btn" (click)="downloadDocument(doc)">{{doc.split('/')[7]}}</button>
             </li>
           </ul>

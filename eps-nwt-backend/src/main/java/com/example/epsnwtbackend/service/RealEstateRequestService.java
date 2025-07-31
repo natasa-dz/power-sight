@@ -2,6 +2,7 @@ package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.AllRealEstateRequestsDTO;
 import com.example.epsnwtbackend.dto.CreateRealEstateRequestDTO;
+import com.example.epsnwtbackend.dto.RealEstateRequestDTO;
 import com.example.epsnwtbackend.enums.RealEstateRequestStatus;
 import com.example.epsnwtbackend.model.*;
 import com.example.epsnwtbackend.repository.*;
@@ -9,6 +10,10 @@ import com.example.epsnwtbackend.utils.ImageUploadUtil;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -45,6 +50,7 @@ public class RealEstateRequestService {
     @Autowired
     private RealEstateRepository realEstateRepository;
 
+    @CacheEvict(value = {"reRequests", "reRequestsForOwner"}, key = "#requestDTO.owner.id", allEntries = true)
     public RealEstateRequest createRequest(CreateRealEstateRequestDTO requestDTO,
                                            List<HouseholdRequest> householdRequests){
         RealEstateRequest request = new RealEstateRequest();
@@ -84,6 +90,7 @@ public class RealEstateRequestService {
         return uploadDir+"/"+fileName;
     }
 
+    @Cacheable("cityMunicipality")
     public Map<String, List<String>> getCitiesWithMunicipalities() {
         Map<String, List<String>> citiesWithMunicipalities = new HashMap<>();
         List<City> cities = cityRepository.findAll();
@@ -94,6 +101,10 @@ public class RealEstateRequestService {
         return citiesWithMunicipalities;
     }
 
+    @Cacheable(
+            value = "reRequestsForOwner",
+            key = "#ownerId"
+    )
     public List<AllRealEstateRequestsDTO> getAllForOwner(Long ownerId){
         List<RealEstateRequest> requests = repository.getAllForOwner(ownerId);
         List<AllRealEstateRequestsDTO> dtos = new ArrayList<>();
@@ -104,6 +115,7 @@ public class RealEstateRequestService {
         return dtos;
     }
 
+    @Cacheable("reRequests")
     public List<AllRealEstateRequestsDTO> getAllForAdmin(){
         List<AllRealEstateRequestsDTO> dtos = new ArrayList<>();
         for (RealEstateRequest r : repository.findAll()) {
@@ -113,12 +125,26 @@ public class RealEstateRequestService {
         return dtos;
     }
 
-    public RealEstateRequest getRequestForAdmin(Long requestId){
-        return repository.findById(requestId).get();
+    @Cacheable(
+            value = "reRequestForAdmin",
+            key = "#requestId"
+    )
+    public RealEstateRequestDTO getRequestForAdmin(Long requestId){
+        RealEstateRequest entity = repository.findById(requestId).orElseThrow();
+        return RealEstateRequestDTO.mapToDTO(entity);
     }
 
+    public List<String> getDocumentationForRealEstate (Long realEstateId){
+        return repository.findById(realEstateId).get().getDocumentation();
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "reRequests", allEntries = true),
+            @CacheEvict(value = "reRequestForAdmin", key = "#requestId"),
+            @CacheEvict(value = "reRequestsForOwner", key = "#ownerId")
+    })
     @Transactional
-    public int finishRequest(Long requestId, Boolean approved, String adminNote, String owner) {
+    public int finishRequest(Long requestId, Boolean approved, String adminNote, String owner, Long ownerId) {
         if (!approved && (adminNote == null || adminNote.trim().isEmpty())) {
             return 3;
         }
@@ -160,14 +186,13 @@ public class RealEstateRequestService {
         realEstateRepository.save(realEstate);
     }
 
-    //TODO: Izmenila sam setOwner da ne setuje owner-a, DISCLAIMER!
+
     private Household createHousehold(HouseholdRequest request, RealEstate realEstate, User owner){
         Household household = new Household();
         household.setFloor(request.getFloor());
         household.setSquareFootage(request.getSquareFootage());
         household.setApartmentNumber(request.getApartmentNumber());
         household.setRealEstate(realEstate);
-        //household.setOwner(owner);
         household.setAccessGranted(new ArrayList<>());
         return household;
     }
