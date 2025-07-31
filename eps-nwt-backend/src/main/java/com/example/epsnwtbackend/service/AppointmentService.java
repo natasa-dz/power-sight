@@ -9,9 +9,9 @@ import com.example.epsnwtbackend.repository.AppointmentRepository;
 import com.example.epsnwtbackend.repository.AppointmentRepositoryCustom;
 import com.example.epsnwtbackend.repository.EmployeeRepository;
 import jakarta.persistence.LockModeType;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

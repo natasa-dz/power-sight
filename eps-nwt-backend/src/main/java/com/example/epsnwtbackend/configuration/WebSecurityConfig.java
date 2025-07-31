@@ -94,6 +94,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/request/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
+                .requestMatchers("/real-estate-request/documentation/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/docs").permitAll()
                 .requestMatchers("/household/docs/**").permitAll()
                 .requestMatchers("/employee/search").permitAll()
@@ -199,7 +200,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/household/docs/**", "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
-                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
+                        "/users/byId/{userId}", "/real-estate-request/documentation/{realEstateId}",
+                        "/real-estate-request/images/{realEstateId}", "household/graph/",
                         "/consumption/{city}/{timeRange}", "/consumption/municipalities", "/consumption/graph/{city}/{timeRange}",
                         "/consumption/cities", "consumption/household/graph/{householdId}/{timeRange}", "consumption/household/{householdId}/{timeRange}",
                         "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
