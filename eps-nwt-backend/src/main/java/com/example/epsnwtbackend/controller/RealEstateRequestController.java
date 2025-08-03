@@ -1,13 +1,11 @@
 package com.example.epsnwtbackend.controller;
 
-import com.example.epsnwtbackend.dto.AllRealEstateRequestsDTO;
-import com.example.epsnwtbackend.dto.CreateRealEstateRequestDTO;
-import com.example.epsnwtbackend.dto.FinishRealEstateRequestDTO;
-import com.example.epsnwtbackend.dto.HouseholdRequestDTO;
+import com.example.epsnwtbackend.dto.*;
 import com.example.epsnwtbackend.model.HouseholdRequest;
 import com.example.epsnwtbackend.model.RealEstateRequest;
 import com.example.epsnwtbackend.service.HouseholdRequestService;
 import com.example.epsnwtbackend.service.RealEstateRequestService;
+import com.example.epsnwtbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +30,9 @@ public class RealEstateRequestController {
 
     @Autowired
     private HouseholdRequestService householdRequestService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping(value = "/registration", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<String> createRequest(@RequestPart("images") Collection<MultipartFile> imageFiles,
@@ -84,8 +85,13 @@ public class RealEstateRequestController {
     }
 
     @GetMapping(value = "/admin/request/{requestId}")
-    public RealEstateRequest getRequestForAdmin(@PathVariable("requestId")Long requestId){
+    public RealEstateRequestDTO getRequestForAdmin(@PathVariable("requestId")Long requestId){
         return service.getRequestForAdmin(requestId);
+    }
+
+    @GetMapping("/documentation/{realEstateId}")
+    public List<String> getDocumentationByRequestId(@PathVariable Long realEstateId) {
+        return service.getDocumentationForRealEstate(realEstateId);
     }
 
     @GetMapping("/images/{realEstateId}")
@@ -152,8 +158,8 @@ public class RealEstateRequestController {
                 finishedRequest.setNote(null);
             }
         }
-
-        int updated = service.finishRequest(requestId, finishedRequest.getApproved(), finishedRequest.getNote(), finishedRequest.getOwner());
+        Optional<UserDto> userDto = userService.findUser(finishedRequest.getOwner());
+        int updated = service.finishRequest(requestId, finishedRequest.getApproved(), finishedRequest.getNote(), finishedRequest.getOwner(), userDto.get().getId());
         if (updated == 1) {
             return ResponseEntity.ok("Real estate request finished successfully!");
         } else if (updated == 0) {

@@ -1,0 +1,89 @@
+.payment-body {
+  display: flex;
+  justify-content: center;
+  background-color: #f0f4f8;
+  min-height: 90vh;
+  align-items: center;
+}
+
+.payment-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  height: fit-content;
+}
+
+.payment-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #37474f;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #37474f;
+}
+
+input {
+  padding: 10px;
+  border: 1px solid #90a4ae;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: #0288d1;
+}
+
+.btn-pay {
+  width: 100%;
+  padding: 12px;
+  background-color: #0288d1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-pay:hover {
+  background-color: #01579b;
+}
+
+.btn-pay:disabled {
+  background-color: #9aa6ad;
+  cursor: auto;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-top: 3px solid #0288d1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

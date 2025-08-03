@@ -269,6 +269,28 @@ public class HouseholdController {
         return (dateRange[1].toEpochDay() - dateRange[0].toEpochDay()) * secondsInDay;
     }
 
+    @GetMapping(path = "/getForOwner/{ownerId}")
+    public ResponseEntity<List<HouseholdAccessDTO>> getForOwner(@PathVariable Long ownerId) {
+        try {
+
+            List<HouseholdAccessDTO> households = householdService.getHouseholdsForOwner(ownerId);
+            return ResponseEntity.ok(households);
+        } catch (NoResourceFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @PutMapping(path = "/allow-access/{householdId}")
+    public ResponseEntity<String> allowAccess(@PathVariable Long householdId,
+                                              @RequestBody List<Long> ids) {
+        try {
+            householdService.allowAccess(householdId, ids);
+            return ResponseEntity.ok("Successfully allowed access.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @GetMapping(value = "/docs/{householdId}")
     public ResponseEntity<List<Map<String, String>>> getDocsByHouseholdId(@PathVariable Long householdId) {

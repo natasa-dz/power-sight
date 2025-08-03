@@ -94,6 +94,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/request/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
+                .requestMatchers("/real-estate-request/documentation/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/docs").permitAll()
                 .requestMatchers("/household/docs/**").permitAll()
                 .requestMatchers("/employee/search").permitAll()
@@ -115,6 +116,9 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/appointments/create").permitAll()
                 .requestMatchers("/appointments/available-slots/{employeeId}").permitAll()
                 .requestMatchers("/appointments/get-employees-appointments-for-date/{employeeId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/citizen/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/household/getForOwner/{ownerId}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/household/allow-access/{householdId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}?apartmentNumber").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/**").permitAll()
@@ -135,6 +139,18 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/socket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info").permitAll()
                 .requestMatchers(HttpMethod.GET, "/socket/info?t").permitAll()
+                .requestMatchers(HttpMethod.POST, "/price-list/create").permitAll()
+                .requestMatchers(HttpMethod.POST, "/receipts/create/{month}/{year}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/receipts/by-id/{receiptId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/receipts/all-for-household/{householdId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/receipts/all-for-owner/{ownerId}").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/receipts/pay/{receiptId}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/price-list/find-by-id/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/price-list/find-all").permitAll()
+                .requestMatchers(HttpMethod.GET, "/price-list/find-for-date/{date}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
+                .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
@@ -171,8 +187,12 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
                 .requestMatchers(HttpMethod.POST, "/employee/image")
                 .requestMatchers(HttpMethod.POST, "/appointments/create")
+                .requestMatchers(HttpMethod.POST, "/price-list/create")
+                .requestMatchers(HttpMethod.POST, "/receipts/create/{month}/{year}")
                 .requestMatchers(HttpMethod.PUT, "/real-estate-request/admin/finish/{requestId}")
                 .requestMatchers(HttpMethod.PUT, "/employee/suspend/")
+                .requestMatchers(HttpMethod.PUT, "/household/allow-access/{householdId}")
+                .requestMatchers(HttpMethod.PUT, "/receipts/pay/{receiptId}")
                 .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
                         "/**.html", "/**.css", "/**.js",
                         "/ownership-requests/**","/ownership-requests/requestOwnership", "/ownership-requests/pending",
@@ -180,19 +200,17 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/household/docs/**", "/household/find-by-id/", "/household/search/", "household/search-no-owner/","household/no-owner",
                         "/household/availability/", "/real-estate-request", "/real-estate-request/{ownerId}/all",
                         "/real-estate-request/admin/requests", "/real-estate-request/admin/request/{requestId}",
-                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}", "household/graph/",
+                        "/users/byId/{userId}", "/real-estate-request/documentation/{realEstateId}",
+                        "/real-estate-request/images/{realEstateId}", "household/graph/",
                         "/consumption/{city}/{timeRange}", "/consumption/municipalities", "/consumption/graph/{city}/{timeRange}",
                         "/consumption/cities", "consumption/household/graph/{householdId}/{timeRange}", "consumption/household/{householdId}/{timeRange}",
                         "/socket/info/", "/socket/", "/employee/search", "employee/find-by-id/",
                         "appointments/available-slots/", "employee/find-by-user-id/",
                         "appointments/get-employees-appointments-for-date/", "employee/all-employees",
-                        "household/current/", "household/owner",
-                        "/users/byId/{userId}", "/real-estate-request/images/{realEstateId}",
-                        "/socket/info/", "/socket/", "/employee/search/", "employee/find-by-id/",
-                "/employee/all-employees-no-pagination",
-
-        "appointments/available-slots/", "employee/find-by-user-id/",
-                        "appointments/get-employees-appointments-for-date/", "employee/all-employees");
+                        "household/current/", "household/owner", "citizen/search", "household/getForOwner/{ownerId}",
+                        "price-list/find-all", "price-list/find-by-id/{id}", "price-list/find-for-date/{date}",
+                        "/receipts/all-for-household/{householdId}", "/receipts/all-for-owner/{ownerId}",
+                        "/receipts/by-id/{receiptId}", "/employee/all-employees-no-pagination");
 
         // Ovim smo dozvolili pristup statickim resursima aplikacije
 //                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",

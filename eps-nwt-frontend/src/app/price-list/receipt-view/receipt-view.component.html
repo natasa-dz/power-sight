@@ -1,0 +1,74 @@
+<app-navbar-citizen></app-navbar-citizen>
+<div class="body">
+  <div class="details-container">
+    <h2>Receipt Details</h2>
+    <div class="details-content">
+      <div class="info">
+        <p><strong>Owner:</strong> {{ receipt?.ownerUsername }}</p>
+        <p><strong>Address:</strong> {{ receipt?.householdAddress }}, {{ receipt?.householdApartmentNumber }}</p>
+        <p><strong>Status:</strong> {{ this.status }}</p>
+        <p><strong>Amount:</strong> {{ receipt?.price }} RSD</p>
+        <p><strong>Created At:</strong> {{ receipt?.month }} {{ receipt?.year }}</p>
+        <p *ngIf="receipt?.paid">
+          <strong>Payment Date:</strong> {{ this.finishedAt }}
+        </p>
+      </div>
+
+      <div class="images">
+        <table class="zones-table" >
+          <thead>
+          <tr>
+            <th>Zone</th>
+            <th>Price per kWh</th>
+            <th>Consumption</th>
+            <th>Total Price</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr >
+            <td>Green</td>
+            <td>{{ receipt?.priceList?.greenZone }} RSD</td>
+            <td>{{ receipt?.greenZoneConsumption }} kWh</td>
+            <td>{{ this.green }} RSD</td>
+          </tr>
+          <tr>
+            <td>Blue</td>
+            <td>{{ receipt?.priceList?.blueZone }} RSD</td>
+            <td>{{ receipt?.blueZoneConsumption }} kWh</td>
+            <td>{{ this.blue }} RSD</td>
+          </tr>
+          <tr>
+            <td>Red</td>
+            <td>{{ receipt?.priceList?.redZone }} RSD</td>
+            <td>{{ receipt?.redZoneConsumption }} kWh</td>
+            <td>{{ this.red }} RSD</td>
+          </tr>
+          <tr >
+            <td>Base</td>
+            <td></td>
+            <td></td>
+            <td>{{ receipt?.priceList?.basePrice }} RSD</td>
+          </tr>
+          <tr  >
+            <td>PDV</td>
+            <td></td>
+            <td></td>
+            <td>{{ receipt?.priceList?.pdvPercentage }} </td>
+          </tr>
+          <tr >
+            <td></td>
+            <td></td>
+            <td>{{ this.totalConsumption }} kWh</td>
+            <td>{{ receipt?.price }} RSD</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="buttons" *ngIf="!receipt?.paid">
+        <button (click)="pay()" class="btn">Pay</button>
+      </div>
+    </div>
+  </div>
+</div>
+

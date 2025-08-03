@@ -42,6 +42,9 @@ public interface HouseholdRepository extends JpaRepository<Household, Long> {
     @Query("SELECT h FROM Household h WHERE h.owner IS NULL ")
     Page<Household> searchNoOwner(Pageable pageable);
 
+    @Query("SELECT h FROM Household h WHERE h.owner.id = :id ")
+    List<Household> findForOwner(@Param("id") Long id);
+
     @Query("SELECT h FROM Household h WHERE h.owner.id= :id ")
     Page<Household> searchOwner(Pageable pageable, @Param("id") Long id);
 
