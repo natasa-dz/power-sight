@@ -2,11 +2,14 @@ package com.example.epsnwtbackend.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.env.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +21,12 @@ public class AmqpConfig implements DeliverCallback {
     private final String host;
     private final Integer port;
 
+    @Value("${rabbitmq.management.username}")
+    private String username;
+
+    @Value("${rabbitmq.management.password}")
+    private String password;
+
     public AmqpConfig(Environment env) {
         this.host = env.getProperty("amqp.host");
         this.port = Integer.parseInt(Objects.requireNonNull(env.getProperty("amqp.port")));
@@ -26,11 +35,19 @@ public class AmqpConfig implements DeliverCallback {
     @Bean
     public Channel amqpClient() throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
+        System.out.println("MILA KONEKCIJA " + this.host + ":" + this.port);
         factory.setHost(this.host);
         factory.setPort(this.port);
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
         return channel;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+                .basicAuthentication(username, password)
+                .build();
     }
 
     @Override

@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -25,17 +29,19 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 public class AppConfig {
 
-    private static final String RABBITMQ_API_URL = "http://localhost:15672/api/queues";
-    private static final String RABBITMQ_USER = "guest";
-    private static final String RABBITMQ_PASSWORD = "guest";
+    @Value("${rabbitmq.management.username}")
+    private String username;
+
+    @Value("${rabbitmq.management.password}")
+    private String password;
+
+    @Value("${rabbitmq.api.url}")
+    private String apiUrl;
 
     private List<String> heartbeatQueueNames = Collections.emptyList();
     private List<String> consumptionQueueNames = Collections.emptyList();
@@ -43,25 +49,39 @@ public class AppConfig {
     @Autowired
     RabbitQueueService rabbitQueueService;
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @PostConstruct
+    public void logInjectedValues() {
+        System.out.println("✅ RabbitMQ API URL: " + apiUrl);
+        System.out.println("✅ Username: " + username);
+        System.out.println("✅ Password: " + password);
     }
 
     public List<String> getHeartbeatQueues(RestTemplate restTemplate) {
-        String url = UriComponentsBuilder.fromHttpUrl(RABBITMQ_API_URL)
+        String url1 = String.format("%s/api/queues", apiUrl);
+        System.out.println("MILAAAAAAAAAAAA: " + url1);
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .build().toUriString();
 
         // Set up authentication headers
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(RABBITMQ_USER, RABBITMQ_PASSWORD);
+        headers.setBasicAuth("guest", "guest");
 
         // Wrap headers in an HttpEntity
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Make the API request with authentication headers
         try {
-            ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+
+            /*ResponseEntity<Queue[]> response = restTemplate.exchange(
+                    "http://rabbitmq:15672/api/queues",
+                    HttpMethod.GET,
+                    entity,
+                    Queue[].class
+            );*/
+            ResponseEntity<List> response = restTemplate.exchange(apiUrl + "/queues", HttpMethod.GET, entity, List.class);
             List<?> queues = response.getBody();
 
             return queues.stream()
@@ -76,19 +96,19 @@ public class AppConfig {
     }
 
     public List<String> getConsumptionQueues(RestTemplate restTemplate) {
-        String url = UriComponentsBuilder.fromHttpUrl(RABBITMQ_API_URL)
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .build().toUriString();
 
         // Set up authentication headers
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(RABBITMQ_USER, RABBITMQ_PASSWORD);
+        headers.setBasicAuth(username, password);
 
         // Wrap headers in an HttpEntity
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Make the API request with authentication headers
         try {
-            ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+            ResponseEntity<List> response = restTemplate.exchange(apiUrl + "/queues", HttpMethod.GET, entity, List.class);
             List<?> queues = response.getBody();
 
             return queues.stream()
@@ -102,9 +122,8 @@ public class AppConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 20000)
     public void updateQueues() {
-        RestTemplate restTemplate = restTemplate();
 
         Set<String> newHeartbeatQueues = new HashSet<>(getHeartbeatQueues(restTemplate));
         Set<String> newConsumptionQueues = new HashSet<>(getConsumptionQueues(restTemplate));
