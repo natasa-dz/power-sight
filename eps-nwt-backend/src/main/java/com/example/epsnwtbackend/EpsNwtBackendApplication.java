@@ -12,12 +12,11 @@ public class EpsNwtBackendApplication {
 	private static final Logger log = LoggerFactory.getLogger(EpsNwtBackendApplication.class);
 
 	public static void main(String[] args) {
-		log.info("➡️ Starting app...");
 		try {
 			SpringApplication.run(EpsNwtBackendApplication.class, args);
-			log.info("✅ Application started successfully");
+			log.info("Application started successfully");
 		} catch (Exception e) {
-			log.error("❌ Application failed to start", e);
+			log.error("Application failed to start", e);
 		}
 	}
 }

@@ -21,12 +21,26 @@ services:
     ports:
       - "8086:8086"
     environment:
-      - INFLUXDB_DB=eps_db
-      - INFLUXDB_ADMIN_USER=admin
-      - INFLUXDB_ADMIN_PASSWORD=admin_password
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin_password
+      DOCKER_INFLUXDB_INIT_ORG: nwt
+      DOCKER_INFLUXDB_INIT_BUCKET: initial_bucket
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA==
     volumes:
       - influxdb-data:/var/lib/influxdb2
+      - ./influx-init.sh:/docker-entrypoint-initdb.d/influx-init.sh:ro
     restart: always
+
+  influxdb-cli:
+    image: influxdb:2.7
+    container_name: influxdb-cli
+    entrypoint: >
+      sh -c "sleep 10 &&
+      influx bucket create --name heartbeats --org nwt --token sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA== --host http://influxdb:8086 &&
+      influx bucket create --name consumptions --org nwt --token sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA== --host http://influxdb:8086"
+    depends_on:
+      - influxdb
 
   postgres:
     image: postgres:15
@@ -98,7 +112,12 @@ services:
       RABBITMQ_MANAGEMENT_PORT: 15672
       RABBITMQ_MANAGEMENT_USERNAME: guest
       RABBITMQ_MANAGEMENT_PASSWORD: guest
-      RABBIT_MANAGEMENT_URL: http://rabbitmq:15672
+      RABBIT_MANAGEMENT_URL: http://rabbitmq:15672/api
+
+      SPRING_INFLUXDB_URL: http://influxdb:8086
+      SPRING_INFLUXDB_TOKEN: sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA==
+      SPRING_INFLUXDB_ORG: nwt
+      SPRING_INFLUXDB_BUCKET: initial_bucket
 
       REDIS_HOST: redis
       REDIS_PORT: 6379
@@ -112,20 +131,8 @@ services:
     depends_on:
       - backend
     restart: always
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./frontend/dist/eps-nwt-frontend:/usr/share/nginx/html:ro
-      - ./uploads:/usr/share/nginx/uploads
     ports:
-      - "80:80"
-    depends_on:
-      - frontend
-      - backend
-    restart: always
+      - "4200:80"
 
 volumes:
   postgres-data:

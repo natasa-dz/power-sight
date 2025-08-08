@@ -35,7 +35,6 @@ public class AmqpConfig implements DeliverCallback {
     @Bean
     public Channel amqpClient() throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
-        System.out.println("MILA KONEKCIJA " + this.host + ":" + this.port);
         factory.setHost(this.host);
         factory.setPort(this.port);
         Connection connection = factory.newConnection();
