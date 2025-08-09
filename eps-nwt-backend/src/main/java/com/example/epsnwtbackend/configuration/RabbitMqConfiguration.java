@@ -53,6 +53,7 @@ public class RabbitMqConfiguration implements RabbitListenerConfigurer {
     }
     @Override
     public void configureRabbitListeners(final RabbitListenerEndpointRegistrar registrar) {
+        System.out.println("HOST I PORT SU " + connectionFactory.getHost() + ":" + connectionFactory.getPort());
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setPrefetchCount(1);
         factory.setConsecutiveActiveTrigger(1);
