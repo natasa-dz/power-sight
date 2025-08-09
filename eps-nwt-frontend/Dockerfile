@@ -15,7 +15,7 @@ FROM nginx:stable-alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy built Angular app from previous stage to Nginx's html folder
-COPY --from=build /app/dist/nwt-eps-frontend /usr/share/nginx/html
+COPY --from=build /app/dist/nwt-eps-frontend/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port 80 to serve the app
