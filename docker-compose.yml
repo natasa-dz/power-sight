@@ -6,4 +6,136 @@ services:
     container_name: redis-cache
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin_password
+      DOCKER_INFLUXDB_INIT_ORG: nwt
+      DOCKER_INFLUXDB_INIT_BUCKET: initial_bucket
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA==
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - ./influx-init.sh:/docker-entrypoint-initdb.d/influx-init.sh:ro
+    restart: always
+
+  influxdb-cli:
+    image: influxdb:2.7
+    container_name: influxdb-cli
+    entrypoint: >
+      sh -c "sleep 10 &&
+      influx bucket create --name heartbeats --org nwt --token sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA== --host http://influxdb:8086 &&
+      influx bucket create --name consumptions --org nwt --token sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA== --host http://influxdb:8086"
+    depends_on:
+      - influxdb
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=nwt
+      - POSTGRES_PASSWORD=epsnwtdockerpassword
+      - POSTGRES_DB=eps_nwt
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nwt -d eps_nwt"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  backend:
+    build:
+      context: ./eps-nwt-backend
+      dockerfile: Dockerfile
+    container_name: spring-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      influxdb:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/eps_nwt
+      SPRING_DATASOURCE_USERNAME: nwt
+      SPRING_DATASOURCE_PASSWORD: epsnwtdockerpassword
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      
+      # For the wait script
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: nwt
+      POSTGRES_PASSWORD: epsnwtdockerpassword
+      POSTGRES_DB: eps_nwt
+
+      #for rabbitmq
+      AMQP_HOST: rabbitmq
+      AMQP_PORT: 5672
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      RABBITMQ_MANAGEMENT_HOST: rabbitmq
+      RABBITMQ_MANAGEMENT_PORT: 15672
+      RABBITMQ_MANAGEMENT_USERNAME: guest
+      RABBITMQ_MANAGEMENT_PASSWORD: guest
+      RABBIT_MANAGEMENT_URL: http://rabbitmq:15672/api
+
+      SPRING_INFLUXDB_URL: http://influxdb:8086
+      SPRING_INFLUXDB_TOKEN: sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA==
+      SPRING_INFLUXDB_ORG: nwt
+      SPRING_INFLUXDB_BUCKET: initial_bucket
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    restart: always
+
+  frontend:
+    build:
+      context: ./eps-nwt-frontend
+      dockerfile: Dockerfile
+    container_name: angular-frontend
+    depends_on:
+      - backend
+    restart: always
+    ports:
+      - "4200:80"
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+  influxdb-data:
