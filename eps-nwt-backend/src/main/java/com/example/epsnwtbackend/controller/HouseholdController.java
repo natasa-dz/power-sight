@@ -4,6 +4,7 @@ import com.example.epsnwtbackend.dto.*;
 import com.example.epsnwtbackend.model.Household;
 import com.example.epsnwtbackend.service.HouseholdService;
 import com.example.epsnwtbackend.service.InfluxService;
+import com.example.epsnwtbackend.utils.CyrillicConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +52,7 @@ public class HouseholdController {
         if (apartmentNumber != null && apartmentNumber < 0) {
             return ResponseEntity.badRequest().build();
         }
-        Page<HouseholdSearchDTO> households = householdService.search(municipality, address,
+        Page<HouseholdSearchDTO> households = householdService.search(municipality, CyrillicConverter.toLatin2(address),
                 apartmentNumber, pageable);
         return ResponseEntity.ok(households);
     }
@@ -60,33 +61,15 @@ public class HouseholdController {
 
     @GetMapping(path = "/no-owner")
     public ResponseEntity<Page<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
-        Page<Household> households = householdService.noOwnerHouseholds(pageable);
-
-        Page<HouseholdDto> householdDTOs = households.map(household -> new HouseholdDto(
-                household.getId(),
-                household.getFloor(),
-                household.getSquareFootage(),
-                household.getApartmentNumber(),
-                household.getRealEstate().getId()
-        ));
-
-        return ResponseEntity.ok(householdDTOs);
+        Page<HouseholdDto> households = householdService.noOwnerHouseholds(pageable);
+        return ResponseEntity.ok(households);
     }
 
 
     @GetMapping(path = "/owner")
     public ResponseEntity<Page<HouseholdDto>> getOwnerHouseholds(Pageable pageable, @RequestParam Long ownerId) {
-        Page<Household> households = householdService.ownerHouseholds(pageable, ownerId);
-
-        Page<HouseholdDto> householdDTOs = households.map(household -> new HouseholdDto(
-                household.getId(),
-                household.getFloor(),
-                household.getSquareFootage(),
-                household.getApartmentNumber(),
-                household.getRealEstate().getId()
-        ));
-
-        return ResponseEntity.ok(householdDTOs);
+        Page<HouseholdDto> households = householdService.ownerHouseholds(pageable, ownerId);
+        return ResponseEntity.ok(households);
     }
 
     @GetMapping(path = "/search-no-owner/{municipality}/{address}")
@@ -96,7 +79,7 @@ public class HouseholdController {
         if (apartmentNumber != null && apartmentNumber < 0) {
             return ResponseEntity.badRequest().build();
         }
-        Page<HouseholdSearchDTO> households = householdService.searchNoOwner(municipality, address,
+        Page<HouseholdSearchDTO> households = householdService.searchNoOwner(municipality, CyrillicConverter.toLatin2(address),
                 apartmentNumber, pageable);
         return ResponseEntity.ok(households);
     }

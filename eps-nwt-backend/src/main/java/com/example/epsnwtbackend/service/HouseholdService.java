@@ -1,11 +1,13 @@
 package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.*;
-import com.example.epsnwtbackend.model.AccessGranted;
-import com.example.epsnwtbackend.model.Household;
+import com.example.epsnwtbackend.model.*;
 import com.example.epsnwtbackend.repository.AccessGrantedRepository;
 import com.example.epsnwtbackend.repository.HouseholdRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
@@ -39,6 +41,7 @@ public class HouseholdService {
     @Autowired
     private AccessGrantedRepository accessGrantedRepository;
 
+    @Cacheable(value = "householdDetails", key = "#id")
     public ViewHouseholdDTO getHousehold(Long id) throws NoResourceFoundException {
         Optional<Household> reference = householdRepository.findById(id);
         if (reference.isPresent()) {
@@ -59,20 +62,33 @@ public class HouseholdService {
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
     }
 
+    // for receipts
     public List<Household> getAll() {
-        return householdRepository.findAll();
+        return householdRepository.findByOwnerIsNotNull();
     }
 
     public Page<HouseholdSearchDTO> searchNoOwner(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
         return householdRepository.findHouseholdsWithoutOwner(municipality, address, apartmentNumber, pageable);
     }
 
-    public Page<Household> noOwnerHouseholds(Pageable pageable) {
-        return householdRepository.searchNoOwner(pageable);
+    public Page<HouseholdDto> noOwnerHouseholds(Pageable pageable) {
+        return householdRepository.searchNoOwner(pageable).map(household -> new HouseholdDto(
+                household.getId(),
+                household.getFloor(),
+                household.getSquareFootage(),
+                household.getApartmentNumber(),
+                household.getRealEstate().getId()
+        ));
     }
 
-    public Page<Household> ownerHouseholds(Pageable pageable, Long ownerId){
-        return householdRepository.searchOwner(pageable, ownerId);
+    public Page<HouseholdDto> ownerHouseholds(Pageable pageable, Long ownerId){
+        return householdRepository.searchOwner(pageable, ownerId).map(household -> new HouseholdDto(
+                household.getId(),
+                household.getFloor(),
+                household.getSquareFootage(),
+                household.getApartmentNumber(),
+                household.getRealEstate().getId()
+        ));
     }
 
     public Page<HouseholdSearchDTO> search(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
@@ -392,6 +408,7 @@ public class HouseholdService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "householdAccess", key = "#id")
     public List<HouseholdAccessDTO> getHouseholdsForOwner(Long id) throws NoResourceFoundException {
         List<Household> households = householdRepository.findForOwner(id);
         List<HouseholdAccessDTO> dtos = new ArrayList<>();
@@ -416,6 +433,10 @@ public class HouseholdService {
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "householdDetails", key = "#householdId"),
+            @CacheEvict(value = "householdAccess", allEntries = true)
+    })
     public void allowAccess(Long householdId, List<Long> ids) {
         Household household = householdRepository.getReferenceById(householdId);
         List<Long> existingIds = accessGrantedRepository.findCitizenIdsByHouseholdId(householdId);
