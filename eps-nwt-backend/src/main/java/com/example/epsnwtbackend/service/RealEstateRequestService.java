@@ -188,7 +188,7 @@ public class RealEstateRequestService {
         realEstateRepository.save(realEstate);
     }
 
-    @CacheEvict(value = {"householdDetails"}, allEntries = true)
+    @CacheEvict(value = {"householdDetails", "noOwnerHouseholds"}, allEntries = true)
     public Household createHousehold(HouseholdRequest request, RealEstate realEstate, User owner){
         Household household = new Household();
         household.setFloor(request.getFloor());

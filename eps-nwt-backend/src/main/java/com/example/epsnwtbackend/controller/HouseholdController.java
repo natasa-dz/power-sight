@@ -1,7 +1,7 @@
 package com.example.epsnwtbackend.controller;
 
 import com.example.epsnwtbackend.dto.*;
-import com.example.epsnwtbackend.model.Household;
+import com.example.epsnwtbackend.dto.CacheablePage;
 import com.example.epsnwtbackend.service.HouseholdService;
 import com.example.epsnwtbackend.service.InfluxService;
 import com.example.epsnwtbackend.utils.CyrillicConverter;
@@ -47,12 +47,12 @@ public class HouseholdController {
     // na katastru se u opstini unosi adresa ili broj parcele
     // za pretragu domacinstava je mozda najbolje opstina + adresa + broj stana
     @GetMapping(path = "/search/{municipality}/{address}")
-    public ResponseEntity<Page<HouseholdSearchDTO>> search(@PathVariable String municipality,
-           @PathVariable String address, @RequestParam(required = false) Integer apartmentNumber, Pageable pageable) {
+    public ResponseEntity<CacheablePage<HouseholdSearchDTO>> search(@PathVariable String municipality,
+                                                @PathVariable String address, @RequestParam(required = false) Integer apartmentNumber, Pageable pageable) {
         if (apartmentNumber != null && apartmentNumber < 0) {
             return ResponseEntity.badRequest().build();
         }
-        Page<HouseholdSearchDTO> households = householdService.search(municipality, CyrillicConverter.toLatin2(address),
+        CacheablePage<HouseholdSearchDTO> households = householdService.search(municipality, CyrillicConverter.toLatin2(address),
                 apartmentNumber, pageable);
         return ResponseEntity.ok(households);
     }
@@ -60,26 +60,26 @@ public class HouseholdController {
 
 
     @GetMapping(path = "/no-owner")
-    public ResponseEntity<Page<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
-        Page<HouseholdDto> households = householdService.noOwnerHouseholds(pageable);
+    public ResponseEntity<CacheablePage<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
+        CacheablePage<HouseholdDto> households = householdService.noOwnerHouseholds(pageable);
         return ResponseEntity.ok(households);
     }
 
 
     @GetMapping(path = "/owner")
-    public ResponseEntity<Page<HouseholdDto>> getOwnerHouseholds(Pageable pageable, @RequestParam Long ownerId) {
-        Page<HouseholdDto> households = householdService.ownerHouseholds(pageable, ownerId);
+    public ResponseEntity<CacheablePage<HouseholdDto>> getOwnerHouseholds(Pageable pageable, @RequestParam Long ownerId) {
+        CacheablePage<HouseholdDto> households = householdService.ownerHouseholds(pageable, ownerId);
         return ResponseEntity.ok(households);
     }
 
     @GetMapping(path = "/search-no-owner/{municipality}/{address}")
-    public ResponseEntity<Page<HouseholdSearchDTO>> searchNoOwner(
+    public ResponseEntity<CacheablePage<HouseholdSearchDTO>> searchNoOwner(
             @PathVariable String municipality, @PathVariable String address,
             @RequestParam(required = false) Integer apartmentNumber, Pageable pageable) {
         if (apartmentNumber != null && apartmentNumber < 0) {
             return ResponseEntity.badRequest().build();
         }
-        Page<HouseholdSearchDTO> households = householdService.searchNoOwner(municipality, CyrillicConverter.toLatin2(address),
+        CacheablePage<HouseholdSearchDTO> households = householdService.searchNoOwner(municipality, CyrillicConverter.toLatin2(address),
                 apartmentNumber, pageable);
         return ResponseEntity.ok(households);
     }
@@ -268,6 +268,7 @@ public class HouseholdController {
     public ResponseEntity<String> allowAccess(@PathVariable Long householdId,
                                               @RequestBody List<Long> ids) {
         try {
+            System.out.println("kontroler");
             householdService.allowAccess(householdId, ids);
             return ResponseEntity.ok("Successfully allowed access.");
         } catch (Exception e) {
