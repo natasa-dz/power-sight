@@ -10,6 +10,9 @@ import com.example.epsnwtbackend.repository.AppointmentRepositoryCustom;
 import com.example.epsnwtbackend.repository.EmployeeRepository;
 import jakarta.persistence.LockModeType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,10 @@ public class AppointmentService {
     private static final LocalTime BREAK_END = LocalTime.of(12, 30);
 
 
+    @Cacheable(
+            value = "availableSlots",
+            key = "{#employeeId, #date}"
+    )
     public List<LocalDateTime> getAvailableSlots(Long employeeId, LocalDate date) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
@@ -77,6 +84,10 @@ public class AppointmentService {
         return availableSlots;
     }
 
+    @Cacheable(
+            value = "employeeAppointments",
+            key = "{#employeeId, #date}"
+    )
     public List<AppointmentDTO> getAppointments(Long employeeId, LocalDate date) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
@@ -108,6 +119,12 @@ public class AppointmentService {
         return appointmentDTOs;
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "availableSlots", key = "{#employeeId, #startTime.toLocalDate()}"),
+                    @CacheEvict(value = "employeeAppointments", key = "{#employeeId, #startTime.toLocalDate()}")
+            }
+    )
     @Transactional
     public void bookAppointment(Long employeeId, Long userId, LocalDateTime startTime, int slotCount) {
         if (slotCount <= 0) {
@@ -156,6 +173,12 @@ public class AppointmentService {
         }
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "availableSlots", key = "{#employeeId, #startTime.toLocalDate()}"),
+                    @CacheEvict(value = "employeeAppointments", key = "{#employeeId, #startTime.toLocalDate()}")
+            }
+    )
     @Transactional
     public boolean tryBookAppointment(Long employeeId, Long userId, LocalDateTime startTime, int slotCount) {
         try {
@@ -166,6 +189,12 @@ public class AppointmentService {
         }
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "availableSlots", allEntries = true),
+                    @CacheEvict(value = "employeeAppointments", allEntries = true)
+            }
+    )
     @Transactional
     public void cancelAppointments(Long employeeId) {
         if (!employeeRepository.existsById(employeeId)) {

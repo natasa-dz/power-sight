@@ -19,6 +19,10 @@ import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,9 +33,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -42,7 +44,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.util.Optional;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -73,12 +75,17 @@ public class ReceiptService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    CacheManager cacheManager;
 
 
+
+    @Cacheable(value = "receiptById", key = "#receiptId")
     public ReceiptDTO getReceipt(Long receiptId) {
         return ReceiptDTO.toDTO(receiptRepository.getReferenceById(receiptId));
     }
 
+    @Cacheable(value = "receiptsForOwner", key = "#ownerId")
     public List<ReceiptDTO> getAllReceiptsForOwner(Long ownerId) {
         List<Receipt> result = new ArrayList<>();
         List<ReceiptDTO> receipts = new ArrayList<>();
@@ -90,6 +97,7 @@ public class ReceiptService {
         return receipts;
     }
 
+    @Cacheable(value = "receiptsForHousehold", key = "#householdId")
     public List<ReceiptDTO> getAllReceiptsForHousehold(Long householdId) {
         List<ReceiptDTO> receipts = new ArrayList<>();
         List<Receipt> result = receiptRepository.getAllByHousehold_Id(householdId);
@@ -98,7 +106,10 @@ public class ReceiptService {
         }
         return receipts;
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "receiptsForHousehold", allEntries = true),
+            @CacheEvict(value = "receiptsForOwner", allEntries = true)
+    })
     public void createReceipts(String month, int year) throws Exception {
         boolean isReceiptCreated = checkIsReceiptCreated(month, year);
         if (isReceiptCreated) {
@@ -343,7 +354,12 @@ public class ReceiptService {
     }
 
     @Transactional
-    public void payment(Long receiptId, String username) throws Exception {
+    @Caching(evict = {
+            @CacheEvict(value = "receiptById", key="#receiptId"),
+            @CacheEvict(value = "receiptsForOwner", allEntries = true),
+            @CacheEvict(value = "receiptsForHousehold", key="#householdId")
+    })
+    public void payment(Long receiptId, String username, Long ownerId, Long householdId) throws Exception {
         Receipt receipt = receiptRepository.getReferenceById(receiptId);
         if (receipt != null){
             receipt.setPaid(true);

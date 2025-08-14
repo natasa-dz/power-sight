@@ -4,6 +4,7 @@ import com.example.epsnwtbackend.dto.PaymentDTO;
 import com.example.epsnwtbackend.dto.PaymentSlipDTO;
 import com.example.epsnwtbackend.dto.ReceiptDTO;
 import com.example.epsnwtbackend.model.Receipt;
+import com.example.epsnwtbackend.repository.ReceiptRepository;
 import com.example.epsnwtbackend.service.ReceiptService;
 import com.example.epsnwtbackend.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequestMapping("/receipts")
 public class ReceiptController {
     @Autowired private ReceiptService receiptService;
+    @Autowired private ReceiptRepository receiptRepository;
     @Autowired private TokenUtils tokenService;
 
     @PostMapping("/create/{month}/{year}")
@@ -68,9 +70,10 @@ public class ReceiptController {
     @PutMapping("/pay/{receiptId}")
     public ResponseEntity<String> payReceipt(@PathVariable Long receiptId,
                                              @RequestBody PaymentDTO paymentDTO){
-        System.out.println("POGODIOOO: "+ paymentDTO.getUsername());
         try {
-            receiptService.payment(receiptId, paymentDTO.getUsername());
+            Receipt receipt = receiptRepository.getReferenceById(receiptId);
+            receiptService.payment(receiptId, paymentDTO.getUsername(),
+                    receipt.getHousehold().getOwner().getId(), receipt.getHousehold().getId());
             return ResponseEntity.ok().body("Success");
         } catch (Exception e) {
             e.printStackTrace();

@@ -39,10 +39,58 @@ public class CyrillicConverter {
         cyrToLatMap.put('Ш', "Š");   cyrToLatMap.put('ш', "š");
     }
 
+    private static final Map<Character, String> cyrToLatMap2 = new HashMap<>();
+
+    static {
+        cyrToLatMap2.put('А', "A");   cyrToLatMap2.put('а', "a");
+        cyrToLatMap2.put('Б', "B");   cyrToLatMap2.put('б', "b");
+        cyrToLatMap2.put('В', "V");   cyrToLatMap2.put('в', "v");
+        cyrToLatMap2.put('Г', "G");   cyrToLatMap2.put('г', "g");
+        cyrToLatMap2.put('Д', "D");   cyrToLatMap2.put('д', "d");
+        cyrToLatMap2.put('Ђ', "Dj");   cyrToLatMap2.put('ђ', "dj");
+        cyrToLatMap2.put('Е', "E");   cyrToLatMap2.put('е', "e");
+        cyrToLatMap2.put('Ж', "Z");   cyrToLatMap2.put('ж', "z");
+        cyrToLatMap2.put('З', "Z");   cyrToLatMap2.put('з', "z");
+        cyrToLatMap2.put('И', "I");   cyrToLatMap2.put('и', "i");
+        cyrToLatMap2.put('Ј', "J");   cyrToLatMap2.put('ј', "j");
+        cyrToLatMap2.put('К', "K");   cyrToLatMap2.put('к', "k");
+        cyrToLatMap2.put('Л', "L");   cyrToLatMap2.put('л', "l");
+        cyrToLatMap2.put('Љ', "Lj");  cyrToLatMap2.put('љ', "lj");
+        cyrToLatMap2.put('М', "M");   cyrToLatMap2.put('м', "m");
+        cyrToLatMap2.put('Н', "N");   cyrToLatMap2.put('н', "n");
+        cyrToLatMap2.put('Њ', "Nj");  cyrToLatMap2.put('њ', "nj");
+        cyrToLatMap2.put('О', "O");   cyrToLatMap2.put('о', "o");
+        cyrToLatMap2.put('П', "P");   cyrToLatMap2.put('п', "p");
+        cyrToLatMap2.put('Р', "R");   cyrToLatMap2.put('р', "r");
+        cyrToLatMap2.put('С', "S");   cyrToLatMap2.put('с', "s");
+        cyrToLatMap2.put('Т', "T");   cyrToLatMap2.put('т', "t");
+        cyrToLatMap2.put('Ћ', "C");   cyrToLatMap2.put('ћ', "c");
+        cyrToLatMap2.put('У', "U");   cyrToLatMap2.put('у', "u");
+        cyrToLatMap2.put('Ф', "F");   cyrToLatMap2.put('ф', "f");
+        cyrToLatMap2.put('Х', "H");   cyrToLatMap2.put('х', "h");
+        cyrToLatMap2.put('Ц', "C");   cyrToLatMap2.put('ц', "c");
+        cyrToLatMap2.put('Ч', "C");   cyrToLatMap2.put('ч', "c");
+        cyrToLatMap2.put('Џ', "Dz");  cyrToLatMap2.put('џ', "dz");
+        cyrToLatMap2.put('Ш', "S");   cyrToLatMap2.put('ш', "s");
+        cyrToLatMap2.put('Ž', "Z");   cyrToLatMap2.put('ž', "z");
+        cyrToLatMap2.put('Ć', "C");   cyrToLatMap2.put('ć', "c");
+        cyrToLatMap2.put('Č', "C");   cyrToLatMap2.put('č', "c");
+        cyrToLatMap2.put('Š', "S");   cyrToLatMap2.put('š', "s");
+    }
+
     public static String toLatin(String cyrillic) {
         StringBuilder latin = new StringBuilder();
         for (char c : cyrillic.toCharArray()) {
             String converted = cyrToLatMap.getOrDefault(c, String.valueOf(c));
+            latin.append(converted);
+        }
+        return latin.toString();
+    }
+
+    public static String toLatin2(String cyrillic) {
+        StringBuilder latin = new StringBuilder();
+        for (char c : cyrillic.toCharArray()) {
+            String converted = cyrToLatMap2.getOrDefault(c, String.valueOf(c));
             latin.append(converted);
         }
         return latin.toString();

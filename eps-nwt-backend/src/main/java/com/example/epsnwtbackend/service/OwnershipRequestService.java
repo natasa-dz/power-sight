@@ -9,6 +9,9 @@ import com.example.epsnwtbackend.repository.OwnershipRequestRepository;
 import com.example.epsnwtbackend.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -54,11 +57,17 @@ public class OwnershipRequestService {
         return folder.toString();
     }
 
+    @Cacheable(value = "pendingRequests")
     public List<OwnershipRequest> getPendingRequests() {
         return ownershipRequestRepository.findByStatus(Status.PENDING);
     }
+    @Caching(evict = {
+            @CacheEvict(value = "pendingRequests", allEntries = true),
+            @CacheEvict(value = "userOwnershipRequests", key = "#username"),
+            @CacheEvict(value = "noOwnerHouseholds", allEntries = true)
+    })
     //TODO: modify register funkciju, setovanje i id usera, pronalazenje!
-    public void processRequest(Long requestId, boolean approved, String reason) throws MessagingException, NoResourceFoundException {
+    public void processRequest(Long requestId, boolean approved, String reason, String username) throws MessagingException, NoResourceFoundException {
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));
 
@@ -86,6 +95,7 @@ public class OwnershipRequestService {
         ownershipRequestRepository.save(request);
     }
 
+    @Cacheable(value = "userOwnershipRequests", key="#username")
     public List<OwnershipRequest> getUserOwnershipRequests(String username){
         return ownershipRequestRepository.findByUserId(username);
     }
