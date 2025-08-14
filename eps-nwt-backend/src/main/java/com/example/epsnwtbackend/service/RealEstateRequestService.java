@@ -6,6 +6,7 @@ import com.example.epsnwtbackend.dto.RealEstateRequestDTO;
 import com.example.epsnwtbackend.enums.RealEstateRequestStatus;
 import com.example.epsnwtbackend.model.*;
 import com.example.epsnwtbackend.repository.*;
+import com.example.epsnwtbackend.utils.CyrillicConverter;
 import com.example.epsnwtbackend.utils.ImageUploadUtil;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,8 @@ public class RealEstateRequestService {
                                            List<HouseholdRequest> householdRequests){
         RealEstateRequest request = new RealEstateRequest();
         request.setOwner(requestDTO.getOwner());
-        request.setAddress(requestDTO.getAddress());
+        String address = CyrillicConverter.toLatin2(requestDTO.getAddress());
+        request.setAddress(address);
         request.setMunicipality(requestDTO.getMunicipality());
         request.setTown(requestDTO.getTown());
         request.setFloors(requestDTO.getFloors());
@@ -186,8 +188,8 @@ public class RealEstateRequestService {
         realEstateRepository.save(realEstate);
     }
 
-
-    private Household createHousehold(HouseholdRequest request, RealEstate realEstate, User owner){
+    @CacheEvict(value = {"householdDetails", "noOwnerHouseholds"}, allEntries = true)
+    public Household createHousehold(HouseholdRequest request, RealEstate realEstate, User owner){
         Household household = new Household();
         household.setFloor(request.getFloor());
         household.setSquareFootage(request.getSquareFootage());

@@ -110,7 +110,7 @@ public class UserController {
 
     @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto) throws MessagingException {
-        Optional<UserCredentials> credentials = userDetailsService.register(dto);
+        Optional<UserCredentials> credentials = userDetailsService.register(dto, dto.getUsername());
 
         if (credentials.isPresent()){
 
@@ -157,7 +157,7 @@ public class UserController {
         try {
             // Register user credentials
             UserDto dto = new UserDto(username, password, Role.valueOf(role), false, true, ""); // Assume 'false' for isActive
-            Optional<UserCredentials> credentials = userDetailsService.register(dto);
+            Optional<UserCredentials> credentials = userDetailsService.register(dto, dto.getUsername());
 
             if (credentials.isPresent()) {
                 User user = userService.findWholeUser(dto.getUsername());

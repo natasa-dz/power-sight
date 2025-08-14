@@ -1,5 +1,6 @@
 package com.example.epsnwtbackend.repository;
 
+import com.example.epsnwtbackend.dto.HouseholdDto;
 import com.example.epsnwtbackend.dto.HouseholdSearchDTO;
 import com.example.epsnwtbackend.model.Household;
 import org.springframework.data.domain.Page;
@@ -39,15 +40,16 @@ public interface HouseholdRepository extends JpaRepository<Household, Long> {
             Pageable pageable);
 
 
-    @Query("SELECT h FROM Household h WHERE h.owner IS NULL ")
-    Page<Household> searchNoOwner(Pageable pageable);
+    @Query("SELECT new com.example.epsnwtbackend.dto.HouseholdDto(h.id, h.floor, h.squareFootage, h.apartmentNumber, r.id) FROM Household h JOIN h.realEstate r WHERE h.owner IS NULL ")
+    Page<HouseholdDto> searchNoOwner(Pageable pageable);
 
     @Query("SELECT h FROM Household h WHERE h.owner.id = :id ")
     List<Household> findForOwner(@Param("id") Long id);
 
-    @Query("SELECT h FROM Household h WHERE h.owner.id= :id ")
-    Page<Household> searchOwner(Pageable pageable, @Param("id") Long id);
+    @Query("SELECT new com.example.epsnwtbackend.dto.HouseholdDto(h.id, h.floor, h.squareFootage, h.apartmentNumber, r.id) FROM Household h JOIN h.realEstate r WHERE h.owner.id= :id ")
+    Page<HouseholdDto> searchOwner(Pageable pageable, @Param("id") Long id);
 
+    List<Household> findByOwnerIsNotNull();
 
 }
 
