@@ -1,5 +1,6 @@
 package com.example.epsnwtbackend.controller;
 
+import com.example.epsnwtbackend.dto.CacheablePage;
 import com.example.epsnwtbackend.dto.CitizenSearchDTO;
 import com.example.epsnwtbackend.service.CitizenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,10 @@ public class CitizenController {
     private CitizenService citizenService;
 
     @GetMapping(path = "/search")
-    public ResponseEntity<Page<CitizenSearchDTO>> search(
+    public ResponseEntity<CacheablePage<CitizenSearchDTO>> search(
             @RequestParam(value = "username", required = false, defaultValue = "") String username,
             Pageable pageable) {
-        Page<CitizenSearchDTO> users = citizenService.search(username, pageable);
+        CacheablePage<CitizenSearchDTO> users = citizenService.search(username, pageable);
         return ResponseEntity.ok(users);
     }
 }

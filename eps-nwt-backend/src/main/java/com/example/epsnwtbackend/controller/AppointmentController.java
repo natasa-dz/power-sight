@@ -27,6 +27,7 @@ public class AppointmentController {
             List<LocalDateTime> slots = appointmentService.getAvailableSlots(employeeId, date);
             return ResponseEntity.ok(slots);
         } catch (RuntimeException e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
     }

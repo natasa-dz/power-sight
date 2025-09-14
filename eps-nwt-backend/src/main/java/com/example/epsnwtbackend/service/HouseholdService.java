@@ -1,17 +1,20 @@
 package com.example.epsnwtbackend.service;
 
 import com.example.epsnwtbackend.dto.*;
-import com.example.epsnwtbackend.model.AccessGranted;
-import com.example.epsnwtbackend.model.Household;
+import com.example.epsnwtbackend.dto.CacheablePage;
+import com.example.epsnwtbackend.model.*;
 import com.example.epsnwtbackend.repository.AccessGrantedRepository;
 import com.example.epsnwtbackend.repository.HouseholdRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -39,6 +42,7 @@ public class HouseholdService {
     @Autowired
     private AccessGrantedRepository accessGrantedRepository;
 
+    @Cacheable(value = "householdDetails", key = "#id")
     public ViewHouseholdDTO getHousehold(Long id) throws NoResourceFoundException {
         Optional<Household> reference = householdRepository.findById(id);
         if (reference.isPresent()) {
@@ -59,24 +63,33 @@ public class HouseholdService {
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
     }
 
+    // for receipts
     public List<Household> getAll() {
-        return householdRepository.findAll();
+        return householdRepository.findByOwnerIsNotNull();
     }
 
-    public Page<HouseholdSearchDTO> searchNoOwner(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
-        return householdRepository.findHouseholdsWithoutOwner(municipality, address, apartmentNumber, pageable);
+    @Cacheable(value = "searchNoOwner", key = "{#municipality, #address, #apartmentNumber, #pageable.pageNumber, #pageable.pageSize}")
+    public CacheablePage<HouseholdSearchDTO> searchNoOwner(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
+        Page<HouseholdSearchDTO> households =  householdRepository.findHouseholdsWithoutOwner(municipality, address, apartmentNumber, pageable);
+        return new CacheablePage<HouseholdSearchDTO>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
     }
 
-    public Page<Household> noOwnerHouseholds(Pageable pageable) {
-        return householdRepository.searchNoOwner(pageable);
+    @Cacheable(value = "noOwnerHouseholds", key = "{#pageable.pageNumber, #pageable.pageSize}")
+    public CacheablePage<HouseholdDto> noOwnerHouseholds(Pageable pageable) {
+        Page<HouseholdDto> households =  householdRepository.searchNoOwner(pageable);
+        return new CacheablePage<HouseholdDto>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
     }
 
-    public Page<Household> ownerHouseholds(Pageable pageable, Long ownerId){
-        return householdRepository.searchOwner(pageable, ownerId);
+    @Cacheable(value = "ownerHouseholds", key = "{#ownerId, #pageable.pageNumber, #pageable.pageSize}")
+    public CacheablePage<HouseholdDto> ownerHouseholds(Pageable pageable, Long ownerId){
+        Page<HouseholdDto> households = householdRepository.searchOwner(pageable, ownerId);
+        return new CacheablePage<HouseholdDto>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
     }
 
-    public Page<HouseholdSearchDTO> search(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
-        return householdRepository.findAllOnAddress(municipality, address, apartmentNumber, pageable);
+    @Cacheable(value = "householdSearch", key = "{#municipality, #address, #apartmentNumber, #pageable.pageNumber, #pageable.pageSize}")
+    public CacheablePage<HouseholdSearchDTO> search(String municipality, String address, Integer apartmentNumber, Pageable pageable) {
+        Page<HouseholdSearchDTO> households = householdRepository.findAllOnAddress(municipality, address, apartmentNumber, pageable);
+        return new CacheablePage<HouseholdSearchDTO>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
     }
 
     public List<AggregatedAvailabilityData> fillMissingData(List<AggregatedAvailabilityData> aggregatedData,
@@ -392,6 +405,7 @@ public class HouseholdService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "householdAccess", key = "#id")
     public List<HouseholdAccessDTO> getHouseholdsForOwner(Long id) throws NoResourceFoundException {
         List<Household> households = householdRepository.findForOwner(id);
         List<HouseholdAccessDTO> dtos = new ArrayList<>();
@@ -416,7 +430,13 @@ public class HouseholdService {
         throw new NoResourceFoundException(HttpMethod.GET, "Household with this id does not exist");
     }
 
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "householdDetails", key = "#householdId"),
+            @CacheEvict(value = "householdAccess", allEntries = true)
+    })
     public void allowAccess(Long householdId, List<Long> ids) {
+        System.out.println("usaooooo");
         Household household = householdRepository.getReferenceById(householdId);
         List<Long> existingIds = accessGrantedRepository.findCitizenIdsByHouseholdId(householdId);
         List<Long> idsToDelete = existingIds.stream()
@@ -425,9 +445,17 @@ public class HouseholdService {
         List<Long> idsToAdd = ids.stream()
                 .filter(id -> !existingIds.contains(id))
                 .toList();
-
+        System.out.println("na pola");
         for (Long idToDelete : idsToDelete) {
             accessGrantedRepository.deleteByHouseholdIdAndCitizenId(householdId, idToDelete);
+        }
+        System.out.println("jos ovde");
+        for(Long idToAdd : idsToAdd){
+            System.out.println(idToAdd);
+        }
+        System.out.println("jos delete");
+        for(Long idToAdd : idsToDelete){
+            System.out.println(idToAdd);
         }
         for (Long id : idsToAdd) {
             AccessGranted accessGranted = new AccessGranted();

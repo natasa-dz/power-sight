@@ -19,7 +19,7 @@
           (click)="onHouseholdClick(household)"
           class="clickable-row"
       >
-        <td>{{ i + 1 + (page.number) * page.size }}</td>
+        <td>{{ i + 1 + (currentPage - 1) * pageSize }}</td>
         <td>{{ household.id }}</td>
         <td>{{ household.floor }}</td>
         <td>{{ household.apartmentNumber }}</td>
@@ -34,11 +34,11 @@
   </ng-template>
 
   <div class="pagination">
-    <button (click)="onPageChange(page.number - 1)" [disabled]="page.number <= 0">
+    <button [disabled]="currentPage <= 1" (click)="onPageChange(page.number - 1)">
       Previous
     </button>
-    <span>Page {{ page.number + 1 }} of {{ page.totalPages }}</span>
-    <button (click)="onPageChange(page.number + 1)" [disabled]="page.number >= page.totalPages - 1">
+    <span>Page {{ currentPage }} of {{ page.totalPages }}</span>
+    <button [disabled]="currentPage > page.totalPages - 1" (click)="onPageChange(page.number + 1)">
       Next
     </button>
   </div>

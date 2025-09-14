@@ -26,6 +26,7 @@ public class RabbitMQListener {
 
     @RabbitListener(id = "heartbeatExchange", concurrency = "2")
     public void receiveHeartbeat(Message message) {
+        System.out.println("Received heartbeat message");
         String messageContent = new String(message.getBody());
         try {
             ObjectMapper objectMapper = new ObjectMapper();

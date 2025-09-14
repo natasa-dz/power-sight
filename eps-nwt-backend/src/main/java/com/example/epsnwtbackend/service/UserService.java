@@ -8,7 +8,9 @@ import com.example.epsnwtbackend.model.User;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -80,7 +82,9 @@ public class UserService implements UserDetailsService {
             e.printStackTrace();
         }
     }
+
     @Override
+    @Cacheable(value = "userByUsername", key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         Optional<User> user = userRepository.findByUsername(username);
@@ -109,10 +113,12 @@ public class UserService implements UserDetailsService {
 
     }
 
+    @Cacheable(value = "userPhoto", key = "#userId")
     public String getUserPhotoPath(Long userId) {
         return userRepository.findUserPhotoPathById(userId);
     }
 
+    @Cacheable(value = "userByEmail", key = "#email")
     public Optional<UserDto> findUser(String email){
         Optional<User> toFind = userRepository.findByUsername(email);
         if(toFind.isPresent()){
@@ -130,7 +136,10 @@ public class UserService implements UserDetailsService {
     }
 
 
-
+    @Caching(evict = {
+            @CacheEvict(value = "userByEmail", key="#username"),
+            @CacheEvict(value = "userByUsername", key="#username")
+    })
     public boolean changePassword(String username, String confirmPassword, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -152,7 +161,11 @@ public class UserService implements UserDetailsService {
         return new GoogleAuthenticator().createCredentials().getKey();
     }
 
-    public Optional<UserCredentials> register(UserDto dto) {
+    @Caching(evict = {
+            @CacheEvict(value = "userByEmail", key="#username"),
+            @CacheEvict(value = "userByUsername", key="#username")
+    })
+    public Optional<UserCredentials> register(UserDto dto, String username) {
 
 
         if(userRepository.findByUsername(dto.getUsername()).isPresent()){
@@ -197,6 +210,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    @Cacheable(value = "userById", key = "#userId")
     public User getUserById(Long userId){
         return userRepository.findById(userId).get();
     }

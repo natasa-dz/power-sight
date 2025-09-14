@@ -5,9 +5,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,27 +21,26 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 public class AppConfig {
 
-    private static final String RABBITMQ_API_URL = "http://localhost:15672/api/queues";
-    private static final String RABBITMQ_USER = "guest";
-    private static final String RABBITMQ_PASSWORD = "guest";
+    @Value("${rabbitmq.management.username}")
+    private String username;
+
+    @Value("${rabbitmq.management.password}")
+    private String password;
+
+    @Value("${rabbitmq.api.url}")
+    private String apiUrl;
 
     private List<String> heartbeatQueueNames = Collections.emptyList();
     private List<String> consumptionQueueNames = Collections.emptyList();
@@ -43,30 +48,36 @@ public class AppConfig {
     @Autowired
     RabbitQueueService rabbitQueueService;
 
-    @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
+    @Autowired
+    private RestTemplate restTemplate;
 
     public List<String> getHeartbeatQueues(RestTemplate restTemplate) {
-        String url = UriComponentsBuilder.fromHttpUrl(RABBITMQ_API_URL)
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .build().toUriString();
 
         // Set up authentication headers
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(RABBITMQ_USER, RABBITMQ_PASSWORD);
+        headers.setBasicAuth(username, password);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         // Wrap headers in an HttpEntity
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Make the API request with authentication headers
         try {
-            ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
-            List<?> queues = response.getBody();
+
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url + "/queues",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+
+            List<Map<String, Object>> queues = response.getBody();
 
             return queues.stream()
-                    .filter(queue -> ((String) ((java.util.Map) queue).get("name")).startsWith("heartbeat_queue_"))
-                    .map(queue -> (String) ((java.util.Map) queue).get("name"))
+                    .map(q -> (String) q.get("name"))
+                    .filter(name -> name.startsWith("heartbeat_queue_"))
                     .toList();
         } catch (HttpClientErrorException e) {
             // Handle error (e.g. unauthorized)
@@ -76,24 +87,30 @@ public class AppConfig {
     }
 
     public List<String> getConsumptionQueues(RestTemplate restTemplate) {
-        String url = UriComponentsBuilder.fromHttpUrl(RABBITMQ_API_URL)
+        String url = UriComponentsBuilder.fromHttpUrl(apiUrl)
                 .build().toUriString();
 
         // Set up authentication headers
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(RABBITMQ_USER, RABBITMQ_PASSWORD);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         // Wrap headers in an HttpEntity
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Make the API request with authentication headers
         try {
-            ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
-            List<?> queues = response.getBody();
+            ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
+                    url + "/queues",
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<List<Map<String, Object>>>() {}
+            );
+
+            List<Map<String, Object>> queues = response.getBody();
 
             return queues.stream()
-                    .filter(queue -> ((String) ((java.util.Map) queue).get("name")).startsWith("consumption_queue_"))
-                    .map(queue -> (String) ((java.util.Map) queue).get("name"))
+                    .map(q -> (String) q.get("name"))
+                    .filter(name -> name.startsWith("consumption_queue_"))
                     .toList();
         } catch (HttpClientErrorException e) {
             // Handle error (e.g. unauthorized)
@@ -104,7 +121,6 @@ public class AppConfig {
 
     @Scheduled(fixedDelay = 10000)
     public void updateQueues() {
-        RestTemplate restTemplate = restTemplate();
 
         Set<String> newHeartbeatQueues = new HashSet<>(getHeartbeatQueues(restTemplate));
         Set<String> newConsumptionQueues = new HashSet<>(getConsumptionQueues(restTemplate));
@@ -140,6 +156,8 @@ public class AppConfig {
         template.setConnectionFactory(connectionFactory);
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.EVERYTHING,
@@ -158,6 +176,8 @@ public class AppConfig {
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.EVERYTHING,
