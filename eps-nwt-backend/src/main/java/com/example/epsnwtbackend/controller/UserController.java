@@ -181,8 +181,6 @@ public class UserController {
                 Files.write(filePath, userPhoto.getBytes()); // Save the photo to the file system
                 dto.setUserPhoto(filePath.toString());
 
-
-                // Process additional data if the role is EMPLOYEE
                 if (dto.getRole() == Role.EMPLOYEE) {
                     ObjectMapper objectMapper = new ObjectMapper();
                     if (userDataJson == null) {
@@ -254,7 +252,6 @@ public class UserController {
 
         if (isChanged) {
             return ResponseEntity.ok().build(); // Status 200 (OK), with no body
-            //
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }

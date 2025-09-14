@@ -57,23 +57,7 @@ export class AuthService {
     this.userAccount$.next(null);
     console.log("You have logged out successfully!");
     return of(null);
-    // return this.http.get(environment.apiHost + 'users/login', {
-    //   responseType: 'text',
     }
-
-
-  // logOut(): Observable<any> {
-  //   return this.http.post(environment.apiHost + 'users/logout', {}).pipe(
-  //     tap(() => {
-  //       console.log("You have loggedOut successfully!")
-  //       // Clear user-related data on logout
-  //       localStorage.removeItem('user');
-  //       this.user$.next('');
-  //       this.userAccount$.next(null);
-  //     })
-  //   );
-  // }
-
 
 
   getRole(): any {
