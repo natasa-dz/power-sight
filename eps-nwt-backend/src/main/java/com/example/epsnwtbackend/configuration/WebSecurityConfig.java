@@ -24,9 +24,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-// Injektovanje bean-a za bezbednost
 @EnableWebSecurity
-// Ukljucivanje podrske za anotacije "@Pre*" i "@Post*" koje ce aktivirati autorizacione provere za svaki pristup metodi
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig implements WebMvcConfigurer{
 
@@ -35,16 +33,14 @@ public class WebSecurityConfig implements WebMvcConfigurer{
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost","http://localhost:4200") //angular app
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
-    // Servis koji se koristi za citanje podataka o korisnicima aplikacije
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserService();
     }
 
-    // Implementacija PasswordEncoder-a koriscenjem BCrypt hashing funkcije.
-    // BCrypt po defalt-u radi 10 rundi hesiranja prosledjene vrednosti.
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -71,12 +67,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
     @Autowired
     private TokenUtils tokenUtils;
 
-    // Definisemo prava pristupa za zahteve ka odredjenim URL-ovima/rutama
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        // sve neautentifikovane zahteve obradi uniformno i posalji 401 gresku
         http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
         http.authorizeRequests()
                 .requestMatchers("/main").permitAll()
@@ -176,12 +170,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
         return http.build();
     }
 
-    // metoda u kojoj se definisu putanje za igorisanje autentifikacije
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        // Autentifikacija ce biti ignorisana ispod navedenih putanja (kako bismo ubrzali pristup resursima)
-        // Zahtevi koji se mecuju za web.ignoring().antMatchers() nemaju pristup SecurityContext-u
-        // Dozvoljena POST metoda na ruti /auth/login, za svaki drugi tip HTTP metode greska je 401 Unauthorized
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/registration")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
@@ -212,9 +202,6 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/receipts/all-for-household/{householdId}", "/receipts/all-for-owner/{ownerId}",
                         "/receipts/by-id/{receiptId}", "/employee/all-employees-no-pagination");
 
-        // Ovim smo dozvolili pristup statickim resursima aplikacije
-//                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
-//                        "/**/*.html", "/**/*.css", "/**/*.js");
 
     }
 
