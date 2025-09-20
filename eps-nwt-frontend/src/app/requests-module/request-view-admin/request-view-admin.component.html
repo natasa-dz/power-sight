@@ -27,13 +27,15 @@
           <p>No images available.</p>
         </ng-template>
       </div>
-
+<!--TODO: Izmeni pristup dokumentaciji putem nginxa-->
       <div class="documents">
         <h3>Documentation</h3>
         <div class="document-box" *ngIf="this.documentation?.length; else noDocs">
           <ul>
-            <li *ngFor="let doc of this.documentation">
-              <button class="doc-btn" (click)="downloadDocument(doc)">{{doc.split('/')[7]}}</button>
+            <li *ngFor="let doc of documentation">
+              <a class="doc-btn" [href]="doc" download>
+                {{ doc.split('/').pop() }}
+              </a>
             </li>
           </ul>
         </div>

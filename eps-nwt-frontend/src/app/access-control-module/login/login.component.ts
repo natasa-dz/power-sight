@@ -6,6 +6,7 @@ import {AuthService} from "../auth.service";
 import {MatDialog} from "@angular/material/dialog";
 import {ChangePasswordComponent} from "../../change-password/change-password.component";
 import {Role} from "../../model/user.model";
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 @Component({
   selector: 'app-login',
@@ -55,6 +56,8 @@ export class LoginComponent implements OnInit {
             localStorage.setItem('user', response.accessToken);
             this.userService.setUserDetails();
 
+            const helper = new JwtHelperService();
+            const decoded = helper.decodeToken(response.accessToken);
             this.userService.getCurrentUser().subscribe((user: any) => {
               this.currentUser = user;
               console.log(user);
@@ -73,7 +76,6 @@ export class LoginComponent implements OnInit {
                 } else{
                   this.router.navigate(['main']);
                 }
-                console.log("Uspesno ulogovan korisnik!");
               }
             });
           }
@@ -82,6 +84,7 @@ export class LoginComponent implements OnInit {
           if (err.status === 403) {
             alert('Your account is suspended!');
           } else {
+            console.log("Greska je: ",err);
             alert('Bad credentials or account not verified yet');
           }
         }

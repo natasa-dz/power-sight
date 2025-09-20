@@ -20,18 +20,13 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost","http://localhost:4200")); //angular
+        config.setAllowedOrigins(List.of("http://localhost","http://localhost:4200"));
         config.addAllowedMethod("*");
-        //config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        //config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);
+        config.setAllowPrivateNetwork(true);
 
-
-/*        config.addAllowedMethod(HttpMethod.GET.name());
-        config.addAllowedMethod(HttpMethod.POST.name());
-        config.addAllowedHeader(HttpHeaders.ACCEPT);
-        config.addAllowedHeader(HttpHeaders.CONTENT_TYPE);*/
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
 

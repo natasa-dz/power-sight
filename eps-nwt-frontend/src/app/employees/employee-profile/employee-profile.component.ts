@@ -1,15 +1,11 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {BaseChartDirective} from "ng2-charts";
 import {BaseModule} from "../../base/base.module";
-import {DatePipe, DecimalPipe, NgForOf, NgIf} from "@angular/common";
+import {DecimalPipe, NgForOf, NgIf} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {EmployeeViewDto} from "../../model/view-employee-dto.model";
 import {ActivatedRoute} from "@angular/router";
-import {HouseholdService} from "../../simulators/household.service";
-import {WebSocketService} from "../../service/websocket.service";
 import {EmployeeService} from "../employee.service";
-import {Page} from "../../model/page.model";
-import {EmployeeSearchDto} from "../../model/employee-search-dto.model";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,9 +32,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost","http://localhost:4200") //angular app
+                .allowedOrigins("http://localhost","http://localhost:4200")
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
+                .allowPrivateNetwork(true)
                 .allowCredentials(true);
     }
     @Bean
@@ -69,9 +71,12 @@ public class WebSecurityConfig implements WebMvcConfigurer{
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults());
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors(Customizer.withDefaults());
 
-        http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
+        http.exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint));
+
         http.authorizeRequests()
                 .requestMatchers("/main").permitAll()
                 .requestMatchers("/users/register").permitAll()
@@ -157,12 +162,9 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 // za development svrhe ukljuci konfiguraciju za CORS iz WebConfig klase
                 .cors().and()
 
-                // umetni custom filter TokenAuthenticationFilter kako bi se vrsila provera JWT tokena umesto cistih korisnickog imena i lozinke (koje radi BasicAuthenticationFilter)
                 .addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), BasicAuthenticationFilter.class);
 
-        // zbog jednostavnosti primera ne koristimo Anti-CSRF token (https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
-        http.csrf().disable();
-        http.headers().frameOptions().disable();
+        http.headers(headers -> headers.frameOptions().disable());
 
         // ulancavanje autentifikacije
         http.authenticationProvider(authenticationProvider());

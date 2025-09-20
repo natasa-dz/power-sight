@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {HouseholdSearchDTO} from "../model/household-search-dto.model";
 import {Page} from "../model/page.model";
-import {Observable} from "rxjs";
+import {map, Observable} from "rxjs";
 import {Household} from "../model/household.model";
 import {ViewHouseholdDto} from "../model/view-household-dto.model";
 import {HouseholdDto} from "../model/householdDTO";
@@ -17,16 +17,12 @@ export class HouseholdService {
   private apiUrl = 'http://localhost:8080/household';  // Adjust to your backend URL
   private ownershipUrl = 'http://localhost:8080/ownership-requests';  // Adjust to your backend URL
 
-  getDocumentBytes(householdId: number): Observable<ArrayBuffer> {
-    const url = `${this.apiUrl}/docs`;
-    return this.http.post(url, householdId, { responseType: 'arraybuffer' });
-  }
-
   constructor(private http: HttpClient) {}
 
-  getSubmittedFiles(requestId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/docs/${requestId}`);
+  getSubmittedFiles(householdId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/docs/${householdId}`);
   }
+
 
   downloadFile(householdId: number, fileName: string): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/docs/${householdId}/${fileName}`, {
@@ -48,12 +44,6 @@ export class HouseholdService {
       .set('page', page.toString())
       .set('size', size.toString());
     return this.http.get<Page<HouseholdDto>>(`${this.apiUrl}/owner`, { params });
-  }
-
-
-  createOwnershipRequest(formData: FormData): Observable<any> {
-    const url =`${this.apiUrl}/no-owner`;
-    return this.http.post(url, formData);
   }
 
   search(municipality: string, address: string, apartmentNumber?: number, page: number = 0, size: number = 10): Observable<Page<HouseholdSearchDTO>> {
@@ -98,11 +88,6 @@ export class HouseholdService {
       formData.append('files', file);  // Remove file.name
     });
 
-    // Log formData keys and values using a manual loop
-    formData.forEach((value, key) => {
-      console.log(`FormData - ${key}:`, value);
-    });
-
     return this.http.post(`${this.ownershipUrl}/requestOwnership`, formData, { responseType: 'text' });
   }
 
@@ -118,6 +103,5 @@ export class HouseholdService {
     const payload = { requestId, approved, reason };
     return this.http.post(`${this.ownershipUrl}/process`, payload, { responseType: 'text' });
   }
-
 
 }

@@ -34,20 +34,6 @@ export class UserService {
 
   }
 
-
-  getPhotoPath(userId: number): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/${userId}/photo`);
-  }
-
-  updateUser(dto: User): Observable<User> {
-    const url = `${this.apiUrl}/${dto.username}`;
-    return this.http.post<User>(url, dto).pipe(
-      catchError((error: any) => {
-        return throwError(error);
-      })
-    );
-  }
-
   setUserDetails(): void {
         this.getCurrentUser().subscribe(user => {
             this.userAccount$.next(user);
@@ -65,11 +51,6 @@ export class UserService {
     );
   }
 
-
-  private handleError(error: HttpErrorResponse) {
-    console.error('Error:', error);
-    return throwError('An error occurred. Please try again later.');
-  }
 
   getUser(email: string): Observable<User> {
     const url = `${this.apiUrl}/${email}`;
@@ -163,8 +144,6 @@ export class UserService {
       this.userAccount$.next(null);
       console.log("You have logged out successfully!");
       return of(null);
-      // return this.http.get(environment.apiHost + 'users/login', {
-      //   responseType: 'text',
   }
 
   changePassword(dto: ChangePasswordDto): Observable<HttpResponse<string>> {

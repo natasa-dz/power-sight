@@ -57,7 +57,7 @@ export class EmployeeService {
     const params = new HttpParams({ fromObject: payload as any });
     return this.http.post(`${this.appointmentUrl}/create`, null, {
       params,
-      responseType: 'text' as 'json', // Ensures the response is treated as text
+      responseType: 'text' as 'json',
     });
   }
 

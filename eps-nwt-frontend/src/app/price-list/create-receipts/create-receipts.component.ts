@@ -1,12 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgForOf, NgIf} from "@angular/common";
-import {Router, RouterLink} from "@angular/router";
-import {AuthService} from "../../access-control-module/auth.service";
-import {UserService} from "../../service/user.service";
+import {RouterLink} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {PriceListService} from "../price-list.service";
-import {Role} from "../../model/user.model";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {BaseModule} from "../../base/base.module";
 

@@ -4,8 +4,6 @@ import {FormsModule} from "@angular/forms";
 import {BaseModule} from "../../base/base.module";
 import {NgIf} from "@angular/common";
 import {PriceListService} from "../price-list.service";
-import {Receipt} from "../../model/receipt.model";
-
 @Component({
   selector: 'app-payment',
   standalone: true,

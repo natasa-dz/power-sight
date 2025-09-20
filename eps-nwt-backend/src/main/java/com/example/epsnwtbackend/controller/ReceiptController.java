@@ -59,7 +59,6 @@ public class ReceiptController {
 
     @GetMapping("/by-id/{receiptId}")
     public ResponseEntity<ReceiptDTO> getReceiptById(@PathVariable Long receiptId){
-        System.out.println("POGODIOOO: "+ receiptId);
         try {
             return ResponseEntity.ok().body(receiptService.getReceipt(receiptId));
         } catch (Exception e) {

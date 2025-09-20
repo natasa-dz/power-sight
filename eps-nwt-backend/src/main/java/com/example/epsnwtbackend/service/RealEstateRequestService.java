@@ -27,7 +27,7 @@ import java.util.List;
 @Service
 public class RealEstateRequestService {
 
-    @Value("src/main/resources/data/requests/realEstate")
+    @Value("${app.upload.real-estate}")
     private String dataDirPath;
 
     @Autowired

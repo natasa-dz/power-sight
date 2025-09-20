@@ -17,19 +17,16 @@ export class ChangePasswordComponent {
     private userService: UserService,
     public dialogRef: MatDialogRef<ChangePasswordComponent>
   ) {
-    // Custom Validator for matching passwords
     this.changePasswordForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
     }, { validator: this.passwordsMatchValidator });
   }
 
-  // Custom validator to check if passwords match
   passwordsMatchValidator(formGroup: FormGroup) {
     const newPassword = formGroup.get('newPassword')?.value;
     const confirmPassword = formGroup.get('confirmPassword')?.value;
 
-    // If the newPassword and confirmPassword don't match, return an error
     return newPassword && confirmPassword && newPassword !== confirmPassword
       ? { passwordsDoNotMatch: true }
       : null;
@@ -43,19 +40,15 @@ export class ChangePasswordComponent {
       this.userService.getCurrentUser().subscribe((user: any) => {
         this.currentUser = user;
 
-        // Use the correct properties directly
         const username = this.currentUser.username;
 
-        // Create DTO object to send to the backend
         const changePasswordDto = {
           username,
           confirmPassword,
           newPassword
         };
 
-        console.log("ChangePassword DTO: ", changePasswordDto);
 
-        // Call the changePassword API
         this.userService.changePassword(changePasswordDto).subscribe({
           next: (response) => {
             if (response.status === 200) {

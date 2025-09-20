@@ -24,44 +24,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenUtils {
 
-    // Izdavac tokena
     @Value("bookit")
     private String APP_NAME;
 
-    // Tajna koju samo backend aplikacija treba da zna kako bi mogla da generise i proveri JWT https://jwt.io/
     @Value("somesecret")
     public String SECRET;
 
-    // Period vazenja tokena - 30 minuta
     @Value("1800000")
     private int EXPIRES_IN;
 
-    // Naziv headera kroz koji ce se prosledjivati JWT u komunikaciji server-klijent
     @Value("Authorization")
     private String AUTH_HEADER;
 
-    // Moguce je generisati JWT za razlicite klijente (npr. web i mobilni klijenti nece imati isto trajanje JWT,
-    // JWT za mobilne klijente ce trajati duze jer se mozda aplikacija redje koristi na taj nacin)
-    // Radi jednostavnosti primera, necemo voditi racuna o uređaju sa kojeg zahtev stiže.
-    //	private static final String AUDIENCE_UNKNOWN = "unknown";
-    //	private static final String AUDIENCE_MOBILE = "mobile";
-    //	private static final String AUDIENCE_TABLET = "tablet";
-
     private static final String AUDIENCE_WEB = "web";
 
-    // Algoritam za potpisivanje JWT
     private SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
     private UserDetailsService userDetailsService;
 
-
-    // ============= Funkcije za generisanje JWT tokena =============
-
-    /**
-     * Funkcija za generisanje JWT tokena.
-     *
-     * @param username Korisničko ime korisnika kojem se token izdaje
-     * @return JWT token
-     */
     public String generateToken(String username, Role role, Long userId) {
 
         return Jwts.builder()
@@ -73,9 +52,6 @@ public class TokenUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(generateExpirationDate())
                 .signWith(SIGNATURE_ALGORITHM, SECRET).compact();
-
-
-        // moguce je postavljanje proizvoljnih podataka u telo JWT tokena pozivom funkcije .claim("key", value), npr. .claim("role", user.getRole())
     }
 
     /**
@@ -83,19 +59,6 @@ public class TokenUtils {
      * @return Tip uređaja.
      */
     private String generateAudience() {
-
-        //	Moze se iskoristiti org.springframework.mobile.device.Device objekat za odredjivanje tipa uredjaja sa kojeg je zahtev stigao.
-        //	https://spring.io/projects/spring-mobile
-
-        //	String audience = AUDIENCE_UNKNOWN;
-        //		if (device.isNormal()) {
-        //			audience = AUDIENCE_WEB;
-        //		} else if (device.isTablet()) {
-        //			audience = AUDIENCE_TABLET;
-        //		} else if (device.isMobile()) {
-        //			audience = AUDIENCE_MOBILE;
-        //		}
-
         return AUDIENCE_WEB;
     }
 
@@ -108,16 +71,6 @@ public class TokenUtils {
         return new Date(new Date().getTime() + EXPIRES_IN);
     }
 
-    // =================================================================
-
-    // ============= Funkcije za citanje informacija iz JWT tokena =============
-
-    /**
-     * Funkcija za preuzimanje JWT tokena iz zahteva.
-     *
-     * @param request HTTP zahtev koji klijent šalje.
-     * @return JWT token ili null ukoliko se token ne nalazi u odgovarajućem zaglavlju HTTP zahteva.
-     */
     public String getToken(HttpServletRequest request) {
         String authHeader = getAuthHeaderFromHeader(request);
 
@@ -131,11 +84,6 @@ public class TokenUtils {
         return null;
     }
 
-    /**
-     * Funkcija za preuzimanje vlasnika tokena (korisničko ime).
-     * @param token JWT token.
-     * @return Korisničko ime iz tokena ili null ukoliko ne postoji.
-     */
     public String getUsernameFromToken(String token) {
         String username;
 

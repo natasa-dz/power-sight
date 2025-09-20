@@ -60,12 +60,17 @@ export class RealEstateRequestService {
       responseType: 'json'
     });
   }
+  // getDocumentBytes(filePath: string) {
+  //   console.log("Get Document Bytes iz RealEstate requesta: ", filePath);
+  //   return this.http.post(this.apiUrl + '/docs', filePath, {
+  //     responseType: 'arraybuffer'
+  //   });
+  // }
 
-  getDocumentBytes(filePath: string) {
-    return this.http.post(this.apiUrl + '/docs', filePath, {
-      responseType: 'arraybuffer'
-    });
+  getDocumentUrl(realEstateId: number, fileName: string): string {
+    return `/uploads/realEstate/${realEstateId}/docs/${fileName}`;
   }
+
 
   finishRequest(requestId: number, finishedRequest: FinishRealEstateRequestDTO) {
     return this.http.put<string>(`${this.apiUrl}/admin/finish/${requestId}`, finishedRequest);

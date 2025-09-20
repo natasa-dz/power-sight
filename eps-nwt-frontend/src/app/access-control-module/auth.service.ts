@@ -35,7 +35,6 @@ export class AuthService {
     this.user$.next(this.getRole());
     this.setUser();
     this.setUserDetails();
-
   }
 
   getRoleObservable(): Observable<string> {
@@ -43,10 +42,11 @@ export class AuthService {
   }
 
   login(auth: any): Observable<AuthResponse> {
-    const body = {
-      ...auth,
-    };
-    return this.http.post<AuthResponse>(`${environment.apiHost}users/login`, body);
+    return this.http.post<AuthResponse>(
+      `${environment.apiHost}users/login`,
+      auth,
+      { headers: this.headers }
+    );
   }
 
   logout(): Observable<void|null> {
@@ -55,20 +55,18 @@ export class AuthService {
     localStorage.removeItem('userId');
     this.user$.next('');
     this.userAccount$.next(null);
-    console.log("You have logged out successfully!");
     return of(null);
     }
 
 
   getRole(): any {
-    console.log("usao u getRole")
     if (this.isLoggedIn()) {
       console.log("is logged in")
       try {
-        const accessToken: any = localStorage.getItem('user');
+        const userToken: any = localStorage.getItem('user');
+
         const helper = new JwtHelperService();
-        const decodedToken = helper.decodeToken(accessToken);
-        console.log(decodedToken)
+        const decodedToken = helper.decodeToken(userToken);
         localStorage.setItem("userId", decodedToken.id);
 
         return decodedToken ? decodedToken.role : null;
@@ -94,7 +92,7 @@ export class AuthService {
 
   getCurrentUser(): Observable<User | null> {
     const accessToken = localStorage.getItem('user');
-    console.log(accessToken);
+
     if (!accessToken) {
       return of(null);
     }
@@ -107,45 +105,30 @@ export class AuthService {
     }
 
     const userId = decodedToken.sub;
-    console.log("User ID: ", userId);
-    //return userId;
     if (!userId) {
-      console.error('User ID not available in the decoded token');
       return of(null);
     }
     const allUsers$ = this.userService.getAllUsers();
 
-    // Use RxJS map operator to transform the result
     return allUsers$.pipe(
       map(users => {
         users.forEach(user=>console.log(user));
 
-        // Find the user with the matching ID
         const currentUser = users.find(user => user.username === userId);
 
         if (currentUser) {
-          // Check if the user is blocked
-          // if (currentUser.isBlocked) {
-          //   console.log('User is blocked.');
-          //   // Optionally, you can log the user out or redirect to a different page
-          //   return null;
-          // } else {
-
             return currentUser;
 
         } else {
-          console.error('User not found with ID:', userId);
           return null;
         }
       }),
 
       catchError(error => {
-        console.error('Error fetching user info---> getCurrentUser()', error);
         return of(null);
       })
     );
   }
-
 
   setUserDetails(): void {
     this.getCurrentUser().subscribe(user => {
