@@ -33,6 +33,7 @@ export class LoginComponent implements OnInit {
     public dialog: MatDialog  // Inject MatDialog service
   ) {}
   ngOnInit(): void {
+    this.authService.logout();
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -60,8 +61,6 @@ export class LoginComponent implements OnInit {
             const decoded = helper.decodeToken(response.accessToken);
             this.userService.getCurrentUser().subscribe((user: any) => {
               this.currentUser = user;
-              console.log(user);
-              console.log("IsActive: ", user.active)
              if (user.role === Role.SUPERADMIN && !user.passwordChanged) {
                alert('Please change your default password.');
                this.openChangePasswordDialog();
@@ -102,7 +101,7 @@ export class LoginComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         alert('Password changed successfully. You can now proceed.');
-        this.router.navigate(['main']);  // Redirect to main page after successful password change
+        this.router.navigate(['main']);
       } else {
         alert('Password change is required to continue.');
         this.authService.logout();

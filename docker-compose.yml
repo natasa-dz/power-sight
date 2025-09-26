@@ -134,22 +134,6 @@ services:
         aliases:
           - backend-name
 
-#  frontend:
-#    build:
-#      context: ./eps-nwt-frontend
-#      dockerfile: Dockerfile
-#    container_name: angular-frontend
-#    depends_on:
-#      - backend
-#    restart: always
-#    ports:
-#      - "4200:80"
-#    networks:
-#      app-network:
-#        aliases:
-#          - frontend-name
-
-
   nginx:
     image: nginx:1.25
     container_name: nginx

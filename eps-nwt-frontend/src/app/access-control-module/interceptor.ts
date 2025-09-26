@@ -5,22 +5,51 @@ import {
   HttpEvent,
   HttpInterceptor,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 @Injectable()
 export class Interceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (req.headers.get('skip')) {
+    console.log('[Interceptor] Request:', {
+      url: req.url,
+      method: req.method,
+      headers: req.headers.keys(),
+    });
+
+    if (req.url.includes('/login') || req.url.includes('/register')) {
+      console.log('[Interceptor] Skipping for:', req.url);
       return next.handle(req);
     }
+
+    if (req.headers.has('X-Skip-Interceptor')) {
+      console.log('[Interceptor] Skipping due to X-Skip-Interceptor:', req.url);
+
+      const cleanReq = req.clone({
+        headers: req.headers.delete('X-Skip-Interceptor'),
+      });
+
+      return next.handle(cleanReq);
+    }
+
     const token = localStorage.getItem('accessToken');
     if (token) {
       const cloned = req.clone({
         setHeaders: { Authorization: `Bearer ${token}` },
       });
-      return next.handle(cloned);
+      console.log('[Interceptor] Added Authorization header for:', req.url);
+
+      return next.handle(cloned).pipe(
+        tap({
+          error: (err) => console.error('[Interceptor] Error with token:', err),
+        })
+      );
     }
 
-    return next.handle(req);
+    console.warn('[Interceptor] No token found, sending request without Authorization:', req.url);
+    return next.handle(req).pipe(
+      tap({
+        error: (err) => console.error('[Interceptor] Error (no token):', err),
+      })
+    );
   }
 }

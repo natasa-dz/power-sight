@@ -20,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -35,7 +36,6 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .allowedOrigins("http://localhost","http://localhost:4200")
                 .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowPrivateNetwork(true)
                 .allowCredentials(true);
     }
     @Bean
@@ -78,9 +78,9 @@ public class WebSecurityConfig implements WebMvcConfigurer{
         http.exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint));
 
         http.authorizeRequests()
-                .requestMatchers("/main").permitAll()
                 .requestMatchers("/users/register").permitAll()
                 .requestMatchers("/users/login").permitAll()
+                .requestMatchers("/main").permitAll()
                 .requestMatchers("/users/{email}").permitAll()
                 .requestMatchers("/users/byId/{userId}").permitAll()
                 .requestMatchers("/users").permitAll()
@@ -152,21 +152,11 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
                 .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
-                // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
-                // koji tip korisnika moze da pristupi odgovarajucoj ruti. Npr. ukoliko zelimo da definisemo da ruti 'admin' moze da pristupi
-                // samo korisnik koji ima rolu 'ADMIN', navodimo na sledeci nacin:
-                // .antMatchers("/admin").hasRole("ADMIN") ili .antMatchers("/admin").hasAuthority("ROLE_ADMIN")
-
-                // za svaki drugi zahtev korisnik mora biti autentifikovan
                 .anyRequest().authenticated().and()
-                // za development svrhe ukljuci konfiguraciju za CORS iz WebConfig klase
                 .cors().and()
-
-                .addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), BasicAuthenticationFilter.class);
+                .addFilterAfter(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), UsernamePasswordAuthenticationFilter.class);
 
         http.headers(headers -> headers.frameOptions().disable());
-
-        // ulancavanje autentifikacije
         http.authenticationProvider(authenticationProvider());
 
         return http.build();

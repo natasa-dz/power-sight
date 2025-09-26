@@ -18,11 +18,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
-// Filter koji ce presretati SVAKI zahtev klijenta ka serveru
-// (sem nad putanjama navedenim u WebSecurityConfig.configure(WebSecurity web))
-// Filter proverava da li JWT token postoji u Authorization header-u u zahtevu koji stize od klijenta
-// Ukoliko token postoji, proverava se da li je validan. Ukoliko je sve u redu, postavlja se autentifikacija
-// u SecurityContext holder kako bi podaci o korisniku bili dostupni u ostalim delovima aplikacije gde su neophodni
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private TokenUtils tokenUtils;
@@ -40,12 +35,26 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         String username;
+        String path = request.getRequestURI();
+        logger.info("[Filter] Request path: {}"+ path);
+        if (path.startsWith("/users/login") ||
+                path.startsWith("/users/register") ||
+                path.startsWith("/users/auth/activate")) {
+            logger.info("[Filter] Skipping JWT validation for path: {}"+ path);
+
+            chain.doFilter(request, response);
+            return;
+        }
+
+
         String authToken = tokenUtils.getToken(request);
+        logger.info("[Filter] Extracted token: {}"+ authToken);
 
         try {
             if (authToken != null) {
 
                 username = tokenUtils.getUsernameFromToken(authToken);
+                logger.info("[Filter] Username from token: {}"+ username);
 
                 if (username != null) {
 

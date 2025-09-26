@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -278,59 +279,10 @@ public class HouseholdController {
         }
     }
 
-//    @GetMapping(value = "/docs/{householdId}")
-//    public ResponseEntity<List<Map<String, String>>> getDocsByHouseholdId(@PathVariable Long householdId) {
-//        try {
-//            Path directoryPath = Paths.get("..","uploads", "data", "requests", "house" + householdId).normalize();
-//
-//            if (!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//            }
-//
-//            List<Map<String, String>> fileList = new ArrayList<>();
-//            Files.list(directoryPath).forEach(file -> {
-//                try {
-//                    Map<String, String> fileMetadata = new HashMap<>();
-//                    fileMetadata.put("fileName", file.getFileName().toString());
-//                    fileMetadata.put("contentType", Files.probeContentType(file));
-//                    fileList.add(fileMetadata);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//
-//            return ResponseEntity.ok(fileList);
-//
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-//
-//    @GetMapping(value = "/docs/{householdId}/{fileName}")
-//    public ResponseEntity<byte[]> getFile(@PathVariable Long householdId, @PathVariable String fileName) {
-//        try {
-//            Path filePath = Paths.get("..","uploads", "data", "requests", "house" + householdId, fileName).normalize();
-//
-//            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//            }
-//
-//            byte[] fileBytes = Files.readAllBytes(filePath);
-//            String contentType = Files.probeContentType(filePath);
-//
-//            return ResponseEntity.ok()
-//                    .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
-//                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-//                    .body(fileBytes);
-//
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-
     @GetMapping(value = "/docs/{householdId}")
     public ResponseEntity<List<Map<String, String>>> getDocsByHouseholdId(@PathVariable Long householdId) {
-        Path directoryPath = Paths.get(householdFilePath + householdId).normalize();
+        Path directoryPath = Paths.get(householdFilePath+householdId).normalize();
+        System.out.println("Documentation: "+ directoryPath);
 
         if (!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -352,7 +304,7 @@ public class HouseholdController {
                             fileMetadata.put("contentType", "application/octet-stream");
                         }
 
-                        String fileUrl = "/uploads/data/requests/house" + householdId + "/" + fileName;
+                        String fileUrl = "/uploads/requests/house" + householdId + "/" + fileName;
                         fileMetadata.put("url", fileUrl);
 
                         fileList.add(fileMetadata);
