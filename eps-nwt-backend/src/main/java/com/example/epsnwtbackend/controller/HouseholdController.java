@@ -304,7 +304,7 @@ public class HouseholdController {
                             fileMetadata.put("contentType", "application/octet-stream");
                         }
 
-                        String fileUrl = "/uploads/requests/house" + householdId + "/" + fileName;
+                        String fileUrl = householdFilePath + householdId + "/" + fileName;
                         fileMetadata.put("url", fileUrl);
 
                         fileList.add(fileMetadata);

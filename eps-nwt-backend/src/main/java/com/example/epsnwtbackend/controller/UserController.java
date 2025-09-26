@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -42,6 +44,8 @@ import java.util.UUID;
 @CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     UserService userDetailsService;
     @Autowired
@@ -62,12 +66,13 @@ public class UserController {
     @Value("${app.upload.base}")
     private String uploadBase;
 
-    private static final String PHOTO_PATH = "/var/www/photos/profiles/";
+    @Value("${app.upload.photo-path}")
+    private String photoPathBase;
     @Autowired
     private UserService userService;
     @PostMapping("/{userId}/upload_photo")
     public ResponseEntity<String> uploadUserPhoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) throws IOException {
-        String userFolder = PHOTO_PATH + "user_" + userId;
+        String userFolder = photoPathBase + "user_" + userId;
         File dir = new File(userFolder);
         if (!dir.exists()) {
             dir.mkdirs();

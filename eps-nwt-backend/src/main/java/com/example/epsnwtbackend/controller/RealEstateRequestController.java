@@ -36,8 +36,8 @@ public class RealEstateRequestController {
     @Autowired
     private UserService userService;
 
-    @Value("${app.upload.base}")
-    private String basePath;
+    @Value("${app.upload.real-estate-requests}")
+    private String realEstateRequestsBase;
 
     @PostMapping(value = "/registration", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<String> createRequest(@RequestPart("images") Collection<MultipartFile> imageFiles,
@@ -96,82 +96,25 @@ public class RealEstateRequestController {
         return service.getDocumentationForRealEstate(realEstateId);
     }
 
-//    @GetMapping("/images/{realEstateId}")
-//    public ResponseEntity<List<String>> getImagesByRealEstateId(@PathVariable("realEstateId") String realEstateId) {
-//        Path imageDirectory = Paths.get("..","uploads", "realEstate", String.valueOf(realEstateId), "images");
-//        try {
-//            Files.createDirectories(imageDirectory);
-//        } catch (IOException e) {
-//            throw new RuntimeException("Could not create upload directory: " + imageDirectory, e);
-//        }
-//        List<String> base64Images = new ArrayList<>();
-//
-//        try {
-//            if (!Files.exists(imageDirectory) || !Files.isDirectory(imageDirectory)) {
-//                return ResponseEntity.badRequest().body(null);
-//            }
-//            Files.list(imageDirectory)
-//                    .filter(Files::isRegularFile)
-//                    .forEach(imagePath -> {
-//                        try {
-//                            byte[] imageBytes = Files.readAllBytes(imagePath);
-//                            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-//                            base64Images.add(base64Image);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    });
-//
-//            return ResponseEntity.ok(base64Images);
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-
-//    @PostMapping(value = "/docs")
-//    public ResponseEntity<byte[]> getDocsByRealEstateId(@RequestBody String filePath) {
-//
-//        try {
-//            Path path = Paths.get(filePath).normalize();
-//            if (!Files.exists(path) || !Files.isRegularFile(path)) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//            }
-//
-//            byte[] fileBytes = Files.readAllBytes(path);
-//            String contentType = Files.probeContentType(path);
-//            if (contentType == null) {
-//                contentType = "application/pdf";
-//            }
-//
-//            return ResponseEntity.ok()
-//                    .contentType(MediaType.parseMediaType(contentType))
-//                    .body(fileBytes);
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-
-    @PostMapping(value = "/docs")
-    public ResponseEntity<String> getDocsByRealEstateId(@RequestBody String filePath) {
-        System.out.println(filePath);
-
-        Path path = Paths.get(basePath).resolve(filePath).normalize();
-
-        if (!Files.exists(path) || !Files.isRegularFile(path)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    @GetMapping(value = "/docs/{realEstateId}")
+    public ResponseEntity<List<String>> getDocsByRealEstateId(@PathVariable Long realEstateId) throws IOException {
+        Path dir = Paths.get(realEstateRequestsBase+ realEstateId);
+        if (!Files.exists(dir) || !Files.isDirectory(dir)) {
+            return ResponseEntity.ok(List.of());
         }
 
-        String url = "/uploads/" + path.toString().replace("\\", "/")
-                .replaceFirst("^.*/uploads/", "");  // skida sve ispred "uploads/"
+        List<String> urls = Files.list(dir)
+                .filter(Files::isRegularFile)
+                .map(file -> realEstateRequestsBase + realEstateId + "/" + file.getFileName().toString())
+                .toList();
 
-        return ResponseEntity.ok(url);
+        return ResponseEntity.ok(urls);
     }
-
 
 
     @GetMapping("/images/{realEstateId}")
     public ResponseEntity<List<String>> getImageUrlsByRealEstateId(@PathVariable("realEstateId") String realEstateId) {
-        Path imageDirectory = Paths.get(basePath, "realEstate", String.valueOf(realEstateId), "images");
+        Path imageDirectory = Paths.get(realEstateRequestsBase+ realEstateId, "images");
 
         try {
             if (!Files.exists(imageDirectory) || !Files.isDirectory(imageDirectory)) {
@@ -180,7 +123,7 @@ public class RealEstateRequestController {
 
             List<String> imageUrls = Files.list(imageDirectory)
                     .filter(Files::isRegularFile)
-                    .map(imagePath -> "/uploads/realEstate/" + realEstateId + "/images/" + imagePath.getFileName().toString())
+                    .map(imagePath -> realEstateRequestsBase + realEstateId + "/images/" + imagePath.getFileName().toString())
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(imageUrls);
@@ -188,7 +131,6 @@ public class RealEstateRequestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
 
     @PutMapping(value = "admin/finish/{requestId}")
