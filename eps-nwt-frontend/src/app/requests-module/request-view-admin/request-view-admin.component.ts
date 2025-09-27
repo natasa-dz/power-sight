@@ -70,41 +70,25 @@ export class RequestViewAdminComponent implements OnInit{
           });
 
           this.service.getImagesByRealEstateId(id).subscribe({
-            next: (urls: string[]) => {
-              this.images = urls;
-            },
-            error: (err) => {
-              console.error('Error loading images', err);
-            }
+            next: (urls: string[]) => (this.images = urls),
+            error: (err) => console.error('Error loading images', err)
           });
-
 
           this.service.getDocumentationByRealEstateId(id).subscribe({
-            next: (urls: string[]) => {
-              this.documentation = urls;
-            },
-            error: (err) => {
-              console.error('Error loading docs', err);
-            }
+            next: (urls: string[]) => (this.documentation = urls),
+            error: (err) => console.error('Error loading docs', err)
           });
-
-
         },
-        error: (_:any) => {
-          console.log("Error fetching request " + id + " for admin!")
-        }
+        error: () => console.log("Error fetching request " + id + " for admin!")
       });
-    }
+      }
 
   }
 
   finishRequest(approved: boolean) {
-    alert("alalalx")
     let note = false;
     if (!note){
-      // ako se odbija
       if(!approved) {
-        // ako nema note
         if (this.adminNote === '') {
           this.showSnackbar("Admin note is required for denied requests!\nAdd reason for denying the request.");
         } else {
@@ -127,7 +111,6 @@ export class RequestViewAdminComponent implements OnInit{
           location.reload();
         },
         error: (mess:any) => {
-          //console.log(mess)
           if(mess.status === 200){
             this.showSnackbar(mess.error.text);
             location.reload();

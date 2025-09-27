@@ -27,12 +27,14 @@ export class UserService {
   userAccount$=new BehaviorSubject<User | null>(null);
 
 
-  constructor(private http: HttpClient){
-      this.user$.next(this.getRole());
-      this.setUser();
-      this.setUserDetails();
+  // constructor(private http: HttpClient){
+  //     this.user$.next(this.getRole());
+  //     this.setUser();
+  //     this.setUserDetails();
+  // }
 
-  }
+  constructor(private http: HttpClient) {}
+
 
   setUserDetails(): void {
         this.getCurrentUser().subscribe(user => {

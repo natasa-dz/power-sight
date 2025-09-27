@@ -23,13 +23,6 @@ export class HouseholdService {
     return this.http.get<any[]>(`${this.apiUrl}/docs/${householdId}`);
   }
 
-
-  downloadFile(householdId: number, fileName: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/docs/${householdId}/${fileName}`, {
-      responseType: 'blob',
-    });
-  }
-
   getHouseholdsWithoutOwner(page: number, size: number): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())

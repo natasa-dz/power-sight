@@ -49,28 +49,25 @@ export class RealEstateRequestService {
     return this.http.get<RealEstateRequest>(`${this.apiUrl}/admin/request/${id}`)
   }
 
-  getImagesByRealEstateId(realEstateId: number) {
-    return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`, {
-      responseType: 'json'
-    });
-  }
-
-  getDocumentationByRealEstateId(realEstateId: number) {
-    return this.http.get<string[]>(`${this.apiUrl}/documentation/${realEstateId}`, {
-      responseType: 'json'
-    });
-  }
-  // getDocumentBytes(filePath: string) {
-  //   console.log("Get Document Bytes iz RealEstate requesta: ", filePath);
-  //   return this.http.post(this.apiUrl + '/docs', filePath, {
-  //     responseType: 'arraybuffer'
+  // getImagesByRealEstateId(realEstateId: number) {
+  //   return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`, {
+  //     responseType: 'json'
   //   });
   // }
 
-  getDocumentUrl(realEstateId: number, fileName: string): string {
-    return `/uploads/realEstate/${realEstateId}/docs/${fileName}`;
+  // getDocumentationByRealEstateId(realEstateId: number) {
+  //   return this.http.get<string[]>(`${this.apiUrl}/documentation/${realEstateId}`, {
+  //     responseType: 'json'
+  //   });
+  // }
+
+  getImagesByRealEstateId(realEstateId: number): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`);
   }
 
+  getDocumentationByRealEstateId(realEstateId: number): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/docs/${realEstateId}`);
+  }
 
   finishRequest(requestId: number, finishedRequest: FinishRealEstateRequestDTO) {
     return this.http.put<string>(`${this.apiUrl}/admin/finish/${requestId}`, finishedRequest);

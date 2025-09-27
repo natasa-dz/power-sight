@@ -36,8 +36,11 @@ public class RealEstateRequestController {
     @Autowired
     private UserService userService;
 
-    @Value("${app.upload.real-estate-requests}")
+    @Value("${app.upload.real-estate-request}")
     private String realEstateRequestsBase;
+
+    @Value("${app.upload.real-estate-request-prefix}")
+    private String uploadUrlPrefix;
 
     @PostMapping(value = "/registration", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<String> createRequest(@RequestPart("images") Collection<MultipartFile> imageFiles,
@@ -98,15 +101,15 @@ public class RealEstateRequestController {
 
     @GetMapping(value = "/docs/{realEstateId}")
     public ResponseEntity<List<String>> getDocsByRealEstateId(@PathVariable Long realEstateId) throws IOException {
-        Path dir = Paths.get(realEstateRequestsBase+ realEstateId);
+        Path dir = Paths.get(realEstateRequestsBase+ realEstateId, "docs");
         if (!Files.exists(dir) || !Files.isDirectory(dir)) {
             return ResponseEntity.ok(List.of());
         }
 
         List<String> urls = Files.list(dir)
                 .filter(Files::isRegularFile)
-                .map(file -> realEstateRequestsBase + realEstateId + "/" + file.getFileName().toString())
-                .toList();
+                .map(file -> uploadUrlPrefix + realEstateId +  "/docs/"  + file.getFileName().toString())
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(urls);
     }
@@ -123,7 +126,7 @@ public class RealEstateRequestController {
 
             List<String> imageUrls = Files.list(imageDirectory)
                     .filter(Files::isRegularFile)
-                    .map(imagePath -> realEstateRequestsBase + realEstateId + "/images/" + imagePath.getFileName().toString())
+                    .map(imagePath -> uploadUrlPrefix + realEstateId + "/images/" + imagePath.getFileName().toString())
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(imageUrls);

@@ -6,7 +6,7 @@ import {catchError} from "rxjs/operators";
 import {UserService} from "../service/user.service";
 import {Role, User} from "../model/user.model";
 export const environment = {
-  apiHost: 'http://localhost:8080/'
+  apiHost: 'http://localhost/api/'
 }
 export interface AuthResponse {
   accessToken: string;
@@ -18,11 +18,6 @@ export interface AuthResponse {
 })
 
 export class AuthService {
-
-  private headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    skip: 'true',
-  });
 
   //user$ = new BehaviorSubject(this.getRole());
   user$ = new BehaviorSubject("");
@@ -42,12 +37,18 @@ export class AuthService {
   }
 
   login(auth: any): Observable<AuthResponse> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Skip-Interceptor': 'true'
+    });
+
     return this.http.post<AuthResponse>(
       `${environment.apiHost}users/login`,
       auth,
-      { headers: this.headers }
+      { headers }
     );
   }
+
 
   logout(): Observable<void|null> {
 
@@ -61,7 +62,6 @@ export class AuthService {
 
   getRole(): any {
     if (this.isLoggedIn()) {
-      console.log("is logged in")
       try {
         const userToken: any = localStorage.getItem('user');
 

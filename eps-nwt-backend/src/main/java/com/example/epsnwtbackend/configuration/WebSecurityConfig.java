@@ -94,7 +94,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/documentation/{realEstateId}").permitAll()
-                .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers("/real-estate-request/docs/{realEstateId}").permitAll()
                 .requestMatchers("/household/docs/**").permitAll()
                 .requestMatchers("/employee/search").permitAll()
                 .requestMatchers("/employee/search?username").permitAll()

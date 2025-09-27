@@ -129,7 +129,6 @@ export class RequestAppointmentComponent {
       const dateString = `${this.selectedDate.year}-${String(this.selectedDate.month + 1).padStart(2, '0')}-${String(this.selectedDate.day).padStart(2, '0')}`;
       this.employeeService.getAppointmentsForDate(this.selectedEmployeeId, dateString).subscribe(
         (appointments) => {
-          //sort ascending, backedn returns in order of creation
           this.appointments = appointments.sort((a, b) => {
             const timeA = a.startTime;
             const timeB = b.startTime;

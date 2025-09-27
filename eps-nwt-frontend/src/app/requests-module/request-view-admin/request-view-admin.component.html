@@ -18,22 +18,22 @@
 
       <div class="images">
         <h3>Images</h3>
-        <div class="photo-box" *ngIf="this.images?.length; else noImages">
-          <div *ngFor="let image of this.images">
-            <img [src]="'data:image/jpeg;base64,' + image" alt="Real Estate Image" />
+        <div class="photo-box" *ngIf="images?.length; else noImages">
+          <div *ngFor="let imageUrl of images">
+            <img [src]="imageUrl" alt="Real Estate Image" />
           </div>
         </div>
         <ng-template #noImages>
           <p>No images available.</p>
         </ng-template>
       </div>
-<!--TODO: Izmeni pristup dokumentaciji putem nginxa-->
+
       <div class="documents">
         <h3>Documentation</h3>
-        <div class="document-box" *ngIf="this.documentation?.length; else noDocs">
+        <div class="document-box" *ngIf="documentation?.length; else noDocs">
           <ul>
             <li *ngFor="let doc of documentation">
-              <a class="doc-btn" [href]="doc" download>
+              <a class="doc-btn" [href]="doc" target="_blank">
                 {{ doc.split('/').pop() }}
               </a>
             </li>
@@ -45,6 +45,7 @@
       </div>
     </div>
   </div>
+
   <div class="admin-container">
     <h3>Admin Note</h3>
     <div *ngIf="this.status === 'CREATED'">
