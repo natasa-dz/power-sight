@@ -6,6 +6,7 @@ import com.example.epsnwtbackend.service.HouseholdService;
 import com.example.epsnwtbackend.service.InfluxService;
 import com.example.epsnwtbackend.utils.CyrillicConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +35,8 @@ public class HouseholdController {
 
     @Autowired
     private InfluxService influxService;
+    @Value("${app.upload.household}")
+    private String householdFilePath;
 
     @GetMapping(path = "/find-by-id/{id}")
     public ResponseEntity<ViewHouseholdDTO> findById(@PathVariable Long id) {
@@ -268,7 +272,6 @@ public class HouseholdController {
     public ResponseEntity<String> allowAccess(@PathVariable Long householdId,
                                               @RequestBody List<Long> ids) {
         try {
-            System.out.println("kontroler");
             householdService.allowAccess(householdId, ids);
             return ResponseEntity.ok("Successfully allowed access.");
         } catch (Exception e) {
@@ -278,52 +281,47 @@ public class HouseholdController {
 
     @GetMapping(value = "/docs/{householdId}")
     public ResponseEntity<List<Map<String, String>>> getDocsByHouseholdId(@PathVariable Long householdId) {
+        Path directoryPath = Paths.get(householdFilePath+householdId).normalize();
+        System.out.println("Documentation: "+ directoryPath);
+
+        if (!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        List<Map<String, String>> fileList = new ArrayList<>();
         try {
-            Path directoryPath = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId).normalize();
+            Files.list(directoryPath)
+                    .filter(Files::isRegularFile)
+                    .forEach(file -> {
+                        Map<String, String> fileMetadata = new HashMap<>();
+                        String fileName = file.getFileName().toString();
+                        fileMetadata.put("fileName", fileName);
 
-            if (!Files.exists(directoryPath) || !Files.isDirectory(directoryPath)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
+                        try {
+                            String contentType = Files.probeContentType(file);
+                            fileMetadata.put("contentType", contentType != null ? contentType : "application/octet-stream");
+                        } catch (IOException e) {
+                            fileMetadata.put("contentType", "application/octet-stream");
+                        }
 
-            List<Map<String, String>> fileList = new ArrayList<>();
-            Files.list(directoryPath).forEach(file -> {
-                try {
-                    Map<String, String> fileMetadata = new HashMap<>();
-                    fileMetadata.put("fileName", file.getFileName().toString());
-                    fileMetadata.put("contentType", Files.probeContentType(file));
-                    fileList.add(fileMetadata);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+                        String fileUrl = householdFilePath + householdId + "/" + fileName;
+                        fileMetadata.put("url", fileUrl);
 
-            return ResponseEntity.ok(fileList);
-
+                        fileList.add(fileMetadata);
+                    });
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+
+        return ResponseEntity.ok(fileList);
     }
+
 
     @GetMapping(value = "/docs/{householdId}/{fileName}")
-    public ResponseEntity<byte[]> getFile(@PathVariable Long householdId, @PathVariable String fileName) {
-        try {
-            Path filePath = Paths.get("src", "main", "resources", "data", "requests", "house" + householdId, fileName).normalize();
-
-            if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-
-            byte[] fileBytes = Files.readAllBytes(filePath);
-            String contentType = Files.probeContentType(filePath);
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
-                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
-                    .body(fileBytes);
-
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public ResponseEntity<Void> getFile(@PathVariable Long householdId, @PathVariable String fileName) {
+        String fileUrl = householdFilePath + householdId + "/" + fileName;
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", fileUrl)
+                .build();
     }
-
 }

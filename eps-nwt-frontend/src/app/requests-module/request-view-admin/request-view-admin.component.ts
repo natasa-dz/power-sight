@@ -70,54 +70,25 @@ export class RequestViewAdminComponent implements OnInit{
           });
 
           this.service.getImagesByRealEstateId(id).subscribe({
-            next: (base64Images: string[]) => {
-              this.images = base64Images;
-            },
-            error: (err) => {
-              console.error('Error loading images', err);
-            }
+            next: (urls: string[]) => (this.images = urls),
+            error: (err) => console.error('Error loading images', err)
           });
 
           this.service.getDocumentationByRealEstateId(id).subscribe({
-            next: (documentPaths: string[]) => {
-              console.log("Učitane putanje dokumenata:", documentPaths);
-              this.documentation = documentPaths;
-            },
-            error: (err) => {
-              console.error('Error loading docs', err);
-            }
+            next: (urls: string[]) => (this.documentation = urls),
+            error: (err) => console.error('Error loading docs', err)
           });
         },
-        error: (_:any) => {
-          console.log("Error fetching request " + id + " for admin!")
-        }
+        error: () => console.log("Error fetching request " + id + " for admin!")
       });
-    }
-
-  }
-
-  downloadDocument(filePath: string) {
-    this.service.getDocumentBytes(filePath).subscribe({
-      next: (fileBytes: ArrayBuffer) => {
-        const blob = new Blob([fileBytes], { type: 'application/pdf' }); // Adjust MIME type as needed
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'request' + this.request?.id + '-' + filePath.split('/')[7];
-        link.click();
-      },
-      error: (err) => {
-        console.error('Failed to download the document:', err);
       }
-    });
+
   }
 
   finishRequest(approved: boolean) {
-    alert("alalalx")
     let note = false;
     if (!note){
-      // ako se odbija
       if(!approved) {
-        // ako nema note
         if (this.adminNote === '') {
           this.showSnackbar("Admin note is required for denied requests!\nAdd reason for denying the request.");
         } else {
@@ -140,7 +111,6 @@ export class RequestViewAdminComponent implements OnInit{
           location.reload();
         },
         error: (mess:any) => {
-          //console.log(mess)
           if(mess.status === 200){
             this.showSnackbar(mess.error.text);
             location.reload();

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,32 +20,29 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-// Injektovanje bean-a za bezbednost
 @EnableWebSecurity
-// Ukljucivanje podrske za anotacije "@Pre*" i "@Post*" koje ce aktivirati autorizacione provere za svaki pristup metodi
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig implements WebMvcConfigurer{
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost","http://localhost:4200") //angular app
-                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*");
+                .allowedOrigins("http://localhost","http://localhost:4200")
+                .allowedMethods("GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
-    // Servis koji se koristi za citanje podataka o korisnicima aplikacije
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserService();
     }
 
-    // Implementacija PasswordEncoder-a koriscenjem BCrypt hashing funkcije.
-    // BCrypt po defalt-u radi 10 rundi hesiranja prosledjene vrednosti.
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -71,17 +69,18 @@ public class WebSecurityConfig implements WebMvcConfigurer{
     @Autowired
     private TokenUtils tokenUtils;
 
-    // Definisemo prava pristupa za zahteve ka odredjenim URL-ovima/rutama
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults());
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors(Customizer.withDefaults());
 
-        // sve neautentifikovane zahteve obradi uniformno i posalji 401 gresku
-        http.exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint);
+        http.exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint));
+
         http.authorizeRequests()
-                .requestMatchers("/main").permitAll()
                 .requestMatchers("/users/register").permitAll()
                 .requestMatchers("/users/login").permitAll()
+                .requestMatchers("/main").permitAll()
                 .requestMatchers("/users/{email}").permitAll()
                 .requestMatchers("/users/byId/{userId}").permitAll()
                 .requestMatchers("/users").permitAll()
@@ -95,7 +94,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers("/real-estate-request/admin/finish/{requestId}").permitAll()
                 .requestMatchers("/real-estate-request/images/{realEstateId}").permitAll()
                 .requestMatchers("/real-estate-request/documentation/{realEstateId}").permitAll()
-                .requestMatchers("/real-estate-request/docs").permitAll()
+                .requestMatchers("/real-estate-request/docs/{realEstateId}").permitAll()
                 .requestMatchers("/household/docs/**").permitAll()
                 .requestMatchers("/employee/search").permitAll()
                 .requestMatchers("/employee/search?username").permitAll()
@@ -151,40 +150,28 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
-                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
-                // ukoliko ne zelimo da koristimo @PreAuthorize anotacije nad metodama kontrolera, moze se iskoristiti hasRole() metoda da se ogranici
-                // koji tip korisnika moze da pristupi odgovarajucoj ruti. Npr. ukoliko zelimo da definisemo da ruti 'admin' moze da pristupi
-                // samo korisnik koji ima rolu 'ADMIN', navodimo na sledeci nacin:
-                // .antMatchers("/admin").hasRole("ADMIN") ili .antMatchers("/admin").hasAuthority("ROLE_ADMIN")
-
-                // za svaki drugi zahtev korisnik mora biti autentifikovan
+                .requestMatchers(HttpMethod.GET, "/users/auth/activate").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()
+                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated().and()
-                // za development svrhe ukljuci konfiguraciju za CORS iz WebConfig klase
                 .cors().and()
+                .addFilterAfter(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), UsernamePasswordAuthenticationFilter.class);
 
-                // umetni custom filter TokenAuthenticationFilter kako bi se vrsila provera JWT tokena umesto cistih korisnickog imena i lozinke (koje radi BasicAuthenticationFilter)
-                .addFilterBefore(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), BasicAuthenticationFilter.class);
-
-        // zbog jednostavnosti primera ne koristimo Anti-CSRF token (https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
-        http.csrf().disable();
-        http.headers().frameOptions().disable();
-
-        // ulancavanje autentifikacije
+        http.headers(headers -> headers.frameOptions().disable());
         http.authenticationProvider(authenticationProvider());
 
         return http.build();
     }
 
-    // metoda u kojoj se definisu putanje za igorisanje autentifikacije
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        // Autentifikacija ce biti ignorisana ispod navedenih putanja (kako bismo ubrzali pristup resursima)
-        // Zahtevi koji se mecuju za web.ignoring().antMatchers() nemaju pristup SecurityContext-u
-        // Dozvoljena POST metoda na ruti /auth/login, za svaki drugi tip HTTP metode greska je 401 Unauthorized
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/registration")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
+                .requestMatchers(HttpMethod.GET, "/users/auth/activate")
+                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate")
+                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate")
                 .requestMatchers(HttpMethod.POST, "/employee/image")
                 .requestMatchers(HttpMethod.POST, "/appointments/create")
                 .requestMatchers(HttpMethod.POST, "/price-list/create")
@@ -212,9 +199,6 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "/receipts/all-for-household/{householdId}", "/receipts/all-for-owner/{ownerId}",
                         "/receipts/by-id/{receiptId}", "/employee/all-employees-no-pagination");
 
-        // Ovim smo dozvolili pristup statickim resursima aplikacije
-//                .requestMatchers(HttpMethod.GET, "/", "/webjars/**", "/*.html", "favicon.ico",
-//                        "/**/*.html", "/**/*.css", "/**/*.js");
 
     }
 

@@ -172,11 +172,11 @@ public class ReceiptService {
             receipt = receiptRepository.save(receipt);
 
             //create pdf
-            String paymentUrl = "http://localhost:4200/receipt/" + receipt.getId();
+            String paymentUrl = "http://localhost/receipt/" + receipt.getId();
             byte[] pdf = generateReceiptPDF(receipt, month, year, paymentUrl);
 
             //save pdf
-            String path = "src/main/resources/data/receipts/" + household.getId();
+            String path = Paths.get("uploads", "receipts", String.valueOf(household.getId())).toString();
             Path folder = Paths.get(path);
             try {
                 Files.createDirectories(folder);
@@ -367,7 +367,7 @@ public class ReceiptService {
             receiptRepository.save(receipt);
             PaymentSlipDTO paymentSlip = generatePaymentSlip(receipt, username);
             byte[] pdf = generatePaymentSlipPDF(paymentSlip);
-            String path = "src/main/resources/data/paymentSlips";
+            String path = Paths.get("uploads", "paymentSlips").toString();
             Path folder = Paths.get(path);
             try {
                 Files.createDirectories(folder);
@@ -389,7 +389,6 @@ public class ReceiptService {
         paymentSlip.setCustomerName(username);
         Household household = receipt.getHousehold();
         String latin = CyrillicConverter.toLatin(household.getRealEstate().getAddress());
-        System.out.println("ADresa: " + latin);
         paymentSlip.setCustomerAddress(latin+", "+household.getApartmentNumber());
         paymentSlip.setPurpose("Receipt payment: " + receipt.getMonth() + " "+receipt.getYear());
         paymentSlip.setModel(97);

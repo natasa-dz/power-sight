@@ -121,10 +121,7 @@ public class UserService implements UserDetailsService {
     @Cacheable(value = "userByEmail", key = "#email")
     public Optional<UserDto> findUser(String email){
         Optional<User> toFind = userRepository.findByUsername(email);
-        if(toFind.isPresent()){
-            return Optional.of(new UserDto(toFind.get()));
-        }
-        return Optional.empty();
+        return toFind.map(UserDto::new);
     }
 
     public Optional<UserDto> findUserByToken(String token){
@@ -144,12 +141,10 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if the new password and confirm password match
         if (!newPassword.equals(confirmPassword)) {
             throw new RuntimeException("New password and confirm password do not match.");
         }
 
-        // Set the new password and mark the password as changed
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setPasswordChanged(true);
         userRepository.save(user);
@@ -166,7 +161,6 @@ public class UserService implements UserDetailsService {
             @CacheEvict(value = "userByUsername", key="#username")
     })
     public Optional<UserCredentials> register(UserDto dto, String username) {
-
 
         if(userRepository.findByUsername(dto.getUsername()).isPresent()){
             return Optional.empty();

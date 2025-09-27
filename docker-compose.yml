@@ -14,6 +14,8 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    networks:
+      - app-network
 
   influxdb:
     image: influxdb:2.7
@@ -31,6 +33,8 @@ services:
       - influxdb-data:/var/lib/influxdb2
       - ./influx-init.sh:/docker-entrypoint-initdb.d/influx-init.sh:ro
     restart: always
+    networks:
+      - app-network
 
   influxdb-cli:
     image: influxdb:2.7
@@ -41,7 +45,8 @@ services:
       influx bucket create --name consumptions --org nwt --token sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA== --host http://influxdb:8086"
     depends_on:
       - influxdb
-
+    networks:
+      - app-network
   postgres:
     image: postgres:15
     container_name: postgres
@@ -59,7 +64,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    networks:
+      - app-network
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -72,7 +78,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-
+    networks:
+      - app-network
   backend:
     build:
       context: ./eps-nwt-backend
@@ -96,14 +103,12 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
       
-      # For the wait script
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_USER: nwt
       POSTGRES_PASSWORD: epsnwtdockerpassword
       POSTGRES_DB: eps_nwt
 
-      #for rabbitmq
       AMQP_HOST: rabbitmq
       AMQP_PORT: 5672
       SPRING_RABBITMQ_HOST: rabbitmq
@@ -122,20 +127,33 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
     restart: always
+    volumes:
+      - ./uploads:/var/www/uploads
+    networks:
+      app-network:
+        aliases:
+          - backend-name
 
-  frontend:
-    build:
-      context: ./eps-nwt-frontend
-      dockerfile: Dockerfile
-    container_name: angular-frontend
+  nginx:
+    image: nginx:1.25
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./uploads:/var/www/uploads:ro
+      - ./eps-nwt-frontend/dist/nwt-eps-frontend/browser:/usr/share/nginx/html:ro
     depends_on:
       - backend
-    restart: always
-    ports:
-      - "4200:80"
-
+    networks:
+      - app-network
 volumes:
+
   postgres-data:
   redis-data:
   rabbitmq-data:
   influxdb-data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -80,7 +80,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         for (String simulator : householdService.getAllSimulatorIds()) {
             System.out.println(simulator);
             Map<String, Double> message = consumptionService.getHouseholdConsumptionGraph(Long.parseLong(simulator), "1");
-            System.out.println("Household data: "+message);
             template.convertAndSend(
                     "/data/household/graph/" + simulator,
                     message

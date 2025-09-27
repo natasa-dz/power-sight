@@ -74,7 +74,6 @@ export class RegisterEmployeeComponent {
     console.log(this.registerForm.get('username')?.value);
     console.log(this.registerForm.get('jmbg')?.value);
 
-    // Check if the form is valid and the file is selected
     if (this.registerForm.valid && this.selectedFile != null) {
       const formData = new FormData();
       let role = 'EMPLOYEE';
