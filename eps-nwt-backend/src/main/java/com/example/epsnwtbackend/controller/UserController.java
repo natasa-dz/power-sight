@@ -116,41 +116,41 @@ public class UserController {
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
     }
 
-    @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto) throws MessagingException {
-        Optional<UserCredentials> credentials = userDetailsService.register(dto, dto.getUsername());
-
-        if (credentials.isPresent()){
-
-            tokenService.generateToken(dto.getUsername(), dto.getRole(), dto.getId());
-
-            String activationToken = UUID.randomUUID().toString();
-            userService.saveActivationToken(dto.getUsername(), activationToken);
-
-            if (dto.getRole() == Role.EMPLOYEE) {
-                User user = userService.findWholeUser(dto.getUsername());
-                Employee employee = new Employee();
-                employee.setUser(user);
-                employee.setName(dto.getName());
-                employee.setSurname(dto.getSurname());
-                employee.setSuspended(false);
-                employee.setUsername(user.getUsername());
-                employeeService.saveEmployee(employee);
-            } else if (dto.getRole() == Role.CITIZEN) {
-                User user = userService.findWholeUser(dto.getUsername());
-                Citizen citizen = new Citizen();
-                citizen.setUser(user);
-                citizen.setUsername(user.getUsername());
-                citizenService.saveCitizen(citizen);
-            }
-
-            String activationLink = "http://localhost:8080/users/api/auth/activate?token=" + activationToken;
-            emailService.sendActivationEmail(dto.getUsername(), activationLink);
-            return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
-
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-    }
+//    @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<UserCredentials> registerProcess(@RequestBody UserDto dto) throws MessagingException {
+//        Optional<UserCredentials> credentials = userDetailsService.register(dto, dto.getUsername());
+//
+//        if (credentials.isPresent()){
+//
+//            tokenService.generateToken(dto.getUsername(), dto.getRole(), dto.getId());
+//
+//            String activationToken = UUID.randomUUID().toString();
+//            userService.saveActivationToken(dto.getUsername(), activationToken);
+//
+//            if (dto.getRole() == Role.EMPLOYEE) {
+//                User user = userService.findWholeUser(dto.getUsername());
+//                Employee employee = new Employee();
+//                employee.setUser(user);
+//                employee.setName(dto.getName());
+//                employee.setSurname(dto.getSurname());
+//                employee.setSuspended(false);
+//                employee.setUsername(user.getUsername());
+//                employeeService.saveEmployee(employee);
+//            } else if (dto.getRole() == Role.CITIZEN) {
+//                User user = userService.findWholeUser(dto.getUsername());
+//                Citizen citizen = new Citizen();
+//                citizen.setUser(user);
+//                citizen.setUsername(user.getUsername());
+//                citizenService.saveCitizen(citizen);
+//            }
+//
+//            String activationLink = "http://localhost:8080/users/api/auth/activate?token=" + activationToken;
+//            emailService.sendActivationEmail(dto.getUsername(), activationLink);
+//            return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
+//
+//        }
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+//    }
 
     @PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCredentials> registerUser(
