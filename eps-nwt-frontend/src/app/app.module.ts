@@ -2,7 +2,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {AppComponent} from "./app.component";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import {AccessControlModule} from "./access-control-module/access-control.module";
 import {RouterModule} from "@angular/router";
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'; // Adjust the path to your component
@@ -20,6 +20,7 @@ import {NavbarEmployeeComponent} from "./base/navbar-employee/navbar-employee.co
 import {BaseModule} from "./base/base.module";  // Import routes from app.routes.ts
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {Interceptor} from "./access-control-module/interceptor";
 
 @NgModule({
   declarations: [AppComponent,
@@ -43,6 +44,10 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
     SearchHouseholdComponent,
     BaseModule],
   bootstrap: [AppComponent],
-  providers: [provideAnimationsAsync()] // Bootstraps the application with AppComponent
+  providers: [provideAnimationsAsync(), {
+    provide: HTTP_INTERCEPTORS,
+    useClass: Interceptor,
+    multi: true
+  }]
 })
 export class AppModule {}

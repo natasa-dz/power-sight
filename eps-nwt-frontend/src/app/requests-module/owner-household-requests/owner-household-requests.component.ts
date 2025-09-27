@@ -50,16 +50,13 @@ export class OwnerHouseholdRequestsComponent implements OnInit {
     this.loadUserRequests();
   }
 
-  // Filter and sort the requests based on user input
   filterAndSortRequests(): void {
     let requests = [...this.ownershipRequests];
 
-    // Filter by status
     if (this.statusFilter) {
       requests = requests.filter((request) => request.status === this.statusFilter);
     }
 
-    // Sort by selected criteria
     requests.sort((a, b) => {
       switch (this.sortCriteria) {
         case 'submittedAtAsc':
@@ -78,7 +75,6 @@ export class OwnerHouseholdRequestsComponent implements OnInit {
     this.filteredRequests = requests;
   }
 
-  // Method to get the appropriate class for the status
   getStatusClass(status: string): string {
     switch (status) {
       case 'APPROVED':

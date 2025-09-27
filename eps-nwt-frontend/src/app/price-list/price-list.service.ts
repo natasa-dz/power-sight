@@ -9,8 +9,8 @@ import {Receipt} from "../model/receipt.model";
 })
 export class PriceListService {
 
-  private apiUrl = 'http://localhost:8080/price-list';
-  private receiptUrl = 'http://localhost:8080/receipts';
+  private apiUrl = '/api/price-list';
+  private receiptUrl = '/api/receipts';
 
   constructor(private http: HttpClient) { }
 

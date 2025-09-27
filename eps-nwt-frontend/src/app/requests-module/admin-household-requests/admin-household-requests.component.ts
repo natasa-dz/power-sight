@@ -45,7 +45,7 @@ export class AdminHouseholdRequestsComponent {
     this.householdService.processRequest(requestId, approved, reason).subscribe(
       () => {
         alert(`Request ${approved ? 'approved' : 'rejected'} successfully!`);
-        this.loadPendingRequests(); // Refresh the list after processing
+        this.loadPendingRequests();
       },
       (error) => {
         console.error(error);
@@ -55,23 +55,15 @@ export class AdminHouseholdRequestsComponent {
   }
 
   loadSubmittedFiles(requestId: number): void {
-    this.householdService.getSubmittedFiles(requestId).subscribe(
-      (files) => {
+    this.householdService.getSubmittedFiles(requestId).subscribe({
+      next: (files) => {
         const request = this.pendingRequests.find(r => r.id === requestId);
-        if (request) request.files = files;
+        if (request) {
+          request.files = files;
+        }
       },
-      (error) => console.error('Error loading files', error)
-    );
-  }
-
-  viewFile(householdId: number, fileName: string): void {
-    this.householdService.downloadFile(householdId, fileName).subscribe(
-      (fileBlob) => {
-        const url = window.URL.createObjectURL(fileBlob);
-        window.open(url);
-      },
-      (error) => console.error('Error opening file', error)
-    );
+      error: (err) => console.error('Error loading files', err)
+    });
   }
 
 

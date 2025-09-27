@@ -12,7 +12,7 @@ import {FinishRealEstateRequestDTO} from "../model/finish-real-estate-request-dt
 })
 export class RealEstateRequestService {
 
-  private apiUrl = 'http://localhost:8080/real-estate-request';
+  private apiUrl = '/api/real-estate-request';
 
   private headers = new HttpHeaders({
     'Content-Type': 'application/json',
@@ -49,22 +49,24 @@ export class RealEstateRequestService {
     return this.http.get<RealEstateRequest>(`${this.apiUrl}/admin/request/${id}`)
   }
 
-  getImagesByRealEstateId(realEstateId: number) {
-    return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`, {
-      responseType: 'json'
-    });
+  // getImagesByRealEstateId(realEstateId: number) {
+  //   return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`, {
+  //     responseType: 'json'
+  //   });
+  // }
+
+  // getDocumentationByRealEstateId(realEstateId: number) {
+  //   return this.http.get<string[]>(`${this.apiUrl}/documentation/${realEstateId}`, {
+  //     responseType: 'json'
+  //   });
+  // }
+
+  getImagesByRealEstateId(realEstateId: number): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/images/${realEstateId}`);
   }
 
-  getDocumentationByRealEstateId(realEstateId: number) {
-    return this.http.get<string[]>(`${this.apiUrl}/documentation/${realEstateId}`, {
-      responseType: 'json'
-    });
-  }
-
-  getDocumentBytes(filePath: string) {
-    return this.http.post(this.apiUrl + '/docs', filePath, {
-      responseType: 'arraybuffer'
-    });
+  getDocumentationByRealEstateId(realEstateId: number): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/docs/${realEstateId}`);
   }
 
   finishRequest(requestId: number, finishedRequest: FinishRealEstateRequestDTO) {

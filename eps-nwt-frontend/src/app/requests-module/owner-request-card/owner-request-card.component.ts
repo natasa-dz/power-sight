@@ -22,9 +22,6 @@ export class OwnerRequestCardComponent implements OnInit{
   @Input()
   request: AllRealEstateRequestsDto | undefined;
 
-  //@Output()
-  //clicked: EventEmitter<AccommodationListingDto> = new EventEmitter<AccommodationListingDto>();
-
   status: string = "";
   createdAt: string = "";
   finishedAt: string = "";

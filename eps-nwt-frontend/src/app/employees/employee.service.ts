@@ -13,8 +13,8 @@ import {Appointment} from "../model/appointment.model";
 })
 export class EmployeeService {
 
-  private apiUrl = 'http://localhost:8080/employee';
-  private appointmentUrl = 'http://localhost:8080/appointments';
+  private apiUrl = '/api/employee';
+  private appointmentUrl = '/api/appointments';
 
   constructor(private http: HttpClient) { }
 
@@ -57,7 +57,7 @@ export class EmployeeService {
     const params = new HttpParams({ fromObject: payload as any });
     return this.http.post(`${this.appointmentUrl}/create`, null, {
       params,
-      responseType: 'text' as 'json', // Ensures the response is treated as text
+      responseType: 'text' as 'json',
     });
   }
 

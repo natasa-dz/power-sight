@@ -16,8 +16,6 @@ export class RegisterComponent {
   registerForm: FormGroup;
   selectedFile: File | null = null;
   profilePic: string | null = null;
-  showActivationPrompt: boolean = false;
-  activationToken: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -25,7 +23,6 @@ export class RegisterComponent {
     private userService: UserService,
     private router: Router,
     private imageCompress: NgxImageCompressService,
-    private route:ActivatedRoute
 
   ) {
     this.registerForm = this.fb.group({
@@ -64,25 +61,22 @@ export class RegisterComponent {
     console.log(this.registerForm.get('username')?.value);
     console.log(this.registerForm.get('password')?.value);
 
-    // Check if the form is valid and the file is selected
     if (this.registerForm.valid && this.selectedFile != null) {
       const formData = new FormData();
       let role = 'CITIZEN';
 
-      if (this.authService.getRole() === Role.SUPERADMIN) {
+      if (this.authService.isLoggedIn() && this.authService.getRole() === Role.SUPERADMIN) {
         role = 'ADMIN';
       }
-      console.log("Role: ", role)
-
       formData.append('role', role)
 
       formData.append('username', this.registerForm.get('username')?.value);
       formData.append('password', this.registerForm.get('password')?.value);
-      formData.append('userPhoto', this.selectedFile);  // Send the selected file
-      console.log(formData)
+      formData.append('userPhoto', this.selectedFile);
       this.userService.registerUser(formData).subscribe({
         next: (response) => {
           alert('Registration successful! Please check your email to activate your account.');
+          this.authService.logout();
           this.router.navigate(['/login']);
         },
         error: () => {

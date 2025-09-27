@@ -17,17 +17,14 @@ export class ActivateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("Activate Component initialized!")
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
-      console.log("Token: ", token)
       if (token) {
         this.activateAccount(token);
       }
     });
   }
   activateAccount(token:string){
-    console.log("Usao u acitvate Account!")
     this.userService.activateAccount(token).subscribe({
       next: (response: HttpResponse<string>) => {
         if (response.status === 200) {

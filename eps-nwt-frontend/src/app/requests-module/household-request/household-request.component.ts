@@ -1,15 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {BaseModule} from "../../base/base.module";
 import {HouseholdService} from "../../simulators/household.service";
 import {HttpClient} from "@angular/common/http";
-import {formatDate} from "date-fns";
 import {HouseholdDto} from "../../model/householdDTO";
-import {AuthService} from "../../access-control-module/auth.service";
 import {UserService} from "../../service/user.service";
-import {User} from "../../model/user.model";
 
 @Component({
   selector: 'app-household-request',

@@ -6,6 +6,7 @@ import {AuthService} from "../auth.service";
 import {MatDialog} from "@angular/material/dialog";
 import {ChangePasswordComponent} from "../../change-password/change-password.component";
 import {Role} from "../../model/user.model";
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 @Component({
   selector: 'app-login',
@@ -32,6 +33,7 @@ export class LoginComponent implements OnInit {
     public dialog: MatDialog  // Inject MatDialog service
   ) {}
   ngOnInit(): void {
+    this.authService.logout();
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -55,10 +57,10 @@ export class LoginComponent implements OnInit {
             localStorage.setItem('user', response.accessToken);
             this.userService.setUserDetails();
 
+            const helper = new JwtHelperService();
+            const decoded = helper.decodeToken(response.accessToken);
             this.userService.getCurrentUser().subscribe((user: any) => {
               this.currentUser = user;
-              console.log(user);
-              console.log("IsActive: ", user.active)
              if (user.role === Role.SUPERADMIN && !user.passwordChanged) {
                alert('Please change your default password.');
                this.openChangePasswordDialog();
@@ -73,7 +75,6 @@ export class LoginComponent implements OnInit {
                 } else{
                   this.router.navigate(['main']);
                 }
-                console.log("Uspesno ulogovan korisnik!");
               }
             });
           }
@@ -82,6 +83,7 @@ export class LoginComponent implements OnInit {
           if (err.status === 403) {
             alert('Your account is suspended!');
           } else {
+            console.log("Greska je: ",err);
             alert('Bad credentials or account not verified yet');
           }
         }
@@ -99,7 +101,7 @@ export class LoginComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         alert('Password changed successfully. You can now proceed.');
-        this.router.navigate(['main']);  // Redirect to main page after successful password change
+        this.router.navigate(['main']);
       } else {
         alert('Password change is required to continue.');
         this.authService.logout();

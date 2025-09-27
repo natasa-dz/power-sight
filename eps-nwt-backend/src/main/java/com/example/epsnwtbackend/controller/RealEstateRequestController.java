@@ -7,6 +7,7 @@ import com.example.epsnwtbackend.service.HouseholdRequestService;
 import com.example.epsnwtbackend.service.RealEstateRequestService;
 import com.example.epsnwtbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/real-estate-request")
@@ -34,11 +36,16 @@ public class RealEstateRequestController {
     @Autowired
     private UserService userService;
 
+    @Value("${app.upload.real-estate-request}")
+    private String realEstateRequestsBase;
+
+    @Value("${app.upload.real-estate-request-prefix}")
+    private String uploadUrlPrefix;
+
     @PostMapping(value = "/registration", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<String> createRequest(@RequestPart("images") Collection<MultipartFile> imageFiles,
                                                 @RequestPart("documentation") Collection<MultipartFile> docFiles,
                                                 @RequestPart("realEstateRequest") CreateRealEstateRequestDTO realEstateRequestDTO) throws IOException {
-        System.out.println("pogadja metodu");
         if (imageFiles.isEmpty()) {
             return new ResponseEntity<>("Missing real estate images!", HttpStatus.BAD_REQUEST);
         }
@@ -69,13 +76,11 @@ public class RealEstateRequestController {
 
     @GetMapping(value = "")
     public Map<String, List<String>> getCitiesWithMunicipalities() {
-        System.out.println("pogadja metodu");
         return service.getCitiesWithMunicipalities();
     }
 
     @GetMapping(value = "/{ownerId}/all")
     public List<AllRealEstateRequestsDTO> getAllForOwner(@PathVariable("ownerId")Long ownerId){
-        System.out.println(ownerId + " hhhhhhhhhhhhhhhhhhhhhhhhhh");
         return service.getAllForOwner(ownerId);
     }
 
@@ -94,61 +99,46 @@ public class RealEstateRequestController {
         return service.getDocumentationForRealEstate(realEstateId);
     }
 
+    @GetMapping(value = "/docs/{realEstateId}")
+    public ResponseEntity<List<String>> getDocsByRealEstateId(@PathVariable Long realEstateId) throws IOException {
+        Path dir = Paths.get(realEstateRequestsBase+ realEstateId, "docs");
+        if (!Files.exists(dir) || !Files.isDirectory(dir)) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<String> urls = Files.list(dir)
+                .filter(Files::isRegularFile)
+                .map(file -> uploadUrlPrefix + realEstateId +  "/docs/"  + file.getFileName().toString())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(urls);
+    }
+
+
     @GetMapping("/images/{realEstateId}")
-    public ResponseEntity<List<String>> getImagesByRealEstateId(@PathVariable("realEstateId") String realEstateId) {
-        Path imageDirectory = Paths.get("src/main/resources/data/requests/realEstate" + realEstateId + "/images");
-        List<String> base64Images = new ArrayList<>();
+    public ResponseEntity<List<String>> getImageUrlsByRealEstateId(@PathVariable("realEstateId") String realEstateId) {
+        Path imageDirectory = Paths.get(realEstateRequestsBase+ realEstateId, "images");
 
         try {
             if (!Files.exists(imageDirectory) || !Files.isDirectory(imageDirectory)) {
-                return ResponseEntity.badRequest().body(null);
+                return ResponseEntity.ok(Collections.emptyList());
             }
-            Files.list(imageDirectory)
+
+            List<String> imageUrls = Files.list(imageDirectory)
                     .filter(Files::isRegularFile)
-                    .forEach(imagePath -> {
-                        try {
-                            byte[] imageBytes = Files.readAllBytes(imagePath);
-                            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-                            base64Images.add(base64Image);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    .map(imagePath -> uploadUrlPrefix + realEstateId + "/images/" + imagePath.getFileName().toString())
+                    .collect(Collectors.toList());
 
-            return ResponseEntity.ok(base64Images);
+            return ResponseEntity.ok(imageUrls);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PostMapping(value = "/docs")
-    public ResponseEntity<byte[]> getDocsByRealEstateId(@RequestBody String filePath) {
-
-        System.out.println("usaoooo");
-        try {
-            Path path = Paths.get(filePath).normalize();
-            if (!Files.exists(path) || !Files.isRegularFile(path)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
-
-            byte[] fileBytes = Files.readAllBytes(path);
-            String contentType = Files.probeContentType(path);
-            if (contentType == null) {
-                contentType = "application/pdf";
-            }
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(fileBytes);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 
     @PutMapping(value = "admin/finish/{requestId}")
     public ResponseEntity<String> finishRequest(@PathVariable("requestId")Long requestId,
                                                 @RequestBody FinishRealEstateRequestDTO finishedRequest){
-        System.out.println("gadja finish!!!!!!!!!!");
         if(!finishedRequest.getApproved()){
             if (finishedRequest.getNote() == null || finishedRequest.getNote().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("Admin note is required for denied requests.");

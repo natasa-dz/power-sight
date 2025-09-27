@@ -38,7 +38,7 @@ public class OwnershipRequestService {
     @Autowired
     private UserRepository userRepository;
 
-    private final String baseDirectory = "src/main/resources/data/requests/house";
+    private final String baseDirectory = Paths.get("..","uploads", "requests", "house").toString();
 
     public String storeFiles(Long requestId, List<MultipartFile> files) {
         String folderPath = baseDirectory + requestId;
@@ -66,7 +66,6 @@ public class OwnershipRequestService {
             @CacheEvict(value = "userOwnershipRequests", key = "#username"),
             @CacheEvict(value = "noOwnerHouseholds", allEntries = true)
     })
-    //TODO: modify register funkciju, setovanje i id usera, pronalazenje!
     public void processRequest(Long requestId, boolean approved, String reason, String username) throws MessagingException, NoResourceFoundException {
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));

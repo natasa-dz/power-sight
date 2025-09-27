@@ -37,7 +37,7 @@ export class MapComponent implements AfterViewInit{
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
       this.http
-        .get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+        .get(`/nominatim/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
         .subscribe((data: any) => {
           const road = data?.address?.road || 'Unknown road';
           if (road === 'Unknown road') {

@@ -10,8 +10,8 @@ import {HouseholdAccessDto} from "../model/household-access-dto.model";
 })
 export class CitizenService {
 
-  private apiUrl = 'http://localhost:8080/citizen';
-  private householdApiUrl = 'http://localhost:8080/household';
+  private apiUrl = '/api/citizen';
+  private householdApiUrl = '/api/household';
 
   constructor(private http: HttpClient) { }
 
