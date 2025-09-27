@@ -150,8 +150,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
-                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()  // Allow unauthenticated access to activate endpoint
+                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()
                 .anyRequest().authenticated().and()
                 .cors().and()
                 .addFilterAfter(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), UsernamePasswordAuthenticationFilter.class);

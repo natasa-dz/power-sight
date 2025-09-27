@@ -13,8 +13,8 @@ import {Appointment} from "../model/appointment.model";
 })
 export class EmployeeService {
 
-  private apiUrl = 'http://localhost:8080/employee';
-  private appointmentUrl = 'http://localhost:8080/appointments';
+  private apiUrl = '/api/employee';
+  private appointmentUrl = '/api/appointments';
 
   constructor(private http: HttpClient) { }
 

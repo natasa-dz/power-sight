@@ -12,7 +12,7 @@ import {FinishRealEstateRequestDTO} from "../model/finish-real-estate-request-dt
 })
 export class RealEstateRequestService {
 
-  private apiUrl = 'http://localhost:8080/real-estate-request';
+  private apiUrl = '/api/real-estate-request';
 
   private headers = new HttpHeaders({
     'Content-Type': 'application/json',

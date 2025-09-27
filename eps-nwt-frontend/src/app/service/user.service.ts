@@ -13,7 +13,7 @@ import {RealEstateRequest} from "../model/real-estate-request.model";
 })
 export class UserService {
 
-  private apiUrl = 'http://localhost:8080/users';
+  private apiUrl = '/api/users';
 
   private headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -25,13 +25,6 @@ export class UserService {
 
 
   userAccount$=new BehaviorSubject<User | null>(null);
-
-
-  // constructor(private http: HttpClient){
-  //     this.user$.next(this.getRole());
-  //     this.setUser();
-  //     this.setUserDetails();
-  // }
 
   constructor(private http: HttpClient) {}
 
@@ -56,7 +49,6 @@ export class UserService {
 
   getUser(email: string): Observable<User> {
     const url = `${this.apiUrl}/${email}`;
-    //{withCredentials:true}
     return this.http.get<User>(url).pipe(
       catchError((error: any) => {
         console.error('Error getting user:', error);

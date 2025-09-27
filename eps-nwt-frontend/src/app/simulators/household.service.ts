@@ -12,10 +12,8 @@ import {HouseholdDto} from "../model/householdDTO";
 })
 export class HouseholdService {
 
-
-
-  private apiUrl = 'http://localhost:8080/household';  // Adjust to your backend URL
-  private ownershipUrl = 'http://localhost:8080/ownership-requests';  // Adjust to your backend URL
+  private apiUrl = '/api/household';
+  private ownershipUrl = '/api/ownership-requests';
 
   constructor(private http: HttpClient) {}
 
