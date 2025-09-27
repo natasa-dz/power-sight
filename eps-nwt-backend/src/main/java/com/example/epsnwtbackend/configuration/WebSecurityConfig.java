@@ -34,7 +34,7 @@ public class WebSecurityConfig implements WebMvcConfigurer{
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost","http://localhost:4200")
-                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+                .allowedMethods("GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
@@ -150,7 +150,10 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                 .requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll()
                 .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/users/auth/activate").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate").permitAll()
+                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated().and()
                 .cors().and()
                 .addFilterAfter(new TokenAuthenticationFilter(tokenUtils,  userDetailsService()), UsernamePasswordAuthenticationFilter.class);
@@ -166,6 +169,9 @@ public class WebSecurityConfig implements WebMvcConfigurer{
         return (web) -> web.ignoring().requestMatchers(HttpMethod.POST, "/users/login").requestMatchers(HttpMethod.POST, "/users/register")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/registration")
                 .requestMatchers(HttpMethod.POST, "/real-estate-request/docs")
+                .requestMatchers(HttpMethod.GET, "/users/auth/activate")
+                .requestMatchers(HttpMethod.OPTIONS,"/users/auth/activate")
+                .requestMatchers(HttpMethod.PATCH,"/users/auth/activate")
                 .requestMatchers(HttpMethod.POST, "/employee/image")
                 .requestMatchers(HttpMethod.POST, "/appointments/create")
                 .requestMatchers(HttpMethod.POST, "/price-list/create")
