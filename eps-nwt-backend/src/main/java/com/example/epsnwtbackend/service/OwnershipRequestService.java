@@ -9,6 +9,7 @@ import com.example.epsnwtbackend.repository.OwnershipRequestRepository;
 import com.example.epsnwtbackend.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -38,8 +39,8 @@ public class OwnershipRequestService {
     @Autowired
     private UserRepository userRepository;
 
-    private final String baseDirectory = Paths.get("..","uploads", "requests", "house").toString();
-
+    @Value("${app.upload.household}")
+    private String baseDirectory;
     public String storeFiles(Long requestId, List<MultipartFile> files) {
         String folderPath = baseDirectory + requestId;
         Path folder = Paths.get(folderPath);
