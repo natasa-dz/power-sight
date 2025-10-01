@@ -54,6 +54,11 @@ public class OwnershipRequestController {
             @CacheEvict(value = "userOwnershipRequests", allEntries = true)
     })
     public ResponseEntity<?> submitOwnershipRequest(@RequestParam String userId,@RequestParam Long householdId, @RequestParam List<MultipartFile> files) {
+
+        if (ownershipRequestRepository.existsByHouseholdIdAndUserId(householdId, userId)) {
+            throw new IllegalStateException("User already submitted a request for this household");
+        }
+
         OwnershipRequest request = new OwnershipRequest();
         request.setHouseholdId(householdId);
         request.setUserId(userId);

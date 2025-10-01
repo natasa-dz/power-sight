@@ -170,6 +170,22 @@ public class RealEstateRequestService {
         return updatedRows;
     }
 
+
+    @Transactional
+    public int finishSeedRequest(Long requestId, Boolean approved, String adminNote, String owner, Long ownerId) {
+        if (!approved && (adminNote == null || adminNote.trim().isEmpty())) {
+            return 3;
+        }
+        RealEstateRequestStatus status = approved ? RealEstateRequestStatus.APPROVED : RealEstateRequestStatus.DENIED;
+        int updatedRows = this.repository.finishRequest(requestId, status, adminNote);
+        System.out.println(updatedRows);
+        if (approved && updatedRows==1){
+            createRealEstate(repository.findById(requestId).get());
+        }
+        return updatedRows;
+    }
+
+
     private void createRealEstate(RealEstateRequest request) {
         RealEstate realEstate = new RealEstate();
         realEstate.setAddress(request.getAddress());

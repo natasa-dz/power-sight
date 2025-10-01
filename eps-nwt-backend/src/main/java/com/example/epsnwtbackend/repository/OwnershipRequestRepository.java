@@ -14,4 +14,8 @@ public interface OwnershipRequestRepository extends JpaRepository<OwnershipReque
     @Query("SELECT o FROM OwnershipRequest o WHERE o.userId = :username")
 
     List<OwnershipRequest> findByUserId(String username);
+
+
+    boolean existsByHouseholdIdAndUserId(Long householdId, String userId);
+
 }

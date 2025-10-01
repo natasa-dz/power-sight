@@ -75,15 +75,18 @@ public class HouseholdService {
     }
 
     @Cacheable(value = "noOwnerHouseholds", key = "{#pageable.pageNumber, #pageable.pageSize}")
-    public CacheablePage<HouseholdDto> noOwnerHouseholds(Pageable pageable) {
+    public Page<HouseholdDto> noOwnerHouseholds(Pageable pageable) {
         Page<HouseholdDto> households =  householdRepository.searchNoOwner(pageable);
-        return new CacheablePage<HouseholdDto>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
+        return households;
+        //return new CacheablePage<HouseholdDto>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
     }
 
     @Cacheable(value = "ownerHouseholds", key = "{#ownerId, #pageable.pageNumber, #pageable.pageSize}")
-    public CacheablePage<HouseholdDto> ownerHouseholds(Pageable pageable, Long ownerId){
+    public Page<HouseholdDto> ownerHouseholds(Pageable pageable, Long ownerId){
         Page<HouseholdDto> households = householdRepository.searchOwner(pageable, ownerId);
-        return new CacheablePage<HouseholdDto>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
+        return households;
+
+        //return new CacheablePage<HouseholdDto>(new ArrayList<>(households.getContent()), households.getTotalPages(), households.getTotalElements());
     }
 
     @Cacheable(value = "householdSearch", key = "{#municipality, #address, #apartmentNumber, #pageable.pageNumber, #pageable.pageSize}")
