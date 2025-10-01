@@ -29,7 +29,7 @@ public class CitizenService {
     public CacheablePage<CitizenSearchDTO> search(String username, Pageable pageable) {
         if (username == null || username.trim().isEmpty()) {
             Page<CitizenSearchDTO> citizens = citizenRepository.findAll(pageable).map(
-                    c -> new CitizenSearchDTO(c.getId(), c.getUsername())
+                    c -> new CitizenSearchDTO(c.getId(), c.getUsername(), c.getUser().getId())
             );
             return new CacheablePage<CitizenSearchDTO>(new ArrayList<>(citizens.getContent()), citizens.getTotalPages(), citizens.getTotalElements());
         }

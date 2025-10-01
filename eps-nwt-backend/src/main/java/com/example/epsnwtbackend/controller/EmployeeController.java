@@ -7,6 +7,7 @@ import com.example.epsnwtbackend.model.Employee;
 import com.example.epsnwtbackend.service.AppointmentService;
 import com.example.epsnwtbackend.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +36,12 @@ public class EmployeeController {
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Value("${app.upload.pictures}")
+    private String picturesBase;
+
+    @Value("${app.upload.pictures-prefix}")
+    private String uploadUrlPrefix;
 
     @GetMapping(path = "/find-by-id/{id}")
     public ResponseEntity<ViewEmployeeDTO> findById(@PathVariable Long id) {
@@ -108,5 +116,18 @@ public class EmployeeController {
         employeeService.saveEmployee(employee);
         appointmentService.cancelAppointments(employee.getId());
         return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/image/{userId}")
+    public ResponseEntity<String> getImageUrlsByUserId(@PathVariable("userId") Long userId) {
+        Path imageDirectory = Paths.get(picturesBase);
+
+        if (!Files.exists(imageDirectory) || !Files.isDirectory(imageDirectory)) {
+            return ResponseEntity.ok(null);
+        }
+
+        String imageUrl = uploadUrlPrefix + "/profile_" + userId + ".jpg";
+
+        return ResponseEntity.ok(imageUrl);
     }
 }

@@ -15,6 +15,11 @@
       <ul>
         <li *ngFor="let citizen of filteredContent">
           <div class="select-citizen">
+            <img
+              [src]="profilePhotos[citizen.userId]"
+              alt="profile"
+              class="profile-img"
+            />
             <p>{{ citizen.username }}</p>
             <button *ngIf="!selectedIds.includes(citizen.id)" (click)="addToList(citizen.id)">Select</button>
             <button *ngIf="selectedIds.includes(citizen.id)" (click)="removeFromList(citizen.id)">Remove</button>

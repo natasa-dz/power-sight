@@ -99,19 +99,28 @@ public class UserController {
 
     @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserTokenState> logInProcess(@RequestBody UserCredentials credentials){
+        System.out.println("ime: "+credentials.getEmail());
+        System.out.println("sifra: "+credentials.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 credentials.getEmail(), credentials.getPassword()));
-
+        System.out.println("dunjaaaaaaaa ");
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        System.out.println("dunjaaaaaaaa22 ");
         Optional<UserDto> dto = userDetailsService.findUser(credentials.getEmail());
 
+        System.out.println("dto: "+dto.get().getUsername()+ " "+dto.get().getRole());
+
         if (dto.get().getRole() == Role.EMPLOYEE) {
+            System.out.println("usao u employee");
             Employee employee = employeeService.getEmployeeByUserId(dto.get().getId());
+            System.out.println("suspendovan: "+employee.getSuspended());
+            System.out.println("employee email: "+employee.getUsername());
             if(employee.getSuspended()) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         String jwt = tokenService.generateToken(dto.get().getUsername(), dto.get().getRole(), dto.get().getId());
+        System.out.println("jwt: "+jwt);
         int expiresIn = tokenService.getExpiredIn();
         return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
     }
@@ -158,10 +167,11 @@ public class UserController {
             @RequestParam("password") String password,
             @RequestParam("role") String role,
             @RequestParam("userPhoto") MultipartFile userPhoto,
-            @RequestParam(value = "userData", required = false) String userDataJson) {
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "surname", required = false) String surname) {
 
         try {
-            UserDto dto = new UserDto(username, password, Role.valueOf(role), false, true, ""); // Assume 'false' for isActive
+            UserDto dto = new UserDto(username, password, Role.valueOf(role), false, true, "");
             Optional<UserCredentials> credentials = userDetailsService.register(dto, dto.getUsername());
 
             if (credentials.isPresent()) {
@@ -173,31 +183,21 @@ public class UserController {
                 String activationToken = UUID.randomUUID().toString();
                 userService.saveActivationToken(dto.getUsername(), activationToken);
 
-
                 Path uploadDir = Paths.get(uploadBase, "pictures");
-                try {
-                    Files.createDirectories(uploadDir);
-                } catch (IOException e) {
-                    throw new RuntimeException("Could not create upload directory: " + uploadDir, e);
-                }
+                Files.createDirectories(uploadDir);
 
                 String fileName = "profile_" + user.getId() + ".jpg";
                 Path filePath = uploadDir.resolve(fileName);
                 Files.write(filePath, userPhoto.getBytes());
 
-                String fileUrl = uploadBase+"/pictures/" + fileName;
+                String fileUrl = uploadBase + "/pictures/" + fileName;
                 dto.setUserPhoto(fileUrl);
 
                 if (dto.getRole() == Role.EMPLOYEE) {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    if (userDataJson == null) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-                    }
-                    AdditionalDataUser userData = objectMapper.readValue(userDataJson, AdditionalDataUser.class);
                     Employee employee = new Employee();
                     employee.setUser(user);
-                    employee.setName(userData.getName());
-                    employee.setSurname(userData.getSurname());
+                    employee.setName(name);
+                    employee.setSurname(surname);
                     employee.setSuspended(false);
                     employee.setUsername(user.getUsername());
                     employeeService.saveEmployee(employee);
@@ -211,16 +211,14 @@ public class UserController {
                 String activationLink = "http://localhost/activate?token=" + activationToken;
                 emailService.sendActivationEmail(dto.getUsername(), activationLink);
 
-                return ResponseEntity.status(HttpStatus.OK).body(credentials.get());
+                return ResponseEntity.ok(credentials.get());
             }
 
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Handle errors like file storage issues
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // In case registration fails
+        return ResponseEntity.badRequest().body(null);
     }
 
 

@@ -1,0 +1,59 @@
+# za insertovanje user-a
+docker cp users.sql postgres:/users.sql
+docker exec -it postgres psql -U nwt -d eps_nwt -f /users.sql
+
+# za insertovanje real estate-ova i household-ova
+docker cp households.sql postgres:/households.sql
+docker exec -it postgres psql -U nwt -d eps_nwt -f /households.sql
+
+# za insertovanje simuliranih podataka
+# BITNO!!!! izmeniti ip adresu na vrhu na 2 mesta
+pip install -r requirements.txt
+python influx_data_generator.py
+
+# za proveru u bazi
+docker exec -it postgres psql -U nwt -d eps_nwt
+\d users
+SELECT COUNT(*) FROM users;
+SELECT * FROM users;
+
+#sa :q se izlazi iz select *, a sa quit iz postgres-a
+
+#za restartovanje svega tako da se obrise baza 
+docker-compose down -v --remove-orphans
+
+
+# brise sve tabele sem users -> mozda bi trebalo skloniti cities i municipalities odavde
+TRUNCATE access_granted,
+         appointments,
+         cities,
+         citizens,
+         consumption_records,
+         created_receipts,
+         employees,
+         household_requests,
+         households,
+         meters,
+         municipalities,
+         ownership_request,
+         price_list,
+         real_estate_images,
+         real_estate_request_documentation,
+         real_estate_request_images,
+         real_estate_requests,
+         real_estates,
+         receipt
+RESTART IDENTITY CASCADE;
+
+# brise sve user-e sem superadmin-a
+DELETE FROM users WHERE id <> 1;
+
+
+# za pokretanje locust-a (izmeniti ip adresu po potrebi)
+python -m locust -f locustfile.py --host=http://192.168.1.39
+http://192.168.1.39 treba da bude url na locust-u
+
+
+# za praznjenje influx-a (prva komanda obrise consumptions a druga ga kreira)
+docker exec -it influxdb influx bucket delete --name consumptions --org nwt --token sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA==
+docker exec -it influxdb influx bucket create --name consumptions --org nwt --token sy1rRDbAjVDMUE8ibzGupFgSolsJTnA23eQuIifG__G6Fz-bI_IET9hGKh38cVKdivK381JcUKzxrOQgSilSZA==

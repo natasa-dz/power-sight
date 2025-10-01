@@ -41,7 +41,7 @@ export class SearchHouseholdComponent {
       .subscribe(
         (result: Page<HouseholdSearchDTO>) => {
           this.page = result;
-          console.log(result)
+          console.log("dunja ", result)
         },
         error => {
           this.showSnackbar("Error fetching households.");

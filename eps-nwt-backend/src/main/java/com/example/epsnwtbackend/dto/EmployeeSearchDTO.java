@@ -13,6 +13,7 @@ public class EmployeeSearchDTO {
     private String username;
     private String name;
     private String surname;
+    private Long userId;
 
     public static EmployeeSearchDTO toDto(Employee employee) {
         EmployeeSearchDTO dto = new EmployeeSearchDTO();
@@ -20,6 +21,7 @@ public class EmployeeSearchDTO {
         dto.setUsername(employee.getUser().getUsername());
         dto.setName(employee.getName());
         dto.setSurname(employee.getSurname());
+        dto.setUserId(employee.getUser().getId());
         return dto;
     }
 }

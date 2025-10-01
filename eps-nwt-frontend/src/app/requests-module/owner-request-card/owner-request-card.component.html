@@ -12,7 +12,7 @@
       </div>
       <div class="card-right">
         <h3 class="status">
-          Status: {{ this.status || 'N/A' }}
+          Status: {{ this.status || 'N/A' | capitalizeEnum }}
         </h3>
         <p class="date">
           Created at: {{ this.createdAt }}
