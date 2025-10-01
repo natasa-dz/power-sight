@@ -6,6 +6,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {PriceListService} from "../price-list.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {BaseModule} from "../../base/base.module";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-create-receipts',
@@ -16,7 +17,8 @@ import {BaseModule} from "../../base/base.module";
     ReactiveFormsModule,
     RouterLink,
     NgForOf,
-    BaseModule
+    BaseModule,
+    MatProgressSpinner
   ],
   templateUrl: './create-receipts.component.html',
   styleUrl: './create-receipts.component.css'
@@ -26,6 +28,7 @@ export class CreateReceiptsComponent implements OnInit {
   years: number[] = [];
   selectedMonth: string = ""
   selectedYear: number = 0
+  loading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -39,6 +42,7 @@ export class CreateReceiptsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loading = false;
     this.receiptForm = this.fb.group({
       month: ['', [Validators.required]],
       year: ['', Validators.required]
@@ -47,12 +51,18 @@ export class CreateReceiptsComponent implements OnInit {
 
   submit() {
     if (this.selectedMonth != "" && this.selectedYear > 1999 && this.selectedYear < 2101) {
+      this.loading = true;
       this.priceListService.generateReceipts(this.selectedMonth, this.selectedYear).subscribe({
         next: (response) => {
-          this.showSnackbar(response);
+          this.showSnackbar(response.toString());
+          this.loading = false;
         },
         error: (err) => {
           this.showSnackbar(err.error);
+          this.loading = false;
+        },
+        complete: () => {
+          this.loading = false;
         }
       });
     } else {

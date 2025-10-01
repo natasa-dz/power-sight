@@ -35,8 +35,8 @@ export class EmployeeService {
     return this.http.get<EmployeeViewDto>(`${this.apiUrl}/find-by-user-id/${id}`);
   }
 
-  getProfileImage(path: string) {
-    return this.http.post<string>(`${this.apiUrl}/image`, path, { responseType: 'text' as 'json' });
+  getProfileImage(userId: number) {
+    return this.http.get(`${this.apiUrl}/image/${userId}`, { responseType: 'text'});
   }
 
   suspend(id: number): Observable<Boolean> {

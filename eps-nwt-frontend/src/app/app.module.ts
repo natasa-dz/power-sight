@@ -21,6 +21,7 @@ import {BaseModule} from "./base/base.module";  // Import routes from app.routes
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {Interceptor} from "./access-control-module/interceptor";
+import {SharedModule} from "./shared/shared.module";
 
 @NgModule({
   declarations: [AppComponent,
@@ -42,7 +43,8 @@ import {Interceptor} from "./access-control-module/interceptor";
     MatSnackBarModule,
     NavbarEmployeeComponent,
     SearchHouseholdComponent,
-    BaseModule],
+    BaseModule,
+    SharedModule],
   bootstrap: [AppComponent],
   providers: [provideAnimationsAsync(), {
     provide: HTTP_INTERCEPTORS,

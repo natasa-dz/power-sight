@@ -110,7 +110,7 @@ public class ReceiptService {
             @CacheEvict(value = "receiptsForHousehold", allEntries = true),
             @CacheEvict(value = "receiptsForOwner", allEntries = true)
     })
-    public void createReceipts(String month, int year) throws Exception {
+    public boolean createReceipts(String month, int year) throws Exception {
         boolean isReceiptCreated = checkIsReceiptCreated(month, year);
         if (isReceiptCreated) {
             throw new Exception("Receipt already exists");
@@ -157,7 +157,9 @@ public class ReceiptService {
                 break;
         }
         PriceList current = priceListService.findForDate(new Date(year, monthNum, 1));
-
+        if (current == null){
+            return false;
+        }
         List<Household> households = householdService.getAll();
         for(Household household : households) {
             Receipt receipt = new Receipt();
@@ -196,6 +198,7 @@ public class ReceiptService {
         createdReceipts.setMonth(month);
         createdReceipts.setYear(year);
         createdReceiptsRepository.save(createdReceipts);
+        return true;
     }
 
     private boolean checkIsReceiptCreated(String month, int year) {

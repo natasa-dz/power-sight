@@ -5,6 +5,7 @@ import {Router, RouterLink} from "@angular/router";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
 import {DatePipe, NgIf} from "@angular/common";
 import {format} from "date-fns";
+import {SharedModule} from "../../shared/shared.module";
 
 @Component({
   selector: 'app-owner-request-card',
@@ -13,7 +14,8 @@ import {format} from "date-fns";
     MatCard,
     MatCardContent,
     DatePipe,
-    NgIf
+    NgIf,
+    SharedModule
   ],
   templateUrl: './owner-request-card.component.html',
   styleUrl: './owner-request-card.component.css'

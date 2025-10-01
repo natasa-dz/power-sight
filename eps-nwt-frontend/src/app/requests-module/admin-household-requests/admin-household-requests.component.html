@@ -3,7 +3,7 @@
 <div *ngFor="let request of pendingRequests" class="request-card">
   <div class="request-header">
     <h3>Request #{{ request.id }}</h3>
-    <span class="status-badge pending">{{ request.status }}</span>
+    <span class="status-badge pending">{{ request.status | capitalizeEnum}}</span>
   </div>
 
   <div class="request-details">

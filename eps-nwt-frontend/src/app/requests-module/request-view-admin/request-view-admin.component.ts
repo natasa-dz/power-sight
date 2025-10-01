@@ -10,17 +10,22 @@ import {UserService} from "../../service/user.service";
 import {FinishRealEstateRequestDTO} from "../../model/finish-real-estate-request-dto";
 import {BaseModule} from "../../base/base.module";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {CapitalizeEnumPipe} from "../../shared/pipes/capitalize-enum.pipe";
+import {SharedModule} from "../../shared/shared.module";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-request-view-admin',
   standalone: true,
-    imports: [
-        NgIf,
-        DatePipe,
-        NgForOf,
-        FormsModule,
-        BaseModule
-    ],
+  imports: [
+    NgIf,
+    DatePipe,
+    NgForOf,
+    FormsModule,
+    BaseModule,
+    SharedModule,
+    MatProgressSpinner
+  ],
   templateUrl: './request-view-admin.component.html',
   styleUrl: './request-view-admin.component.css'
 })
@@ -33,6 +38,7 @@ export class RequestViewAdminComponent implements OnInit{
   status: string = '';
   images: string[] = [];
   documentation: string[] = [];
+  loading = false;
 
   constructor(private service: RealEstateRequestService,
               private route: ActivatedRoute,
@@ -41,6 +47,7 @@ export class RequestViewAdminComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    this.loading = false;
     const id = Number(this.route.snapshot.paramMap.get('requestId'));
     if (id !== null){
       this.service.getRequestForAdmin(id).subscribe({
@@ -100,6 +107,7 @@ export class RequestViewAdminComponent implements OnInit{
 
     }
     if (this.request?.id && note && this.owner?.username){
+      this.loading = true;
       let finishedRequest: FinishRealEstateRequestDTO = {
         owner: this.owner.username,
         approved: approved,
@@ -118,6 +126,9 @@ export class RequestViewAdminComponent implements OnInit{
             this.showSnackbar(mess.error.text);
             console.log("Error with finishing request!")
           }
+        },
+        complete: () => {
+          this.loading = false;
         }
       });
     }

@@ -4,6 +4,7 @@ import {HouseholdService} from "../../simulators/household.service";
 import {FormsModule} from "@angular/forms";
 import {CommonModule, NgForOf, NgIf} from "@angular/common";
 import {BaseModule} from "../../base/base.module";
+import {SharedModule} from "../../shared/shared.module";
 
 @Component({
   selector: 'app-admin-household-requests',
@@ -13,7 +14,8 @@ import {BaseModule} from "../../base/base.module";
     NgIf,
     NgForOf,
     CommonModule,
-    BaseModule
+    BaseModule,
+    SharedModule
   ],
   templateUrl: './admin-household-requests.component.html',
   styleUrl: './admin-household-requests.component.css'

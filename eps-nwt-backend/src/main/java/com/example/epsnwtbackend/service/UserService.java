@@ -120,6 +120,7 @@ public class UserService implements UserDetailsService {
 
     @Cacheable(value = "userByEmail", key = "#email")
     public Optional<UserDto> findUser(String email){
+        System.out.println("dunjaaaaaa 33: "+email);
         Optional<User> toFind = userRepository.findByUsername(email);
         return toFind.map(UserDto::new);
     }
