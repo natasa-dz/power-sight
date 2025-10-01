@@ -15,8 +15,8 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        seedUsers(1000, 10, 4);
-        dataSeedService.seedRealEstateRequests(1000);
+        //seedUsers(1000, 10, 4);
+        //dataSeedService.seedRealEstateRequests(1000);
     }
 
 
