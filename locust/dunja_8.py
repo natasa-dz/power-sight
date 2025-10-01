@@ -1,7 +1,7 @@
 import random
 from locust import HttpUser, task, between
 
-class OwnerReceiptsUser(HttpUser):
+class OwnerHouseholdsUser(HttpUser):
     wait_time = between(0.1, 1)
     
     def on_start(self):
@@ -37,20 +37,43 @@ class OwnerReceiptsUser(HttpUser):
             self.token = None
     
     @task
-    def get_all_receipts_for_owner(self):
-        """Test the get all receipts for owner endpoint."""
+    def get_owner_households(self):
+        """Test the get owner households endpoint."""
         if not self.token:
             return
         
-        # Generate random owner ID between 1000 and 3000
-        owner_id = random.randint(1000, 3000)
+        # Generate random owner ID between 1000 and 5000
+        owner_id = random.randint(1000, 5000)
+        
+        # Random pagination parameters
+        page = random.randint(0, 10)  # Pages 0-10
+        size = random.choice([10, 20, 50, 100])  # Common page sizes
+        
+        # Optional: add sorting
+        sort_options = [
+            "id,asc",
+            "id,desc",
+            "floor,asc",
+            "apartmentNumber,asc",
+            "squareFootage,desc"
+        ]
+        sort = random.choice(sort_options)
+        
+        # Build query parameters
+        params = {
+            "ownerId": owner_id,
+            "page": page,
+            "size": size,
+            "sort": sort
+        }
         
         headers = {
             "Authorization": f"Bearer {self.token}"
         }
         
         self.client.get(
-            f"/api/receipts/all-for-owner/{owner_id}",
+            "/api/household/owner",
+            params=params,
             headers=headers,
-            name="/api/receipts/all-for-owner/{ownerId}"
+            name="/api/household/owner"
         )
