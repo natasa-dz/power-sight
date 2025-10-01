@@ -15,10 +15,10 @@ import java.util.List;
 @Repository
 public interface HouseholdRepository extends JpaRepository<Household, Long> {
 
-    @Query("SELECT new com.example.epsnwtbackend.dto.HouseholdSearchDTO(h.id, h.floor, h.squareFootage, h.apartmentNumber, r.id, h.owner.id) " +
+    @Query("SELECT new com.example.epsnwtbackend.dto.HouseholdSearchDTO(h.id, h.floor, h.squareFootage, h.apartmentNumber, r.id, h.owner.id, r.municipality, r.address) " +
             "FROM Household h JOIN h.realEstate r " +
-            "WHERE r.municipality = :municipality " +
-            "AND r.address LIKE %:address% " +
+            "WHERE LOWER(r.municipality) = LOWER(:municipality) " +
+            "AND LOWER(r.address) LIKE LOWER(CONCAT('%', :address, '%')) " +
             "AND (:apartmentNumber IS NULL OR h.apartmentNumber = :apartmentNumber)")
     Page<HouseholdSearchDTO> findAllOnAddress(
             @Param("municipality") String municipality,
@@ -27,7 +27,7 @@ public interface HouseholdRepository extends JpaRepository<Household, Long> {
             Pageable pageable);
 
 
-    @Query("SELECT new com.example.epsnwtbackend.dto.HouseholdSearchDTO(h.id, h.floor, h.apartmentNumber, h.squareFootage, r.id) " +
+    @Query("SELECT new com.example.epsnwtbackend.dto.HouseholdSearchDTO(h.id, h.floor, h.apartmentNumber, h.squareFootage, r.id, r.municipality, r.address) " +
             "FROM Household h JOIN h.realEstate r " +
             "WHERE r.municipality = :municipality " +
             "AND r.address LIKE %:address% " +

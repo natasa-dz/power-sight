@@ -71,29 +71,23 @@ export class RegisterEmployeeComponent {
 
 
   register(): void {
-    console.log(this.registerForm.get('username')?.value);
-    console.log(this.registerForm.get('jmbg')?.value);
-
     if (this.registerForm.valid && this.selectedFile != null) {
       const formData = new FormData();
-      let role = 'EMPLOYEE';
-
-      formData.append('role', role)
-
+      formData.append('role', 'EMPLOYEE');
       formData.append('username', this.registerForm.get('username')?.value);
       formData.append('password', this.registerForm.get('jmbg')?.value);
       formData.append('userPhoto', this.selectedFile);
-      formData.append('userData', `{"name": "${this.registerForm.get('name')?.value}","surname": "${this.registerForm.get('surname')?.value}"}`);
-      console.log(formData)
+      formData.append('name', this.registerForm.get('name')?.value);
+      formData.append('surname', this.registerForm.get('surname')?.value);
+
       this.userService.registerUser(formData).subscribe({
-        next: (response) => {
+        next: () => {
           this.showSnackbar('Employee is registered!');
           this.registerForm.reset();
           this.selectedFile = null;
           this.profilePic = null;
         },
-        error: () => {
-        }
+        error: () => this.showSnackbar('Registration failed.')
       });
     } else {
       this.showSnackbar('Please fill out all required fields with valid information.');

@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface CitizenRepository extends JpaRepository<Citizen, Long> {
 
-    @Query("SELECT new com.example.epsnwtbackend.dto.CitizenSearchDTO(c.id, c.user.username) " +
+    @Query("SELECT new com.example.epsnwtbackend.dto.CitizenSearchDTO(c.id, c.user.username, c.user.id) " +
             "FROM Citizen c " +
             "WHERE LOWER(c.user.username) LIKE LOWER(CONCAT(:username, '%'))")
     Page<CitizenSearchDTO> findAllWithUsername(@Param("username") String username, Pageable pageable);

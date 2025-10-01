@@ -36,6 +36,7 @@ export class SearchCitizensComponent implements OnInit{
   selectedHouseholdId : number = 0;
   selectedIds : number[] = [];
   households : HouseholdAccessDto[] = [];
+  profilePhotos: { [id: number]: string } = {};
 
   constructor(private citizenService: CitizenService,
               private snackBar: MatSnackBar) {}
@@ -71,12 +72,27 @@ export class SearchCitizensComponent implements OnInit{
         (result: Page<CitizenSearchDto>) => {
           this.page = result;
           this.filteredContent = this.page.content.filter(citizen => citizen.username !== this.loggedIn);
+          this.profilePhotos = {};
+          this.filteredContent.forEach(citizen => {
+            this.getProfilePhoto(citizen.userId);
+          });
         },
         (error: any) => {
           this.showSnackbar("Error fetching citizens.");
           console.error(error);
         }
       );
+  }
+
+  getProfilePhoto(id: number){
+    this.citizenService.getProfileImage(id).subscribe({
+      next: (base64Image: string) => {
+        this.profilePhotos[id] = base64Image;
+      },
+      error: (err: any) => {
+        console.error('Error loading images', err);
+      }
+    });
   }
 
   goToPage(pageNumber: number): void {

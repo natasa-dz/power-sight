@@ -30,7 +30,10 @@ public class ReceiptController {
             return ResponseEntity.badRequest().body("Month is not in correct format!");
         }
         try {
-            receiptService.createReceipts(month, year);
+            boolean success = receiptService.createReceipts(month, year);
+            if (!success){
+                return ResponseEntity.badRequest().body("Price list does not exist.");
+            }
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }

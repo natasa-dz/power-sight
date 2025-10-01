@@ -7,6 +7,7 @@ import {EmployeeViewDto} from "../../model/view-employee-dto.model";
 import {ActivatedRoute} from "@angular/router";
 import {EmployeeService} from "../employee.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-employee-profile',
@@ -17,7 +18,8 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     DecimalPipe,
     FormsModule,
     NgIf,
-    NgForOf
+    NgForOf,
+    MatProgressSpinner
   ],
   templateUrl: './employee-profile.component.html',
   styleUrl: './employee-profile.component.css'
@@ -25,6 +27,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 export class EmployeeProfileComponent implements OnInit {
   employee?: EmployeeViewDto;
   image: string = "";
+  loading: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,7 +42,7 @@ export class EmployeeProfileComponent implements OnInit {
       this.employeeService.findById(+id).subscribe(
         (employee) => {
           this.employee = employee;
-          this.employeeService.getProfileImage(employee.userPhoto).subscribe({
+          this.employeeService.getProfileImage(employee.userId).subscribe({
             next: (base64Image: string) => {
               this.image = base64Image;
               this.cdr.detectChanges();
@@ -58,20 +61,24 @@ export class EmployeeProfileComponent implements OnInit {
 
 
   suspend() {
-    if(this.employee != undefined && this.employee.id) {}
-    // @ts-ignore
-    this.employeeService.suspend(this.employee.id)
-      .subscribe(
-        (result: Boolean) => {
-          if(result) {
-            this.showSnackbar("Employee suspended successfuly!")
+    if(this.employee != undefined && this.employee.id) {
+      this.loading = true;
+      this.employeeService.suspend(this.employee.id)
+        .subscribe(
+          (result: Boolean) => {
+            if (result) {
+              this.showSnackbar("Employee suspended successfuly!")
+              location.reload();
+              this.loading = false;
+            }
+          },
+          (error: any) => {
+            this.showSnackbar("Error suspending employee.");
+            console.error(error);
+            this.loading = false;
           }
-        },
-        (error: any) => {
-          this.showSnackbar("Error suspending employee.");
-          console.error(error);
-        }
-      );
+        );
+    }
   }
 
   showSnackbar(message: string): void {

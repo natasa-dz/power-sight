@@ -22,4 +22,6 @@ public interface RealEstateRequestRepository extends JpaRepository<RealEstateReq
     int finishRequest(@Param("requestId") Long requestId,
                       @Param("status") RealEstateRequestStatus status,
                       @Param("adminNote") String adminNote);
+
+    List<RealEstateRequest> findAllByStatus(RealEstateRequestStatus realEstateRequestStatus);
 }

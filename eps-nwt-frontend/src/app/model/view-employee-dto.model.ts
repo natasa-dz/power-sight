@@ -4,4 +4,6 @@ export interface EmployeeViewDto {
   username: string;
   name: string;
   surname: string;
+  userId: number;
+  suspended: boolean;
 }
