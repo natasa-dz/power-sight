@@ -6,7 +6,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(indexes = @Index(name = "idx_userId", columnList = "userId"))
+@Table(
+indexes = {
+        @Index(name = "idx_userId", columnList = "userId"),
+        @Index(name = "idx_householdId", columnList = "householdId")
+},
+uniqueConstraints = {
+        @UniqueConstraint(name = "uk_household_user", columnNames = {"householdId", "userId"})
+}
+)
 public class OwnershipRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

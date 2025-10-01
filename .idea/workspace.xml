@@ -4,19 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c6fc03b-c9b7-4131-adc6-967839e2ded5" name="Changes" comment="feat: integrate Nginx reverse proxy, static serving and uploads + debug auth issues&#10;&#10;- Added nginx service in docker-compose:&#10;  * serves Angular build from /usr/share/nginx/html&#10;  * exposes /uploads/ via /var/www/uploads&#10;  * proxies backend requests to spring-backend:8080&#10;  * added /nominatim proxy with User-Agent + Referer headers&#10;  * added /activate proxy to backend for email activation links&#10;  * configured CORS headers for /api and OPTIONS preflight handling&#10;&#10;- Unified docker-compose:&#10;  * backend, postgres, redis, rabbitmq, influxdb on shared app-network&#10;  * volumes for uploads and db persistence&#10;  * added aliases for backend container (backend-name)&#10;&#10;- Backend adjustments:&#10;  * file serving endpoints now generate correct /uploads/... URLs for nginx&#10;  * refactored household docs/images endpoints to use base upload path&#10;  * token generation with id + role claims&#10;  * updated Spring Security config with permitAll for login/register&#10;  * added activation link generation: http://localhost/activate?token=...&#10;&#10;- Frontend adjustments:&#10;  * AuthService and Interceptor fixed to use correct token from localStorage&#10;  * updated calls to backend via /api prefix (through nginx)&#10;  * adjusted map component to go via /nominatim proxy instead of direct OSM&#10;  * adjusted file/documentation service to build correct /uploads/... URLs&#10;&#10;---&#10;&#10;TODO / still broken:&#10;- [ ] 401 Unauthorized on login/register when routed through nginx (works locally direct to backend) → need to verify nginx passes Authorization + body correctly&#10;- [ ] test OPTIONS preflight for Angular frontend (CORS headers consistency)&#10;- [ ] test file serving (docs/images) through nginx alias&#10;- [ ] verify email activation link actually reaches backend (nginx /activate route)&#10;- [ ] check static Angular assets served with correct MIME types&#10;- [ ] cleanup WebSecurityConfig (ensure permitAll works as expected)&#10;- [ ] retest OpenStreetMap reverse geocoding through /nominatim with correct headers&#10;&#10;---&#10;&#10;This commit sets up almost all infrastructure pieces (nginx, docker-compose, uploads, proxies, frontend services),&#10;but login/register flow is still failing behind nginx with 401 and requires further debugging.">
+    <list default="true" id="3c6fc03b-c9b7-4131-adc6-967839e2ded5" name="Changes" comment="feat: implement locust testing">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/access-control-module/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/access-control-module/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/admin-household-requests/admin-household-requests.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/admin-household-requests/admin-household-requests.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/admin-household-requests/admin-household-requests.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/admin-household-requests/admin-household-requests.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/household-request/household-request.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/household-request/household-request.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/request-appointment/request-appointment.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/request-appointment/request-appointment.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/request-view-admin/request-view-admin.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/request-view-admin/request-view-admin.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/request-view-admin/request-view-admin.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/requests-module/request-view-admin/request-view-admin.component.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/service/real-estate-request.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/service/real-estate-request.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/service/user.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/service/user.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/simulators/household.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/simulators/household.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nginx/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx/nginx.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/controller/HouseholdController.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/controller/HouseholdController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/controller/OwnershipRequestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/controller/OwnershipRequestController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/model/OwnershipRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/model/OwnershipRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/repository/OwnershipRequestRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/repository/OwnershipRequestRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/seed/DataSeeder.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/seed/DataSeeder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/service/HouseholdService.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/service/HouseholdService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/service/OwnershipRequestService.java" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-backend/src/main/java/com/example/epsnwtbackend/service/OwnershipRequestService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eps-nwt-frontend/src/app/base/navbar-superadmin/navbar-superadmin.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/eps-nwt-frontend/src/app/base/navbar-superadmin/navbar-superadmin.component.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,22 +35,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "feature/nginx-assets-refactor",
-    "last_opened_file_path": "C:/SIIT/cetvrta/eps_nwt",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "C:\\SIIT\\SIIT-cetvrta godina\\eps_nwt\\eps-nwt-frontend\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/performance-testing-student1&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/SIIT/cetvrta/eps_nwt&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\SIIT\\SIIT-cetvrta godina\\eps_nwt\\eps-nwt-frontend\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -78,6 +76,8 @@
       <workItem from="1758886925785" duration="599000" />
       <workItem from="1758912489724" duration="845000" />
       <workItem from="1758964978869" duration="3162000" />
+      <workItem from="1759297177111" duration="2491000" />
+      <workItem from="1759307212187" duration="599000" />
     </task>
     <task id="LOCAL-00001" summary="feat: integrate Nginx reverse proxy, static serving and uploads + debug auth issues&#10;&#10;- Added nginx service in docker-compose:&#10;  * serves Angular build from /usr/share/nginx/html&#10;  * exposes /uploads/ via /var/www/uploads&#10;  * proxies backend requests to spring-backend:8080&#10;  * added /nominatim proxy with User-Agent + Referer headers&#10;  * added /activate proxy to backend for email activation links&#10;  * configured CORS headers for /api and OPTIONS preflight handling&#10;&#10;- Unified docker-compose:&#10;  * backend, postgres, redis, rabbitmq, influxdb on shared app-network&#10;  * volumes for uploads and db persistence&#10;  * added aliases for backend container (backend-name)&#10;&#10;- Backend adjustments:&#10;  * file serving endpoints now generate correct /uploads/... URLs for nginx&#10;  * refactored household docs/images endpoints to use base upload path&#10;  * token generation with id + role claims&#10;  * updated Spring Security config with permitAll for login/register&#10;  * added activation link generation: http://localhost/activate?token=...&#10;&#10;- Frontend adjustments:&#10;  * AuthService and Interceptor fixed to use correct token from localStorage&#10;  * updated calls to backend via /api prefix (through nginx)&#10;  * adjusted map component to go via /nominatim proxy instead of direct OSM&#10;  * adjusted file/documentation service to build correct /uploads/... URLs&#10;&#10;---&#10;&#10;TODO / still broken:&#10;- [ ] 401 Unauthorized on login/register when routed through nginx (works locally direct to backend) → need to verify nginx passes Authorization + body correctly&#10;- [ ] test OPTIONS preflight for Angular frontend (CORS headers consistency)&#10;- [ ] test file serving (docs/images) through nginx alias&#10;- [ ] verify email activation link actually reaches backend (nginx /activate route)&#10;- [ ] check static Angular assets served with correct MIME types&#10;- [ ] cleanup WebSecurityConfig (ensure permitAll works as expected)&#10;- [ ] retest OpenStreetMap reverse geocoding through /nominatim with correct headers&#10;&#10;---&#10;&#10;This commit sets up almost all infrastructure pieces (nginx, docker-compose, uploads, proxies, frontend services),&#10;but login/register flow is still failing behind nginx with 401 and requires further debugging.">
       <option name="closed" value="true" />
@@ -87,7 +87,23 @@
       <option name="project" value="LOCAL" />
       <updated>1758390265811</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat: implement locust testing, helper methods">
+      <option name="closed" value="true" />
+      <created>1759297604273</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1759297604273</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat: implement locust testing, helper methods">
+      <option name="closed" value="true" />
+      <created>1759297672734</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1759297672734</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -96,8 +112,20 @@
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="nginx.conf" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: integrate Nginx reverse proxy, static serving and uploads + debug auth issues&#10;&#10;- Added nginx service in docker-compose:&#10;  * serves Angular build from /usr/share/nginx/html&#10;  * exposes /uploads/ via /var/www/uploads&#10;  * proxies backend requests to spring-backend:8080&#10;  * added /nominatim proxy with User-Agent + Referer headers&#10;  * added /activate proxy to backend for email activation links&#10;  * configured CORS headers for /api and OPTIONS preflight handling&#10;&#10;- Unified docker-compose:&#10;  * backend, postgres, redis, rabbitmq, influxdb on shared app-network&#10;  * volumes for uploads and db persistence&#10;  * added aliases for backend container (backend-name)&#10;&#10;- Backend adjustments:&#10;  * file serving endpoints now generate correct /uploads/... URLs for nginx&#10;  * refactored household docs/images endpoints to use base upload path&#10;  * token generation with id + role claims&#10;  * updated Spring Security config with permitAll for login/register&#10;  * added activation link generation: http://localhost/activate?token=...&#10;&#10;- Frontend adjustments:&#10;  * AuthService and Interceptor fixed to use correct token from localStorage&#10;  * updated calls to backend via /api prefix (through nginx)&#10;  * adjusted map component to go via /nominatim proxy instead of direct OSM&#10;  * adjusted file/documentation service to build correct /uploads/... URLs&#10;&#10;---&#10;&#10;TODO / still broken:&#10;- [ ] 401 Unauthorized on login/register when routed through nginx (works locally direct to backend) → need to verify nginx passes Authorization + body correctly&#10;- [ ] test OPTIONS preflight for Angular frontend (CORS headers consistency)&#10;- [ ] test file serving (docs/images) through nginx alias&#10;- [ ] verify email activation link actually reaches backend (nginx /activate route)&#10;- [ ] check static Angular assets served with correct MIME types&#10;- [ ] cleanup WebSecurityConfig (ensure permitAll works as expected)&#10;- [ ] retest OpenStreetMap reverse geocoding through /nominatim with correct headers&#10;&#10;---&#10;&#10;This commit sets up almost all infrastructure pieces (nginx, docker-compose, uploads, proxies, frontend services),&#10;but login/register flow is still failing behind nginx with 401 and requires further debugging." />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: integrate Nginx reverse proxy, static serving and uploads + debug auth issues&#10;&#10;- Added nginx service in docker-compose:&#10;  * serves Angular build from /usr/share/nginx/html&#10;  * exposes /uploads/ via /var/www/uploads&#10;  * proxies backend requests to spring-backend:8080&#10;  * added /nominatim proxy with User-Agent + Referer headers&#10;  * added /activate proxy to backend for email activation links&#10;  * configured CORS headers for /api and OPTIONS preflight handling&#10;&#10;- Unified docker-compose:&#10;  * backend, postgres, redis, rabbitmq, influxdb on shared app-network&#10;  * volumes for uploads and db persistence&#10;  * added aliases for backend container (backend-name)&#10;&#10;- Backend adjustments:&#10;  * file serving endpoints now generate correct /uploads/... URLs for nginx&#10;  * refactored household docs/images endpoints to use base upload path&#10;  * token generation with id + role claims&#10;  * updated Spring Security config with permitAll for login/register&#10;  * added activation link generation: http://localhost/activate?token=...&#10;&#10;- Frontend adjustments:&#10;  * AuthService and Interceptor fixed to use correct token from localStorage&#10;  * updated calls to backend via /api prefix (through nginx)&#10;  * adjusted map component to go via /nominatim proxy instead of direct OSM&#10;  * adjusted file/documentation service to build correct /uploads/... URLs&#10;&#10;---&#10;&#10;TODO / still broken:&#10;- [ ] 401 Unauthorized on login/register when routed through nginx (works locally direct to backend) → need to verify nginx passes Authorization + body correctly&#10;- [ ] test OPTIONS preflight for Angular frontend (CORS headers consistency)&#10;- [ ] test file serving (docs/images) through nginx alias&#10;- [ ] verify email activation link actually reaches backend (nginx /activate route)&#10;- [ ] check static Angular assets served with correct MIME types&#10;- [ ] cleanup WebSecurityConfig (ensure permitAll works as expected)&#10;- [ ] retest OpenStreetMap reverse geocoding through /nominatim with correct headers&#10;&#10;---&#10;&#10;This commit sets up almost all infrastructure pieces (nginx, docker-compose, uploads, proxies, frontend services),&#10;but login/register flow is still failing behind nginx with 401 and requires further debugging." />
+    <MESSAGE value="feat: implement locust testing" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: implement locust testing" />
   </component>
 </project>

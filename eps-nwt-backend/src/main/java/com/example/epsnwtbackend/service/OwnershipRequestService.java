@@ -68,6 +68,7 @@ public class OwnershipRequestService {
             @CacheEvict(value = "noOwnerHouseholds", allEntries = true)
     })
     public void processRequest(Long requestId, boolean approved, String reason, String username) throws MessagingException, NoResourceFoundException {
+
         OwnershipRequest request = ownershipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid request ID"));
 

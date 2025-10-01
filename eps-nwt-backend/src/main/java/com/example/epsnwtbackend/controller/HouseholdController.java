@@ -61,18 +61,15 @@ public class HouseholdController {
         return ResponseEntity.ok(households);
     }
 
-
-
     @GetMapping(path = "/no-owner")
-    public ResponseEntity<CacheablePage<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
-        CacheablePage<HouseholdDto> households = householdService.noOwnerHouseholds(pageable);
+    public ResponseEntity<Page<HouseholdDto>> getHouseholdsWithoutOwner(Pageable pageable) {
+        Page<HouseholdDto> households = householdService.noOwnerHouseholds(pageable);
         return ResponseEntity.ok(households);
     }
 
-
     @GetMapping(path = "/owner")
-    public ResponseEntity<CacheablePage<HouseholdDto>> getOwnerHouseholds(Pageable pageable, @RequestParam Long ownerId) {
-        CacheablePage<HouseholdDto> households = householdService.ownerHouseholds(pageable, ownerId);
+    public ResponseEntity<Page<HouseholdDto>> getOwnerHouseholds(Pageable pageable, @RequestParam Long ownerId) {
+        Page<HouseholdDto> households = householdService.ownerHouseholds(pageable, ownerId);
         return ResponseEntity.ok(households);
     }
 
