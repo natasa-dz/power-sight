@@ -12,6 +12,11 @@
   <h3>Results:</h3>
   <ul>
     <li *ngFor="let employee of page.content">
+      <img
+        [src]="profilePhotos[employee.userId]"
+        alt="profile"
+        class="profile-img"
+      />
       <a [routerLink]="['/employee', employee.id]">
         {{ employee.username }} - {{ employee.name }} {{ employee.surname }}
       </a>

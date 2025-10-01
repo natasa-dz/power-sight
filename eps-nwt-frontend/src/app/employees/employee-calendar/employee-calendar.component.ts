@@ -7,6 +7,7 @@ import {EmployeeViewDto} from "../../model/view-employee-dto.model";
 import {Appointment} from "../../model/appointment.model";
 import {AppointmentStatus} from "../../enum/appointment-status";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {NavbarEmployeeComponent} from "../../base/navbar-employee/navbar-employee.component";
 
 @Component({
   selector: 'app-employee-calendar',
@@ -17,7 +18,8 @@ import {MatSnackBar} from "@angular/material/snack-bar";
     NgIf,
     DatePipe,
     NgFor,
-    NgForOf
+    NgForOf,
+    NavbarEmployeeComponent
   ],
   templateUrl: './employee-calendar.component.html',
   styleUrl: './employee-calendar.component.css'

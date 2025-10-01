@@ -119,7 +119,8 @@ public class RealEstateRequestService {
     @Cacheable("reRequests")
     public List<AllRealEstateRequestsDTO> getAllForAdmin(){
         List<AllRealEstateRequestsDTO> dtos = new ArrayList<>();
-        for (RealEstateRequest r : repository.findAll()) {
+        List<RealEstateRequest> requests = repository.findAllByStatus(RealEstateRequestStatus.CREATED);
+        for (RealEstateRequest r : requests) {
             dtos.add(new AllRealEstateRequestsDTO(r.getId(), r.getOwner(), r.getStatus(),
                     r.getCreatedAt(), r.getFinishedAt(), r.getAddress(), r.getMunicipality(), r.getTown()));
         }

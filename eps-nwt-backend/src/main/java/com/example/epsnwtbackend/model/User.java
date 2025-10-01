@@ -33,9 +33,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Employee employeeDetails;
-
 
     @Column(name = "user_photo" )  // Make it nullable if user photo is optional
     private String userPhoto;

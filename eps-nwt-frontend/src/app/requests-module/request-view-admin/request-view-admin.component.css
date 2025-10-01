@@ -127,3 +127,10 @@ textarea:focus {
 .btn:hover {
   background-color: #01579b;
 }
+
+.spinner-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+}

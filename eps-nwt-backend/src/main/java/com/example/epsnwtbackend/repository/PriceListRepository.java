@@ -8,4 +8,6 @@ import java.util.Date;
 public interface PriceListRepository extends JpaRepository<PriceList, Long> {
     PriceList findPriceListByStartDateLessThanEqualAndEndDateGreaterThanEqualOrEndDateIsNull(Date date1, Date date2);
 
+    PriceList findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrStartDateLessThanEqualAndEndDateIsNull(Date startDate1, Date endDate1, Date startDate2);
+
 }

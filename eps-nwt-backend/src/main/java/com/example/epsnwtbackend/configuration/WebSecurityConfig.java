@@ -110,12 +110,13 @@ public class WebSecurityConfig implements WebMvcConfigurer{
 
                 .requestMatchers("/employee/find-by-id/{id}").permitAll()
                 .requestMatchers("/employee/find-by-user-id/{id}").permitAll()
-                .requestMatchers("/employee/image").permitAll()
+                .requestMatchers(HttpMethod.GET,"/employee/image/{userId}").permitAll()
                 .requestMatchers("employee/suspend/{employeeId}").permitAll()
                 .requestMatchers("/appointments/create").permitAll()
                 .requestMatchers("/appointments/available-slots/{employeeId}").permitAll()
                 .requestMatchers("/appointments/get-employees-appointments-for-date/{employeeId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/citizen/search").permitAll()
+                .requestMatchers(HttpMethod.GET, "/citizen/image/{userId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/getForOwner/{ownerId}").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/household/allow-access/{householdId}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/household/search/{municipality}/{address}").permitAll()
@@ -197,7 +198,8 @@ public class WebSecurityConfig implements WebMvcConfigurer{
                         "household/current/", "household/owner", "citizen/search", "household/getForOwner/{ownerId}",
                         "price-list/find-all", "price-list/find-by-id/{id}", "price-list/find-for-date/{date}",
                         "/receipts/all-for-household/{householdId}", "/receipts/all-for-owner/{ownerId}",
-                        "/receipts/by-id/{receiptId}", "/employee/all-employees-no-pagination");
+                        "/receipts/by-id/{receiptId}", "/employee/all-employees-no-pagination",
+                        "/citizen/image/{userId}", "/employee/image/{userId}");
 
 
     }

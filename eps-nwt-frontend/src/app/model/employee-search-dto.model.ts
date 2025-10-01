@@ -3,4 +3,5 @@ export interface EmployeeSearchDto {
   username: string;
   name: string;
   surname: string;
+  userId: number;
 }
