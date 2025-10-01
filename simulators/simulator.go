@@ -19,7 +19,7 @@ import (
 const (
 	heartbeatInterval   = 15 * time.Second
 	consumptionInterval = 1 * time.Minute
-	amqpURL             = "amqp://guest:guest@localhost:5672/"
+	amqpURL             = "amqp://guest:guest@192.168.42.199:5672/"
 )
 
 func GetHourlyConsumption(hour int) float64 {
@@ -145,7 +145,7 @@ func sendConsumptionData() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		baseDate := time.Date(2024, time.December, 14, 15, 56, 0, 0, time.UTC)
+		baseDate := time.Date(2025, time.September, 29, 15, 56, 0, 0, time.UTC)
 		now := time.Now().UTC()
 		timePassed := now.Sub(baseDate)
 		simulationHoursPassed := int(math.Round(timePassed.Minutes())) + 60
@@ -203,7 +203,7 @@ func sendAMQPMessage(exchange, routingKey string, data map[string]interface{}, i
 			fmt.Println("Successful connection.")
 
 			if !isFileEmpty(simulatorId + ".txt") {
-				baseDate := time.Date(2024, time.December, 14, 15, 56, 0, 0, time.UTC)
+				baseDate := time.Date(2025, time.September, 29, 15, 56, 0, 0, time.UTC)
 				now := time.Now().UTC()
 				timePassed := now.Sub(baseDate)
 				simulationHoursPassed := int(math.Round(timePassed.Minutes())) + 60
