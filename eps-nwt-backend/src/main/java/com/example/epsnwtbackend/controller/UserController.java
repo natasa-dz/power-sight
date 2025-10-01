@@ -5,10 +5,7 @@ import com.example.epsnwtbackend.dto.UserCredentials;
 import com.example.epsnwtbackend.dto.UserDto;
 import com.example.epsnwtbackend.dto.UserTokenState;
 import com.example.epsnwtbackend.model.*;
-import com.example.epsnwtbackend.service.CitizenService;
-import com.example.epsnwtbackend.service.EmailService;
-import com.example.epsnwtbackend.service.EmployeeService;
-import com.example.epsnwtbackend.service.UserService;
+import com.example.epsnwtbackend.service.*;
 import com.example.epsnwtbackend.utils.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
@@ -53,6 +50,10 @@ public class UserController {
 
     @Autowired
     private TokenUtils tokenService;
+
+    @Autowired
+    DataSeedService dataSeedService;
+
 
     @Autowired
     private EmailService emailService;
@@ -151,6 +152,37 @@ public class UserController {
 //        }
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 //    }
+
+
+    @PostMapping("/register-locust")
+    public ResponseEntity<?> registerLocustUser(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam(defaultValue = "CITIZEN") String role,
+            @RequestParam(required = false) MultipartFile userPhoto) {
+
+        try {
+            UserDto dto = new UserDto();
+            dto.setUsername(username);
+            dto.setPassword(password);
+            dto.setRole(role.equalsIgnoreCase("EMPLOYEE") ? com.example.epsnwtbackend.model.Role.EMPLOYEE :
+                    role.equalsIgnoreCase("ADMIN") ? com.example.epsnwtbackend.model.Role.ADMIN :
+                            com.example.epsnwtbackend.model.Role.CITIZEN);
+
+            // forceActive = true → odmah aktivan (za testove)
+            if (dto.getRole().equals(com.example.epsnwtbackend.model.Role.CITIZEN)) {
+                dataSeedService.registerCitizen(dto, true);
+            } else if (dto.getRole().equals(com.example.epsnwtbackend.model.Role.EMPLOYEE)) {
+                dataSeedService.registerEmployee(dto, true);
+            } else {
+                dataSeedService.registerAdmin(dto, true);
+            }
+
+            return ResponseEntity.ok("Locust user registered successfully: " + username);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to register locust user: " + e.getMessage());
+        }
+    }
 
     @PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserCredentials> registerUser(
