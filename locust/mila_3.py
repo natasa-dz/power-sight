@@ -1,62 +1,57 @@
 import random
-import io
 from locust import HttpUser, task, between
-from PIL import Image
 
-class UserRegistrationUser(HttpUser):
-    wait_time = between(0.5, 2)
+class CurrentStatusUser(HttpUser):
+    wait_time = between(0.1, 1)
     
-    # Counter to generate unique usernames
-    user_counter = 0
+    def on_start(self):
+        """Called when a simulated user starts. Login to get JWT token."""
+        self.login()
     
-    def create_dummy_profile_image(self, size=(400, 400)):
-        """Create a dummy profile image file in memory."""
-        img = Image.new('RGB', size, color=(random.randint(0, 255), 
-                                            random.randint(0, 255), 
-                                            random.randint(0, 255)))
-        img_bytes = io.BytesIO()
-        img.save(img_bytes, format='JPEG')
-        img_bytes.seek(0)
-        return img_bytes
+    def login(self):
+        """Login and store the JWT token for authenticated requests."""
+        # Simulate different user types
+        rand_val = random.random()
+        if rand_val < 0.00001:  # ~10 admins
+            username = f"admin{random.randint(1, 10)}@example.com"
+        elif rand_val < 0.00021:  # ~200 employees
+            username = f"employee{random.randint(1, 200)}@example.com"
+        else:  # citizens
+            username = f"citizen{random.randint(1, 3000)}@example.com"
+        
+        payload = {
+            "email": username,
+            "password": "12345678"
+        }
+        
+        response = self.client.post(
+            "/api/users/login",
+            json=payload,
+            name="/api/users/login"
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            self.token = data.get("accessToken")  # Adjust key name based on your UserTokenState
+        else:
+            self.token = None
     
     @task
-    def register_employee(self):
-        """Test the register endpoint for creating an employee."""
+    def get_current_status(self):
+        """Test the get current status endpoint."""
+        if not self.token:
+            return
         
-        # Generate unique username using counter
-        UserRegistrationUser.user_counter += 1
-        timestamp = random.randint(10000, 99999)
-        username = f"employee_{UserRegistrationUser.user_counter}_{timestamp}@example.com"
+        # Generate random simulator name between simulator-8000 and simulator-11000
+        simulator_id = random.randint(8000, 11000)
+        name = f"simulator-{simulator_id}"
         
-        # Generate random employee data
-        first_names = ["Marko", "Jovana", "Stefan", "Ana", "Nikola", "Milica", 
-                      "Aleksandar", "Tijana", "Lazar", "Jelena"]
-        last_names = ["Petrović", "Jovanović", "Nikolić", "Đorđević", "Stanković",
-                     "Ilić", "Pavlović", "Marković", "Popović", "Kostić"]
-        
-        name = random.choice(first_names)
-        surname = random.choice(last_names)
-        password = "SecurePass123!"  # Or generate random password
-        
-        # Create profile photo
-        photo_bytes = self.create_dummy_profile_image()
-        
-        # Prepare multipart form data
-        files = {
-            'userPhoto': (f'{username}_profile.jpg', photo_bytes, 'image/jpeg')
+        headers = {
+            "Authorization": f"Bearer {self.token}"
         }
         
-        data = {
-            'username': username,
-            'password': password,
-            'role': 'EMPLOYEE',
-            'name': name,
-            'surname': surname
-        }
-        
-        self.client.post(
-            "/api/users/register",
-            files=files,
-            data=data,
-            name="/api/users/register [EMPLOYEE]"
+        self.client.get(
+            f"/api/household/current/{name}",
+            headers=headers,
+            name="/api/household/current/{name}"
         )

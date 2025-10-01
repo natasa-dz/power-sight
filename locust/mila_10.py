@@ -1,8 +1,11 @@
 import random
 from locust import HttpUser, task, between
 
-class HouseholdOwnerUser(HttpUser):
+class GraphDataUser(HttpUser):
     wait_time = between(0.1, 1)
+    
+    # Define possible values
+    time_ranges = ["12", "24", "week", "month", "3months"]
     
     def on_start(self):
         """Called when a simulated user starts. Login to get JWT token."""
@@ -16,7 +19,7 @@ class HouseholdOwnerUser(HttpUser):
             username = f"admin{random.randint(1, 10)}@example.com"
         elif rand_val < 0.00021:  # ~200 employees
             username = f"employee{random.randint(1, 200)}@example.com"
-        else:  # citizens (owners)
+        else:  # citizens
             username = f"citizen{random.randint(1, 3000)}@example.com"
         
         payload = {
@@ -37,20 +40,23 @@ class HouseholdOwnerUser(HttpUser):
             self.token = None
     
     @task
-    def get_households_for_owner(self):
-        """Test the get households for owner endpoint."""
+    def get_graph_data(self):
+        """Test the get data for graph endpoint."""
         if not self.token:
             return
         
-        # Generate random owner ID between 1000 and 5000
-        owner_id = random.randint(1000, 5000)
+        # Name is always "consumption"
+        name = "consumption"
+        
+        # Select random time range
+        time_range = random.choice(self.time_ranges)
         
         headers = {
             "Authorization": f"Bearer {self.token}"
         }
         
         self.client.get(
-            f"/getForOwner/{owner_id}",
+            f"/api/household/graph/{name}/{time_range}",
             headers=headers,
-            name="/getForOwner/{ownerId}"
+            name="/api/household/graph/{name}/{timeRange}"
         )
