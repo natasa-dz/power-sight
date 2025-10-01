@@ -62,7 +62,7 @@ public class EmployeeService {
     public CacheablePage<EmployeeSearchDTO> search(String username, Pageable pageable) {
         if (username == null || username.trim().isEmpty()) {
             Page<EmployeeSearchDTO> employees =  employeeRepository.findAll(pageable).map(
-                    e -> new EmployeeSearchDTO(e.getId(), e.getUser().getUsername(), e.getName(), e.getSurname())
+                    e -> new EmployeeSearchDTO(e.getId(), e.getUser().getUsername(), e.getName(), e.getSurname(), e.getUser().getId())
             );
             return new CacheablePage<EmployeeSearchDTO>(new ArrayList<>(employees.getContent()), employees.getTotalPages(), employees.getTotalElements());
         }

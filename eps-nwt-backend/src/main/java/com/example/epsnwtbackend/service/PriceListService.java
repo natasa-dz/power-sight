@@ -40,6 +40,6 @@ public class PriceListService {
     }
     @Cacheable(value = "priceListForDate", key = "#date")
     public PriceList findForDate(Date date) {
-        return priceListRepository.findPriceListByStartDateLessThanEqualAndEndDateGreaterThanEqualOrEndDateIsNull(date, date);
+        return priceListRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqualOrStartDateLessThanEqualAndEndDateIsNull(date, date, date);
     }
 }

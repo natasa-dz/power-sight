@@ -14,6 +14,8 @@ public class ViewEmployeeDTO {
     private String name;
     private String surname;
     private String userPhoto;
+    private Long userId;
+    private boolean suspended;
 
     public static ViewEmployeeDTO toDto(Employee employee) {
         ViewEmployeeDTO dto = new ViewEmployeeDTO();
@@ -22,6 +24,8 @@ public class ViewEmployeeDTO {
         dto.setName(employee.getName());
         dto.setSurname(employee.getSurname());
         dto.setUserPhoto(employee.getUser().getUserPhoto());
+        dto.setUserId(employee.getUser().getId());
+        dto.setSuspended(employee.getSuspended());
         return dto;
     }
 }

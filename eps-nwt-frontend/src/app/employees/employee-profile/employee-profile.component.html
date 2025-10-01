@@ -5,15 +5,20 @@
     <p><strong>Username:</strong> {{ employee?.username }}</p>
     <p><strong>Name:</strong> {{ employee?.name }}</p>
     <p><strong>Surname:</strong> {{ employee?.surname }}</p>
-    <button (click)="suspend()">Suspend</button>
+    <button *ngIf="!employee.suspended" (click)="suspend()">Suspend</button>
+    <div *ngIf="loading" class="spinner-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Processing request...</p>
+    </div>
+    <p *ngIf="employee.suspended" >Suspended employee!</p>
     <br><br><br>
-    <div class="photo-box" *ngIf="employee?.userPhoto; else noImages">
-      <img [src]="'data:image/jpeg;base64,' + image" alt="Employee Profile Image" />
+    <div class="photo-box" *ngIf="employee?.userId; else noImages">
+      <img [src]="image" alt="Employee Profile Image" />
     </div>
   </div>
 
   <ng-template #noImages>
-    <p>No images available.</p>
+    <p>No image available.</p>
   </ng-template>
 
   <div class="employee-right">

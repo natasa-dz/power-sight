@@ -32,4 +32,8 @@ export class CitizenService {
   allowAccess(householdId: number, selectedIds: number[]) : Observable<string> {
     return this.http.put<string>(`${this.householdApiUrl}/allow-access/${householdId}`, selectedIds);
   }
+
+  getProfileImage(userId: number) {
+    return this.http.get(`${this.apiUrl}/image/${userId}`,{ responseType: 'text' });
+  }
 }

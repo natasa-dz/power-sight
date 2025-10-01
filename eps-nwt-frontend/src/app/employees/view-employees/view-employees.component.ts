@@ -28,6 +28,7 @@ export class ViewEmployeesComponent implements OnInit {
   page: Page<EmployeeSearchDto> = { content: [], totalPages: 0, totalElements: 0, size: 0, number: 0 };
   currentPage: number = 0;
   private debounceTimer: any;
+  profilePhotos: { [id: number]: string } = {};
 
   constructor(private employeeService: EmployeeService,
               private snackBar: MatSnackBar) {}
@@ -46,6 +47,10 @@ export class ViewEmployeesComponent implements OnInit {
       .subscribe(
         (result: Page<EmployeeSearchDto>) => {
           this.page = result;
+          this.profilePhotos = {};
+          this.page.content.forEach(employee => {
+            this.getProfilePhoto(employee.userId);
+          });
         },
         (error: any) => {
           this.showSnackbar("Error fetching employees.");
@@ -53,6 +58,17 @@ export class ViewEmployeesComponent implements OnInit {
           //console.error(error);
         }
       );
+  }
+
+  getProfilePhoto(id: number){
+    this.employeeService.getProfileImage(id).subscribe({
+      next: (base64Image: string) => {
+        this.profilePhotos[id] = base64Image;
+      },
+      error: (err: any) => {
+        console.error('Error loading images', err);
+      }
+    });
   }
 
   goToPage(pageNumber: number): void {

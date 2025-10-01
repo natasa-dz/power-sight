@@ -5,17 +5,19 @@ import {AllRealEstateRequestsDto} from "../../model/all-real-estate-requests-dto
 import {Router, RouterLink} from "@angular/router";
 import {RealEstateRequestService} from "../../service/real-estate-request.service";
 import {format} from "date-fns";
+import {SharedModule} from "../../shared/shared.module";
 
 @Component({
   selector: 'app-admin-request-card',
   standalone: true,
-    imports: [
-      MatCard,
-      MatCardContent,
-      RouterLink,
-      DatePipe,
-      NgIf
-    ],
+  imports: [
+    MatCard,
+    MatCardContent,
+    RouterLink,
+    DatePipe,
+    NgIf,
+    SharedModule
+  ],
   templateUrl: './admin-request-card.component.html',
   styleUrl: './admin-request-card.component.css'
 })

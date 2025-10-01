@@ -9,7 +9,7 @@
         <p><strong>Municipality:</strong> {{ request?.municipality }}</p>
         <p><strong>Town:</strong> {{ request?.town }}</p>
         <p><strong>Floors:</strong> {{ request?.floors }}</p>
-        <p><strong>Status:</strong> {{ request?.status }}</p>
+        <p><strong>Status:</strong> {{ request?.status || '' | capitalizeEnum }}</p>
         <p><strong>Created At:</strong> {{ this.createdAt }}</p>
         <p *ngIf="request?.finishedAt">
           <strong>Finished At:</strong> {{ this.finishedAt }}
@@ -51,8 +51,12 @@
     <div *ngIf="this.status === 'CREATED'">
       <textarea [(ngModel)]="adminNote" placeholder="Add admin note"></textarea>
       <div class="buttons">
-        <button class="btn" (click)="finishRequest(false)">Deny</button>
-        <button class="btn" (click)="finishRequest(true)">Approve</button>
+        <button class="btn" (click)="finishRequest(false)" [disabled]="loading">Deny</button>
+        <button class="btn" (click)="finishRequest(true)" [disabled]="loading">Approve</button>
+      </div>
+      <div *ngIf="loading" class="spinner-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Processing request...</p>
       </div>
     </div>
     <div *ngIf="this.status !== 'CREATED'">

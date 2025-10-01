@@ -8,7 +8,7 @@
     <p><strong>Address:</strong> {{ household?.address }}</p>
     <p><strong>Municipality:</strong> {{ household?.municipality }}</p>
     <p><strong>Town:</strong> {{ household?.town }}</p>
-    <p><strong>Owner ID:</strong> {{ household?.ownerId }}</p>
+    <p *ngIf="household?.ownerId!==null"><strong>Owner ID:</strong> {{ household?.ownerId }}</p>
     <br>
     <div class="latest-simulator-data" *ngIf="latestSimulatorData !== undefined">
       <p><strong>Current status:</strong> {{ latestSimulatorData ? 'Online' : 'Offline' }}</p>
