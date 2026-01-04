@@ -106,7 +106,6 @@ The system supports:
 | Databases | PostgreSQL + InfluxDB |
 | Reverse Proxy | Nginx |
 | Storage | Object storage for files |
-| API Docs | OpenAPI |
 | Charts | Chart.js / ECharts |
 | Maps | leaflet |
 | Load Testing | JMeter / Locust |
