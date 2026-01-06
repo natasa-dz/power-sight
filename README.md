@@ -1,14 +1,14 @@
 # ⚡ PowerSight - eps_nwt  
 **Real-time Electricity Consumption & Smart Grid Monitoring Platform**
 
-PowerSight is a cloud-native platform designed to monitor, analyze and manage electricity consumption for **households, buildings and entire cities** in real time.  
+PowerSight is a platform designed to monitor, analyze and manage electricity consumption for **households, buildings and entire cities** in real time.  
 It simulates a national-scale smart-meter infrastructure similar to what a utility like **EPS Serbia** would operate.
 
 ---
 
 ## 🌍 What is PowerSight?
 
-PowerSight connects **thousands of smart meters (simulators)** to a **central cloud platform** that:
+PowerSight connects **thousands of smart meters (simulators)** to a **central platform** that:
 - collects electricity usage every minute
 - tracks device availability (online/offline)
 - generates bills
